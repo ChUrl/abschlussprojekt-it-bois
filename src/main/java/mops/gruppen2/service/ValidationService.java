@@ -24,17 +24,17 @@ import static mops.gruppen2.domain.Role.ADMIN;
 public class ValidationService {
 
     private final UserService userService;
-    private final GroupService groupService;
+    private final SearchService searchService;
 
-    public ValidationService(UserService userService, GroupService groupService) {
+    public ValidationService(UserService userService, SearchService searchService) {
         this.userService = userService;
-        this.groupService = groupService;
+        this.searchService = searchService;
     }
 
     //TODO: make static or change return + assignment
     public List<Group> checkSearch(String search, List<Group> groups, Account account) {
         if (search != null) {
-            groups = groupService.findGroupWith(search, account);
+            groups = searchService.findGroupWith(search, account);
         }
         return groups;
     }

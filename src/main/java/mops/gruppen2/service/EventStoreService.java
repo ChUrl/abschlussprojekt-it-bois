@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 @Service
 //TODO: Evtl aufsplitten in EventRepoService und EventService?
-public class EventService {
+public class EventStoreService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EventService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventStoreService.class);
     private final EventRepository eventStore;
 
-    public EventService(EventRepository eventStore) {
+    public EventStoreService(EventRepository eventStore) {
         this.eventStore = eventStore;
     }
 

@@ -38,7 +38,7 @@ class ControllerServiceTest {
     Account account2;
     Account account3;
     ControllerService controllerService;
-    EventService eventService;
+    EventStoreService eventStoreService;
     UserService userService;
     ValidationService validationService;
     @Autowired
@@ -46,14 +46,18 @@ class ControllerServiceTest {
     GroupService groupService;
     @Autowired
     InviteService inviteService;
+    @Autowired
+    SearchService searchService;
+    @Autowired
+    ProjectionService projectionService;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventService(eventRepository);
-        groupService = new GroupService(eventService, eventRepository);
-        userService = new UserService(groupService, eventService);
-        validationService = new ValidationService(userService, groupService);
-        controllerService = new ControllerService(eventService, userService, validationService, inviteService);
+        eventStoreService = new EventStoreService(eventRepository);
+        groupService = new GroupService(eventStoreService, eventRepository);
+        userService = new UserService(groupService, eventStoreService, projectionService);
+        validationService = new ValidationService(userService, searchService);
+        controllerService = new ControllerService(eventStoreService, userService, validationService, inviteService);
         Set<String> roles = new HashSet<>();
         roles.add("l");
         account = new Account("ich", "ich@hhu.de", "l", "ichdude", "jap", roles);

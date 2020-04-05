@@ -16,11 +16,13 @@ import java.util.UUID;
 public class UserService {
 
     private final GroupService groupService;
-    private final EventService eventService;
+    private final EventStoreService eventStoreService;
+    private final ProjectionService projectionService;
 
-    public UserService(GroupService groupService, EventService eventService) {
+    public UserService(GroupService groupService, EventStoreService eventStoreService, ProjectionService projectionService) {
         this.groupService = groupService;
-        this.eventService = eventService;
+        this.eventStoreService = eventStoreService;
+        this.projectionService = projectionService;
     }
 
     @Cacheable("groups")
@@ -38,9 +40,9 @@ public class UserService {
     //TODO: Nur AddUserEvents + DeleteUserEvents betrachten
     @Cacheable("groups")
     public List<Group> getUserGroups(User user) {
-        List<UUID> groupIds = eventService.findGroupIdsByUser(user.getId());
+        List<UUID> groupIds = eventStoreService.findGroupIdsByUser(user.getId());
         List<Event> events = groupService.getGroupEvents(groupIds);
-        List<Group> groups = groupService.projectEventList(events);
+        List<Group> groups = projectionService.projectEventList(events);
         List<Group> newGroups = new ArrayList<>();
 
         for (Group group : groups) {
@@ -48,7 +50,7 @@ public class UserService {
                 newGroups.add(group);
             }
         }
-        groupService.sortByGroupType(newGroups);
+        SearchService.sortByGroupType(newGroups);
 
         return newGroups;
     }
@@ -68,7 +70,7 @@ public class UserService {
 
         try {
             List<Event> events = groupService.getGroupEvents(groupIds);
-            return groupService.projectEventList(events).get(0);
+            return projectionService.projectEventList(events).get(0);
         } catch (IndexOutOfBoundsException e) {
             throw new GroupNotFoundException("@UserService");
         }

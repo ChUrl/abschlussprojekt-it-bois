@@ -33,9 +33,8 @@ public class InviteService {
             return UUID.fromString(inviteRepository.findGroupIdByLink(link));
         } catch (Exception e) {
             LOG.error("Gruppe zu Link ({}) konnte nicht gefunden werden!", link);
+            throw new InvalidInviteException(link);
         }
-
-        throw new InvalidInviteException(link);
     }
 
     public String getLinkByGroupId(UUID groupId) {
@@ -43,8 +42,7 @@ public class InviteService {
             return inviteRepository.findLinkByGroupId(groupId.toString());
         } catch (Exception e) {
             LOG.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", groupId);
+            throw new NoInviteExistException(groupId.toString());
         }
-
-        throw new NoInviteExistException(groupId.toString());
     }
 }

@@ -7,9 +7,10 @@ import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.api.GroupRequestWrapper;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
-import mops.gruppen2.service.APIFormatterService;
-import mops.gruppen2.service.EventService;
+import mops.gruppen2.service.APIService;
+import mops.gruppen2.service.EventStoreService;
 import mops.gruppen2.service.GroupService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.UserService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,23 +30,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/gruppen2/api")
 public class APIController {
 
-    private final EventService eventService;
+    private final EventStoreService eventStoreService;
     private final GroupService groupService;
     private final UserService userService;
+    private final ProjectionService projectionService;
 
-    public APIController(EventService eventService, GroupService groupService, UserService userService) {
-        this.eventService = eventService;
+    public APIController(EventStoreService eventStoreService, GroupService groupService, UserService userService, ProjectionService projectionService) {
+        this.eventStoreService = eventStoreService;
         this.groupService = groupService;
         this.userService = userService;
+        this.projectionService = projectionService;
     }
 
     @GetMapping("/updateGroups/{lastEventId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich etwas geändert hat")
     public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers") @PathVariable Long lastEventId) throws EventException {
-        List<Event> events = eventService.getNewEvents(lastEventId);
+        List<Event> events = eventStoreService.getNewEvents(lastEventId);
 
-        return APIFormatterService.wrap(eventService.getMaxEventId(), groupService.projectEventList(events));
+        return APIService.wrap(eventStoreService.getMaxEventId(), projectionService.projectEventList(events));
     }
 
     @GetMapping("/getGroupIdsOfUser/{userId}")
@@ -61,8 +64,8 @@ public class APIController {
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
     public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe") @PathVariable String groupId) throws EventException {
-        List<Event> eventList = eventService.getEventsOfGroup(UUID.fromString(groupId));
-        List<Group> groups = groupService.projectEventList(eventList);
+        List<Event> eventList = eventStoreService.getEventsOfGroup(UUID.fromString(groupId));
+        List<Group> groups = projectionService.projectEventList(eventList);
 
         if (groups.isEmpty()) {
             return null;

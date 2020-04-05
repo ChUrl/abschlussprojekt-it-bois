@@ -3,30 +3,99 @@ package mops.gruppen2.service;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.dto.EventDTO;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.repository.EventRepository;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+/**
+ * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen
+ */
 @Service
 public class GroupService {
 
-    private final EventService eventService;
+    private final EventStoreService eventStoreService;
     private final EventRepository eventRepository;
 
-    public GroupService(EventService eventService, EventRepository eventRepository) {
-        this.eventService = eventService;
+    public GroupService(EventStoreService eventStoreService, EventRepository eventRepository) {
+        this.eventStoreService = eventStoreService;
         this.eventRepository = eventRepository;
+    }
+
+    static User getVeteranMember(Account account, Group group) {
+        List<User> members = group.getMembers();
+        String newAdminId;
+        if (members.get(0).getId().equals(account.getName())) {
+            newAdminId = members.get(1).getId();
+        } else {
+            newAdminId = members.get(0).getId();
+        }
+        return new User(newAdminId, "", "", "");
+    }
+
+    /**
+     * Wenn die maximale Useranzahl unendlich ist, wird das Maximum auf 100000 gesetzt. Praktisch gibt es also Maximla 100000
+     * Nutzer pro Gruppe.
+     *
+     * @param isMaximumInfinite Gibt an ob es unendlich viele User geben soll
+     * @param userMaximum       Das Maximum an Usern, falls es eins gibt
+     *
+     * @return Maximum an Usern
+     */
+    static Long checkInfiniteUsers(Boolean isMaximumInfinite, Long userMaximum) {
+        isMaximumInfinite = isMaximumInfinite != null;
+
+        if (isMaximumInfinite) {
+            userMaximum = 100_000L;
+        }
+
+        return userMaximum;
+    }
+
+    static void removeOldUsersFromNewUsers(List<User> oldUsers, List<User> newUsers) {
+        for (User oldUser : oldUsers) {
+            newUsers.remove(oldUser);
+        }
+    }
+
+    static Long adjustUserMaximum(Long newUsers, Long oldUsers, Long maxUsers) {
+        if (oldUsers + newUsers > maxUsers) {
+            maxUsers = oldUsers + newUsers;
+        }
+        return maxUsers;
+    }
+
+    static Visibility setGroupVisibility(Boolean isVisibilityPrivate) {
+        isVisibilityPrivate = isVisibilityPrivate != null;
+
+        if (isVisibilityPrivate) {
+            return Visibility.PRIVATE;
+        } else {
+            return Visibility.PUBLIC;
+        }
+    }
+
+    static GroupType setGroupType(Boolean isLecture) {
+        isLecture = isLecture != null;
+        if (isLecture) {
+            return GroupType.LECTURE;
+        } else {
+            return GroupType.SIMPLE;
+        }
+    }
+
+    static boolean idIsEmpty(UUID id) {
+        if (id == null) {
+            return true;
+        }
+
+        return "00000000-0000-0000-0000-000000000000".equals(id.toString());
     }
 
     /**
@@ -43,128 +112,7 @@ public class GroupService {
         for (UUID groupId : groupIds) {
             eventDTOS.addAll(eventRepository.findEventDTOByGroupId(groupId.toString()));
         }
-        return eventService.getEventsFromDTOs(eventDTOS);
+        return eventStoreService.getEventsFromDTOs(eventDTOS);
     }
 
-    /**
-     * Wird verwendet beim Gruppe erstellen bei der Parent-Auswahl: nur Titel benötigt.
-     *
-     * @return List of groups
-     */
-    @Cacheable("groups")
-    public List<Group> getAllLecturesWithVisibilityPublic() {
-        List<Event> createEvents = eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("CreateGroupEvent"));
-        createEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("DeleteGroupEvent")));
-        createEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("UpdateGroupTitleEvent")));
-        createEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("DeleteGroupEvent")));
-
-        List<Group> visibleGroups = projectEventList(createEvents);
-
-        return visibleGroups.stream()
-                            .filter(group -> group.getType() == GroupType.LECTURE)
-                            .filter(group -> group.getVisibility() == Visibility.PUBLIC)
-                            .collect(Collectors.toList());
-    }
-
-    /**
-     * Erzeugt eine neue Map wo Gruppen aus den Events erzeugt und den Gruppen_ids zugeordnet werden.
-     * Die Gruppen werden als Liste zurückgegeben.
-     *
-     * @param events Liste an Events
-     *
-     * @return Liste an Projizierten Gruppen
-     *
-     * @throws EventException Projektionsfehler
-     */
-    public List<Group> projectEventList(List<Event> events) throws EventException {
-        Map<UUID, Group> groupMap = new HashMap<>();
-
-        events.parallelStream()
-              .forEachOrdered(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupId())));
-
-        return new ArrayList<>(groupMap.values());
-    }
-
-    /**
-     * Gibt die Gruppe mit der richtigen Id aus der übergebenen Map wieder, existiert diese nicht
-     * wird die Gruppe erstellt und der Map hizugefügt.
-     *
-     * @param groups  Map aus GruppenIds und Gruppen
-     * @param groupId Die Id der Gruppe, die zurückgegeben werden soll
-     *
-     * @return Die gesuchte Gruppe
-     */
-    private static Group getOrCreateGroup(Map<UUID, Group> groups, UUID groupId) {
-        if (!groups.containsKey(groupId)) {
-            groups.put(groupId, new Group());
-        }
-
-        return groups.get(groupId);
-    }
-
-    /**
-     * Filtert alle öffentliche Gruppen nach dem Suchbegriff und gibt diese als Liste von Gruppen zurück.
-     * Groß und Kleinschreibung wird nicht beachtet.
-     *
-     * @param search Der Suchstring
-     *
-     * @return Liste von projizierten Gruppen
-     *
-     * @throws EventException Projektionsfehler
-     */
-    //Todo Rename
-    @Cacheable("groups")
-    public List<Group> findGroupWith(String search, Account account) throws EventException {
-        if (search.isEmpty()) {
-            return getAllGroupWithVisibilityPublic(account.getName());
-        }
-
-        return getAllGroupWithVisibilityPublic(account.getName()).parallelStream().filter(group -> group.getTitle().toLowerCase().contains(search.toLowerCase()) || group.getDescription().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
-    }
-
-    /**
-     * Wird verwendet bei der Suche nach Gruppen: Titel, Beschreibung werden benötigt.
-     * Außerdem wird beachtet, ob der eingeloggte User bereits in entsprechenden Gruppen mitglied ist.
-     *
-     * @return Liste von projizierten Gruppen
-     *
-     * @throws EventException Projektionsfehler
-     */
-    //TODO Rename
-    @Cacheable("groups")
-    public List<Group> getAllGroupWithVisibilityPublic(String userId) throws EventException {
-        List<Event> groupEvents = eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("CreateGroupEvent"));
-        groupEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("UpdateGroupDescriptionEvent")));
-        groupEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("UpdateGroupTitleEvent")));
-        groupEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("DeleteGroupEvent")));
-        groupEvents.addAll(eventService.getEventsFromDTOs(eventRepository.findAllEventsByType("UpdateUserMaxEvent")));
-
-        List<Group> visibleGroups = projectEventList(groupEvents);
-
-        sortByGroupType(visibleGroups);
-
-        return visibleGroups.stream()
-                            .filter(group -> group.getType() != null)
-                            .filter(group -> !eventService.userInGroup(group.getId(), userId))
-                            .filter(group -> group.getVisibility() == Visibility.PUBLIC)
-                            .collect(Collectors.toList());
-    }
-
-    /**
-     * Sortiert die übergebene Liste an Gruppen, sodass Veranstaltungen am Anfang der Liste sind.
-     *
-     * @param groups Die Liste von Gruppen die sortiert werden soll
-     */
-    void sortByGroupType(List<Group> groups) {
-        groups.sort((Group g1, Group g2) -> {
-            if (g1.getType() == GroupType.LECTURE) {
-                return -1;
-            }
-            if (g2.getType() == GroupType.LECTURE) {
-                return 0;
-            }
-
-            return 1;
-        });
-    }
 }

@@ -26,17 +26,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = Gruppen2Application.class)
 @Transactional
 @Rollback
-class EventServiceTest {
+class EventStoreServiceTest {
 
     @Autowired
     private EventRepository eventRepository;
-    private EventService eventService;
+    private EventStoreService eventStoreService;
     @Autowired
     private JdbcTemplate template;
 
     @BeforeEach
     void setUp() {
-        eventService = new EventService(eventRepository);
+        eventStoreService = new EventStoreService(eventRepository);
         eventRepository.deleteAll();
         //noinspection SqlResolve
         template.execute("ALTER TABLE event ALTER COLUMN event_id RESTART WITH 1");
@@ -44,22 +44,22 @@ class EventServiceTest {
 
     @Test
     void saveEvent() {
-        eventService.saveEvent(createPublicGroupEvent());
+        eventStoreService.saveEvent(createPublicGroupEvent());
 
         assertThat(eventRepository.findAll()).hasSize(1);
     }
 
     @Test
     void saveAll() {
-        eventService.saveAll(createPrivateGroupEvents(10));
+        eventStoreService.saveAll(createPrivateGroupEvents(10));
 
         assertThat(eventRepository.findAll()).hasSize(10);
     }
 
     @Test
     void testSaveAll() {
-        eventService.saveAll(createPublicGroupEvents(5),
-                             createPrivateGroupEvents(5));
+        eventStoreService.saveAll(createPublicGroupEvents(5),
+                                  createPrivateGroupEvents(5));
 
         assertThat(eventRepository.findAll()).hasSize(10);
     }
@@ -68,7 +68,7 @@ class EventServiceTest {
     void getDTO() {
         Event event = createPublicGroupEvent();
 
-        EventDTO dto = eventService.getDTOFromEvent(event);
+        EventDTO dto = eventStoreService.getDTOFromEvent(event);
 
         assertThat(dto.getGroup_id()).isEqualTo(event.getGroupId().toString());
         assertThat(dto.getUser_id()).isEqualTo(event.getUserId());
@@ -78,22 +78,22 @@ class EventServiceTest {
 
     @Test
     void getEventsOfGroup() {
-        eventService.saveAll(addUserEvents(10, uuidMock(0)),
-                             addUserEvents(5, uuidMock(1)));
+        eventStoreService.saveAll(addUserEvents(10, uuidMock(0)),
+                                  addUserEvents(5, uuidMock(1)));
 
-        assertThat(eventService.getEventsOfGroup(uuidMock(0))).hasSize(10);
-        assertThat(eventService.getEventsOfGroup(uuidMock(1))).hasSize(5);
+        assertThat(eventStoreService.getEventsOfGroup(uuidMock(0))).hasSize(10);
+        assertThat(eventStoreService.getEventsOfGroup(uuidMock(1))).hasSize(5);
     }
 
     @Test
     void findGroupIdsByUser() {
-        eventService.saveAll(addUserEvent(uuidMock(0), "A"),
-                             addUserEvent(uuidMock(1), "A"),
-                             addUserEvent(uuidMock(2), "A"),
-                             addUserEvent(uuidMock(3), "A"),
-                             addUserEvent(uuidMock(3), "B"));
+        eventStoreService.saveAll(addUserEvent(uuidMock(0), "A"),
+                                  addUserEvent(uuidMock(1), "A"),
+                                  addUserEvent(uuidMock(2), "A"),
+                                  addUserEvent(uuidMock(3), "A"),
+                                  addUserEvent(uuidMock(3), "B"));
 
-        assertThat(eventService.findGroupIdsByUser("A")).hasSize(4);
-        assertThat(eventService.findGroupIdsByUser("B")).hasSize(1);
+        assertThat(eventStoreService.findGroupIdsByUser("A")).hasSize(4);
+        assertThat(eventStoreService.findGroupIdsByUser("B")).hasSize(1);
     }
 }

@@ -4,6 +4,7 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.service.ControllerService;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.KeyCloakService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,11 +28,13 @@ public class GroupCreationController {
     private final GroupService groupService;
     private final ControllerService controllerService;
     private final ValidationService validationService;
+    private final ProjectionService projectionService;
 
-    public GroupCreationController(GroupService groupService, ControllerService controllerService, ValidationService validationService) {
+    public GroupCreationController(GroupService groupService, ControllerService controllerService, ValidationService validationService, ProjectionService projectionService) {
         this.groupService = groupService;
         this.controllerService = controllerService;
         this.validationService = validationService;
+        this.projectionService = projectionService;
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_actuator"})
@@ -42,7 +45,7 @@ public class GroupCreationController {
         Account account = KeyCloakService.createAccountFromPrincipal(token);
 
         model.addAttribute("account", account);
-        model.addAttribute("lectures", groupService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("lectures", projectionService.getAllLecturesWithVisibilityPublic());
 
         return "createOrga";
     }
@@ -85,7 +88,7 @@ public class GroupCreationController {
         Account account = KeyCloakService.createAccountFromPrincipal(token);
 
         model.addAttribute("account", account);
-        model.addAttribute("lectures", groupService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("lectures", projectionService.getAllLecturesWithVisibilityPublic());
 
         return "createStudent";
     }
