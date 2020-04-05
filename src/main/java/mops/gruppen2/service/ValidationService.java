@@ -23,12 +23,12 @@ import static mops.gruppen2.domain.Role.ADMIN;
 @Service
 public class ValidationService {
 
-    private final UserService userService;
     private final SearchService searchService;
+    private final ProjectionService projectionService;
 
-    public ValidationService(UserService userService, SearchService searchService) {
-        this.userService = userService;
+    public ValidationService(SearchService searchService, ProjectionService projectionService) {
         this.searchService = searchService;
+        this.projectionService = projectionService;
     }
 
     //TODO: make static or change return + assignment
@@ -68,7 +68,7 @@ public class ValidationService {
     }
 
     boolean checkIfGroupEmpty(UUID groupId) {
-        return userService.getGroupById(groupId).getMembers().isEmpty();
+        return projectionService.getGroupById(groupId).getMembers().isEmpty();
     }
 
     public void throwIfNoAdmin(Group group, User user) {

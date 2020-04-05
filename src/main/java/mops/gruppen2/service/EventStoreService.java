@@ -3,6 +3,7 @@ package mops.gruppen2.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import mops.gruppen2.domain.dto.EventDTO;
 import mops.gruppen2.domain.event.Event;
+import mops.gruppen2.domain.exception.BadPayloadException;
 import mops.gruppen2.repository.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +41,27 @@ public class EventStoreService {
     }
 
     /**
+     * Speichert alle Events aus der übergebenen Liste in der DB.
+     *
+     * @param events Liste an Events die gespeichert werden soll
+     */
+    @SafeVarargs
+    public final void saveAll(List<Event>... events) {
+        for (List<Event> eventlist : events) {
+            for (Event event : eventlist) {
+                eventStore.save(getDTOFromEvent(event));
+            }
+        }
+    }
+
+    /**
      * Erzeugt aus einem Event Objekt ein EventDTO Objekt.
      *
      * @param event Event, welches in DTO übersetzt wird
      *
      * @return EventDTO (Neues DTO)
      */
-    public EventDTO getDTOFromEvent(Event event) {
+    public static EventDTO getDTOFromEvent(Event event) {
         String payload = "";
         try {
             payload = JsonService.serializeEvent(event);
@@ -55,6 +70,28 @@ public class EventStoreService {
         }
 
         return new EventDTO(null, event.getGroupId().toString(), event.getUserId(), getEventType(event), payload);
+    }
+
+    /**
+     * Erzeugt aus einer Liste von eventDTOs eine Liste von Events.
+     *
+     * @param eventDTOS Liste von DTOs
+     *
+     * @return Liste von Events
+     */
+    static List<Event> getEventsFromDTOs(List<EventDTO> eventDTOS) {
+        return eventDTOS.stream()
+                        .map(EventStoreService::getEventFromDTO)
+                        .collect(Collectors.toList());
+    }
+
+    static Event getEventFromDTO(EventDTO dto) throws BadPayloadException {
+        try {
+            return JsonService.deserializeEvent(dto.getEvent_payload());
+        } catch (JsonProcessingException e) {
+            LOG.error("Payload\n {}\n konnte nicht deserialisiert werden!", dto.getEvent_payload());
+            throw new BadPayloadException(EventStoreService.class.toString());
+        }
     }
 
     /**
@@ -71,17 +108,20 @@ public class EventStoreService {
     }
 
     /**
-     * Speichert alle Events aus der übergebenen Liste in der DB.
+     * Sucht in der DB alle Zeilen raus welche eine der Gruppen_ids hat.
+     * Wandelt die Zeilen in Events um und gibt davon eine Liste zurück.
      *
-     * @param events Liste an Events die gespeichert werden soll
+     * @param groupIds Liste an IDs
+     *
+     * @return Liste an Events
      */
-    @SafeVarargs
-    public final void saveAll(List<Event>... events) {
-        for (List<Event> eventlist : events) {
-            for (Event event : eventlist) {
-                eventStore.save(getDTOFromEvent(event));
-            }
+    //TODO: EventStoreService
+    public List<Event> getGroupEvents(List<UUID> groupIds) {
+        List<EventDTO> eventDTOS = new ArrayList<>();
+        for (UUID groupId : groupIds) {
+            eventDTOS.addAll(eventStore.findEventDTOByGroupId(groupId.toString()));
         }
+        return getEventsFromDTOs(eventDTOS);
     }
 
     /**
@@ -97,26 +137,6 @@ public class EventStoreService {
 
         List<EventDTO> groupEventDTOS = eventStore.findAllEventsOfGroups(groupIdsThatChanged);
         return getEventsFromDTOs(groupEventDTOS);
-    }
-
-    /**
-     * Erzeugt aus einer Liste von eventDTOs eine Liste von Events.
-     *
-     * @param eventDTOS Liste von DTOs
-     *
-     * @return Liste von Events
-     */
-    List<Event> getEventsFromDTOs(Iterable<EventDTO> eventDTOS) {
-        List<Event> events = new ArrayList<>();
-
-        for (EventDTO eventDTO : eventDTOS) {
-            try {
-                events.add(JsonService.deserializeEvent(eventDTO.getEvent_payload()));
-            } catch (JsonProcessingException e) {
-                LOG.error("Payload\n {}\n konnte nicht deserialisiert werden!", eventDTO.getEvent_payload());
-            }
-        }
-        return events;
     }
 
     public long getMaxEventId() {

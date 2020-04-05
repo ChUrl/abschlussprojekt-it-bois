@@ -5,10 +5,10 @@ import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
-import mops.gruppen2.service.ControllerService;
+import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.InviteService;
 import mops.gruppen2.service.KeyCloakService;
-import mops.gruppen2.service.UserService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,16 +31,16 @@ import java.util.UUID;
 @RequestMapping("/gruppen2")
 public class GroupDetailsController {
 
-    private final ControllerService controllerService;
-    private final UserService userService;
     private final ValidationService validationService;
     private final InviteService inviteService;
+    private final GroupService groupService;
+    private final ProjectionService projectionService;
 
-    public GroupDetailsController(ControllerService controllerService, UserService userService, ValidationService validationService, InviteService inviteService) {
-        this.controllerService = controllerService;
-        this.userService = userService;
+    public GroupDetailsController(ValidationService validationService, InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
         this.validationService = validationService;
         this.inviteService = inviteService;
+        this.groupService = groupService;
+        this.projectionService = projectionService;
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin", "ROLE_actuator"})
@@ -50,13 +50,13 @@ public class GroupDetailsController {
                                    HttpServletRequest request,
                                    @PathVariable("id") String groupId) {
 
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
         UUID parentId = group.getParent();
         String actualURL = request.getRequestURL().toString();
         String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
-        Group parent = controllerService.getParent(parentId);
+        Group parent = groupService.getParent(parentId);
 
         validationService.throwIfGroupNotExisting(group.getTitle());
 
@@ -93,7 +93,7 @@ public class GroupDetailsController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfNoAdmin(group, user);
 
@@ -118,12 +118,12 @@ public class GroupDetailsController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfNoAdmin(group, user);
         validationService.checkFields(title, description);
 
-        controllerService.changeMetaData(account, group, title, description);
+        groupService.changeMetaData(account, group, title, description);
 
         return "redirect:/gruppen2/details/" + groupId;
     }
@@ -135,7 +135,7 @@ public class GroupDetailsController {
                               @PathVariable("id") String groupId) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
         User user = new User(account);
 
         validationService.throwIfNoAdmin(group, user);
@@ -156,7 +156,7 @@ public class GroupDetailsController {
                              @RequestParam("user_id") String userId) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
         User principle = new User(account);
         User user = new User(userId, "", "", "");
 
@@ -164,7 +164,7 @@ public class GroupDetailsController {
 
         //TODO: checkIfAdmin checkt nicht, dass die rolle geändert wurde. oder die rolle wird nicht geändert
 
-        controllerService.changeRole(account, user, group);
+        groupService.changeRole(account, user, group);
 
         if (!validationService.checkIfAdmin(group, principle)) {
             return "redirect:/gruppen2/details/" + groupId;
@@ -181,11 +181,11 @@ public class GroupDetailsController {
                                 @RequestParam("group_id") String groupId) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfNewMaximumIsValid(maximum, group);
 
-        controllerService.updateMaxUser(account, UUID.fromString(groupId), maximum);
+        groupService.updateMaxUser(account, UUID.fromString(groupId), maximum);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }
@@ -200,11 +200,11 @@ public class GroupDetailsController {
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User principle = new User(account);
         User user = new User(userId, "", "", "");
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfNoAdmin(group, principle);
 
-        controllerService.deleteUser(account, user, group);
+        groupService.deleteUser(account, user, group);
 
         if (!validationService.checkIfUserInGroup(group, principle)) {
             return "redirect:/gruppen2";
@@ -222,12 +222,12 @@ public class GroupDetailsController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfUserAlreadyInGroup(group, user);
         validationService.throwIfGroupFull(group);
 
-        controllerService.addUser(account, UUID.fromString(groupId));
+        groupService.addUser(account, UUID.fromString(groupId));
 
         model.addAttribute("account", account);
 
@@ -242,9 +242,9 @@ public class GroupDetailsController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
-        controllerService.deleteUser(account, user, group);
+        groupService.deleteUser(account, user, group);
 
         return "redirect:/gruppen2";
     }
@@ -257,11 +257,11 @@ public class GroupDetailsController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfNoAdmin(group, user);
 
-        controllerService.deleteGroupEvent(user.getId(), UUID.fromString(groupId));
+        groupService.deleteGroupEvent(user.getId(), UUID.fromString(groupId));
 
         return "redirect:/gruppen2";
     }
@@ -274,7 +274,7 @@ public class GroupDetailsController {
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        controllerService.addUsersFromCsv(account, file, groupId);
+        groupService.addUsersFromCsv(account, file, groupId);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }

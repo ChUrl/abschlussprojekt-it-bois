@@ -51,10 +51,14 @@ class GroupServiceTest {
     ProjectionService projectionService;
     @Autowired
     private EventStoreService eventStoreService;
+    @Autowired
+    private ValidationService validationService;
+    @Autowired
+    private InviteService inviteService;
 
     @BeforeEach
     void setUp() {
-        groupService = new GroupService(eventStoreService, eventRepository);
+        groupService = new GroupService(eventStoreService, eventRepository, validationService, inviteService, projectionService);
         eventRepository.deleteAll();
         //noinspection SqlResolve
         template.execute("ALTER TABLE event ALTER COLUMN event_id RESTART WITH 1");
@@ -94,6 +98,7 @@ class GroupServiceTest {
         assertThat(groups.stream().map(group -> group.getMembers().size()).reduce(Integer::sum).get()).isEqualTo(70);
     }
 
+    //TODO: EventStoreServiceTest
     @Test
     void getGroupEvents() {
         eventStoreService.saveAll(createPublicGroupEvent(uuidMock(0)),
@@ -102,9 +107,9 @@ class GroupServiceTest {
 
         List<UUID> groupIds = Arrays.asList(uuidMock(0), uuidMock(1));
 
-        assertThat(groupService.getGroupEvents(groupIds)).hasSize(2);
-        assertThat(groupService.getGroupEvents(groupIds).get(0).getGroupId()).isEqualTo(uuidMock(0));
-        assertThat(groupService.getGroupEvents(groupIds).get(1).getGroupId()).isEqualTo(uuidMock(1));
+        assertThat(eventStoreService.getGroupEvents(groupIds)).hasSize(2);
+        assertThat(eventStoreService.getGroupEvents(groupIds).get(0).getGroupId()).isEqualTo(uuidMock(0));
+        assertThat(eventStoreService.getGroupEvents(groupIds).get(1).getGroupId()).isEqualTo(uuidMock(1));
     }
 
     //TODO: ProjectionServiceTest

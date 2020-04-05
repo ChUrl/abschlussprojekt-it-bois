@@ -4,10 +4,10 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
-import mops.gruppen2.service.ControllerService;
+import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.InviteService;
 import mops.gruppen2.service.KeyCloakService;
-import mops.gruppen2.service.UserService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,14 +32,14 @@ public class SearchAndInviteController {
 
     private final ValidationService validationService;
     private final InviteService inviteService;
-    private final UserService userService;
-    private final ControllerService controllerService;
+    private final GroupService groupService;
+    private final ProjectionService projectionService;
 
-    public SearchAndInviteController(ValidationService validationService, InviteService inviteService, UserService userService, ControllerService controllerService) {
+    public SearchAndInviteController(ValidationService validationService, InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
         this.validationService = validationService;
         this.inviteService = inviteService;
-        this.userService = userService;
-        this.controllerService = controllerService;
+        this.groupService = groupService;
+        this.projectionService = projectionService;
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin", "ROLE_actuator"})
@@ -66,9 +66,9 @@ public class SearchAndInviteController {
                                            @RequestParam("id") String groupId) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
         UUID parentId = group.getParent();
-        Group parent = controllerService.getParent(parentId);
+        Group parent = groupService.getParent(parentId);
         User user = new User(account);
 
         model.addAttribute("account", account);
@@ -89,7 +89,7 @@ public class SearchAndInviteController {
                                Model model,
                                @PathVariable("link") String link) {
 
-        Group group = userService.getGroupById(inviteService.getGroupIdFromLink(link));
+        Group group = projectionService.getGroupById(inviteService.getGroupIdFromLink(link));
 
         validationService.throwIfGroupNotExisting(group.getTitle());
 
@@ -111,12 +111,12 @@ public class SearchAndInviteController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
 
         validationService.throwIfUserAlreadyInGroup(group, user);
         validationService.throwIfGroupFull(group);
 
-        controllerService.addUser(account, UUID.fromString(groupId));
+        groupService.addUser(account, UUID.fromString(groupId));
 
         return "redirect:/gruppen2/details/" + groupId;
     }

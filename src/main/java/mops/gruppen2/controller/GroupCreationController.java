@@ -64,7 +64,7 @@ public class GroupCreationController {
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = controllerService.getUUID(parent);
+        UUID parentUUID = GroupService.getUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
 
@@ -105,7 +105,7 @@ public class GroupCreationController {
                                            @RequestParam(value = "parent", required = false) String parent) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = controllerService.getUUID(parent);
+        UUID parentUUID = GroupService.getUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
 

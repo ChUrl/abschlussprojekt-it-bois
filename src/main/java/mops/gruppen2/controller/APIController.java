@@ -9,9 +9,7 @@ import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.service.APIService;
 import mops.gruppen2.service.EventStoreService;
-import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.ProjectionService;
-import mops.gruppen2.service.UserService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +29,10 @@ import java.util.stream.Collectors;
 public class APIController {
 
     private final EventStoreService eventStoreService;
-    private final GroupService groupService;
-    private final UserService userService;
     private final ProjectionService projectionService;
 
-    public APIController(EventStoreService eventStoreService, GroupService groupService, UserService userService, ProjectionService projectionService) {
+    public APIController(EventStoreService eventStoreService, ProjectionService projectionService) {
         this.eventStoreService = eventStoreService;
-        this.groupService = groupService;
-        this.userService = userService;
         this.projectionService = projectionService;
     }
 
@@ -55,9 +49,9 @@ public class APIController {
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich ein Teilnehmer befindet")
     public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen") @PathVariable String userId) {
-        return userService.getUserGroups(userId).stream()
-                          .map(group -> group.getId().toString())
-                          .collect(Collectors.toList());
+        return projectionService.getUserGroups(userId).stream()
+                                .map(group -> group.getId().toString())
+                                .collect(Collectors.toList());
     }
 
     @GetMapping("/getGroup/{groupId}")

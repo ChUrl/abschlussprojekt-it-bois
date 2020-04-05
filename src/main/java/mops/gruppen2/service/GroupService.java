@@ -3,16 +3,28 @@ package mops.gruppen2.service;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
-import mops.gruppen2.domain.dto.EventDTO;
-import mops.gruppen2.domain.event.Event;
+import mops.gruppen2.domain.event.AddUserEvent;
+import mops.gruppen2.domain.event.DeleteGroupEvent;
+import mops.gruppen2.domain.event.DeleteUserEvent;
+import mops.gruppen2.domain.event.UpdateGroupDescriptionEvent;
+import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
+import mops.gruppen2.domain.event.UpdateRoleEvent;
+import mops.gruppen2.domain.event.UpdateUserMaxEvent;
+import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.repository.EventRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import static mops.gruppen2.domain.Role.ADMIN;
 
 /**
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen
@@ -22,10 +34,18 @@ public class GroupService {
 
     private final EventStoreService eventStoreService;
     private final EventRepository eventRepository;
+    private final ValidationService validationService;
+    private final InviteService inviteService;
+    private final ProjectionService projectionService;
 
-    public GroupService(EventStoreService eventStoreService, EventRepository eventRepository) {
+    private static final Logger LOG = LoggerFactory.getLogger(GroupService.class);
+
+    public GroupService(EventStoreService eventStoreService, EventRepository eventRepository, ValidationService validationService, InviteService inviteService, ProjectionService projectionService) {
         this.eventStoreService = eventStoreService;
         this.eventRepository = eventRepository;
+        this.validationService = validationService;
+        this.inviteService = inviteService;
+        this.projectionService = projectionService;
     }
 
     static User getVeteranMember(Account account, Group group) {
@@ -98,21 +118,150 @@ public class GroupService {
         return "00000000-0000-0000-0000-000000000000".equals(id.toString());
     }
 
-    /**
-     * Sucht in der DB alle Zeilen raus welche eine der Gruppen_ids hat.
-     * Wandelt die Zeilen in Events um und gibt davon eine Liste zurück.
-     *
-     * @param groupIds Liste an IDs
-     *
-     * @return Liste an Events
-     */
-    //TODO: Das vielleicht in den EventRepoService?
-    public List<Event> getGroupEvents(List<UUID> groupIds) {
-        List<EventDTO> eventDTOS = new ArrayList<>();
-        for (UUID groupId : groupIds) {
-            eventDTOS.addAll(eventRepository.findEventDTOByGroupId(groupId.toString()));
+    //TODO: GroupService/eventbuilderservice
+    void addUserList(List<User> newUsers, UUID groupId) {
+        for (User user : newUsers) {
+            Group group = projectionService.getGroupById(groupId);
+            if (group.getMembers().contains(user)) {
+                LOG.info("Benutzer {} ist bereits in Gruppe", user.getId());
+            } else {
+                AddUserEvent addUserEvent = new AddUserEvent(groupId, user.getId(), user.getGivenname(), user.getFamilyname(), user.getEmail());
+                eventStoreService.saveEvent(addUserEvent);
+            }
         }
-        return eventStoreService.getEventsFromDTOs(eventDTOS);
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    public void addUser(Account account, UUID groupId) {
+        AddUserEvent addUserEvent = new AddUserEvent(groupId, account.getName(), account.getGivenname(), account.getFamilyname(), account.getEmail());
+        eventStoreService.saveEvent(addUserEvent);
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    void updateTitle(Account account, UUID groupId, String title) {
+        UpdateGroupTitleEvent updateGroupTitleEvent = new UpdateGroupTitleEvent(groupId, account.getName(), title);
+        eventStoreService.saveEvent(updateGroupTitleEvent);
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    public void updateRole(User user, UUID groupId) throws EventException {
+        UpdateRoleEvent updateRoleEvent;
+        Group group = projectionService.getGroupById(groupId);
+        validationService.throwIfNotInGroup(group, user);
+
+        if (group.getRoles().get(user.getId()) == ADMIN) {
+            updateRoleEvent = new UpdateRoleEvent(group.getId(), user.getId(), Role.MEMBER);
+        } else {
+            updateRoleEvent = new UpdateRoleEvent(group.getId(), user.getId(), ADMIN);
+        }
+        eventStoreService.saveEvent(updateRoleEvent);
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    void updateDescription(Account account, UUID groupId, String description) {
+        UpdateGroupDescriptionEvent updateGroupDescriptionEvent = new UpdateGroupDescriptionEvent(groupId, account.getName(), description);
+        eventStoreService.saveEvent(updateGroupDescriptionEvent);
+    }
+
+    //TODO: GroupService
+    public void addUsersFromCsv(Account account, MultipartFile file, String groupId) {
+        Group group = projectionService.getGroupById(UUID.fromString(groupId));
+
+        List<User> newUserList = CsvService.readCsvFile(file);
+        removeOldUsersFromNewUsers(group.getMembers(), newUserList);
+
+        UUID groupUUID = getUUID(groupId);
+
+        Long newUserMaximum = adjustUserMaximum((long) newUserList.size(), (long) group.getMembers().size(), group.getUserMaximum());
+        if (newUserMaximum > group.getUserMaximum()) {
+            updateMaxUser(account, groupUUID, newUserMaximum);
+        }
+
+        addUserList(newUserList, groupUUID);
+    }
+
+    //TODO: GroupService
+    public static UUID getUUID(String id) {
+        return UUID.fromString(Objects.requireNonNullElse(id, "00000000-0000-0000-0000-000000000000"));
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    public void updateMaxUser(Account account, UUID groupId, Long userMaximum) {
+        UpdateUserMaxEvent updateUserMaxEvent = new UpdateUserMaxEvent(groupId, account.getName(), userMaximum);
+        eventStoreService.saveEvent(updateUserMaxEvent);
+    }
+
+    //TODO: GroupService
+    public void changeMetaData(Account account, Group group, String title, String description) {
+        if (!title.equals(group.getTitle())) {
+            updateTitle(account, group.getId(), title);
+        }
+
+        if (!description.equals(group.getDescription())) {
+            updateDescription(account, group.getId(), description);
+        }
+    }
+
+    //TODO: GroupService oder in Group?
+    public Group getParent(UUID parentId) {
+        Group parent = new Group();
+        if (!idIsEmpty(parentId)) {
+            parent = projectionService.getGroupById(parentId);
+        }
+        return parent;
+    }
+
+    //TODO: GroupService
+    public void deleteUser(Account account, User user, Group group) throws EventException {
+        changeRoleIfLastAdmin(account, group);
+
+        validationService.throwIfNotInGroup(group, user);
+
+        deleteUserEvent(user, group.getId());
+
+        if (validationService.checkIfGroupEmpty(group.getId())) {
+            deleteGroupEvent(user.getId(), group.getId());
+        }
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    private void deleteUserEvent(User user, UUID groupId) {
+        DeleteUserEvent deleteUserEvent = new DeleteUserEvent(groupId, user.getId());
+        eventStoreService.saveEvent(deleteUserEvent);
+    }
+
+    //TODO: GroupService/eventbuilderservice
+    public void deleteGroupEvent(String userId, UUID groupId) {
+        DeleteGroupEvent deleteGroupEvent = new DeleteGroupEvent(groupId, userId);
+        inviteService.destroyLink(groupId);
+        eventStoreService.saveEvent(deleteGroupEvent);
+    }
+
+    //TODO: GroupService
+    private void promoteVeteranMember(Account account, Group group) {
+        if (validationService.checkIfLastAdmin(account, group)) {
+            User newAdmin = getVeteranMember(account, group);
+            updateRole(newAdmin, group.getId());
+        }
+    }
+
+    //TODO: GroupService
+    public void changeRoleIfLastAdmin(Account account, Group group) {
+        if (group.getMembers().size() <= 1) {
+            return;
+        }
+        promoteVeteranMember(account, group);
+    }
+
+    //TODO: GroupService
+    public void changeRole(Account account, User user, Group group) {
+        if (user.getId().equals(account.getName())) {
+            if (group.getMembers().size() <= 1) {
+                validationService.throwIfLastAdmin(account, group);
+            }
+            promoteVeteranMember(account, group);
+        }
+        updateRole(user, group.getId());
     }
 
 }

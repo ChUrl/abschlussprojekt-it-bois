@@ -4,7 +4,7 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.PageNotFoundException;
 import mops.gruppen2.service.KeyCloakService;
-import mops.gruppen2.service.UserService;
+import mops.gruppen2.service.ProjectionService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class GruppenfindungController {
 
-    private final UserService userService;
+    private final ProjectionService projectionService;
 
-    public GruppenfindungController(UserService userService) {
-        this.userService = userService;
+    public GruppenfindungController(ProjectionService projectionService) {
+        this.projectionService = projectionService;
     }
 
     @GetMapping("")
@@ -37,7 +37,7 @@ public class GruppenfindungController {
         User user = new User(account);
 
         model.addAttribute("account", account);
-        model.addAttribute("gruppen", userService.getUserGroups(user));
+        model.addAttribute("gruppen", projectionService.getUserGroups(user));
         model.addAttribute("user", user);
 
         return "index";
