@@ -6,7 +6,6 @@ import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.InviteService;
-import mops.gruppen2.service.KeyCloakService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -48,7 +47,7 @@ public class SearchAndInviteController {
                             Model model,
                             @RequestParam(value = "suchbegriff", required = false) String search) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         List<Group> groups = new ArrayList<>();
         groups = validationService.checkSearch(search, groups, account);
 
@@ -65,7 +64,7 @@ public class SearchAndInviteController {
                                            Model model,
                                            @RequestParam("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         UUID parentId = group.getParent();
         Group parent = groupService.getParent(parentId);
@@ -93,7 +92,7 @@ public class SearchAndInviteController {
 
         validationService.throwIfGroupNotExisting(group.getTitle());
 
-        model.addAttribute("account", KeyCloakService.createAccountFromPrincipal(token));
+        model.addAttribute("account", new Account(token));
         model.addAttribute("group", group);
 
         if (group.getVisibility() == Visibility.PUBLIC) {
@@ -109,7 +108,7 @@ public class SearchAndInviteController {
     public String postAcceptInvite(KeycloakAuthenticationToken token,
                                    @RequestParam("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 

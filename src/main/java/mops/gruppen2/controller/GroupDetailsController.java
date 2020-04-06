@@ -7,7 +7,6 @@ import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.InviteService;
-import mops.gruppen2.service.KeyCloakService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -51,7 +50,7 @@ public class GroupDetailsController {
                                    @PathVariable("id") String groupId) {
 
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         UUID parentId = group.getParent();
         String actualURL = request.getRequestURL().toString();
@@ -91,7 +90,7 @@ public class GroupDetailsController {
                                  Model model,
                                  @PathVariable("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -116,7 +115,7 @@ public class GroupDetailsController {
                                      @RequestParam("description") String description,
                                      @RequestParam("groupId") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -134,7 +133,7 @@ public class GroupDetailsController {
                               Model model,
                               @PathVariable("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         User user = new User(account);
 
@@ -155,7 +154,7 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         User principle = new User(account);
         User user = new User(userId, "", "", "");
@@ -180,7 +179,7 @@ public class GroupDetailsController {
                                 @RequestParam("maximum") Long maximum,
                                 @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
         validationService.throwIfNewMaximumIsValid(maximum, group);
@@ -197,7 +196,7 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User principle = new User(account);
         User user = new User(userId, "", "", "");
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
@@ -220,7 +219,7 @@ public class GroupDetailsController {
                             Model model,
                             @RequestParam("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -240,7 +239,7 @@ public class GroupDetailsController {
     public String leaveGroup(KeycloakAuthenticationToken token,
                              @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -255,7 +254,7 @@ public class GroupDetailsController {
     public String deleteGroup(KeycloakAuthenticationToken token,
                               @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -273,7 +272,7 @@ public class GroupDetailsController {
                                   @RequestParam("group_id") String groupId,
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         groupService.addUsersFromCsv(account, file, groupId);
 
         return "redirect:/gruppen2/details/members/" + groupId;

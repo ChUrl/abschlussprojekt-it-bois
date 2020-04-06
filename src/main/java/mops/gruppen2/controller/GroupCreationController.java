@@ -4,7 +4,6 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.service.ControllerService;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.IdService;
-import mops.gruppen2.service.KeyCloakService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -43,7 +42,7 @@ public class GroupCreationController {
     public String createGroupAsOrga(KeycloakAuthenticationToken token,
                                     Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
 
         model.addAttribute("account", account);
         model.addAttribute("lectures", projectionService.projectLectures());
@@ -64,7 +63,7 @@ public class GroupCreationController {
                                        @RequestParam(value = "parent", required = false) String parent,
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         UUID parentUUID = IdService.stringToUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
@@ -86,7 +85,7 @@ public class GroupCreationController {
     public String createGroupAsStudent(KeycloakAuthenticationToken token,
                                        Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
 
         model.addAttribute("account", account);
         model.addAttribute("lectures", projectionService.projectLectures());
@@ -105,7 +104,7 @@ public class GroupCreationController {
                                            @RequestParam(value = "maxInfiniteUsers", required = false) Boolean maxInfiniteUsers,
                                            @RequestParam(value = "parent", required = false) String parent) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         UUID parentUUID = IdService.stringToUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);

@@ -3,7 +3,6 @@ package mops.gruppen2.controller;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.PageNotFoundException;
-import mops.gruppen2.service.KeyCloakService;
 import mops.gruppen2.service.ProjectionService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -33,7 +32,7 @@ public class GruppenfindungController {
     public String index(KeycloakAuthenticationToken token,
                         Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        Account account = new Account(token);
         User user = new User(account);
 
         model.addAttribute("account", account);
