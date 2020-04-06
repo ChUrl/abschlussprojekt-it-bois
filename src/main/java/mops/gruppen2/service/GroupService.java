@@ -14,14 +14,12 @@ import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.event.UpdateUserMaxEvent;
 import mops.gruppen2.domain.exception.EventException;
-import mops.gruppen2.repository.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static mops.gruppen2.domain.Role.ADMIN;
@@ -33,16 +31,14 @@ import static mops.gruppen2.domain.Role.ADMIN;
 public class GroupService {
 
     private final EventStoreService eventStoreService;
-    private final EventRepository eventRepository;
     private final ValidationService validationService;
     private final InviteService inviteService;
     private final ProjectionService projectionService;
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupService.class);
 
-    public GroupService(EventStoreService eventStoreService, EventRepository eventRepository, ValidationService validationService, InviteService inviteService, ProjectionService projectionService) {
+    public GroupService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService, ProjectionService projectionService) {
         this.eventStoreService = eventStoreService;
-        this.eventRepository = eventRepository;
         this.validationService = validationService;
         this.inviteService = inviteService;
         this.projectionService = projectionService;
@@ -110,18 +106,10 @@ public class GroupService {
         }
     }
 
-    static boolean idIsEmpty(UUID id) {
-        if (id == null) {
-            return true;
-        }
-
-        return "00000000-0000-0000-0000-000000000000".equals(id.toString());
-    }
-
     //TODO: GroupService/eventbuilderservice
     void addUserList(List<User> newUsers, UUID groupId) {
         for (User user : newUsers) {
-            Group group = projectionService.projectSingleGroupById(groupId);
+            Group group = projectionService.projectSingleGroup(groupId);
             if (group.getMembers().contains(user)) {
                 LOG.info("Benutzer {} ist bereits in Gruppe", user.getId());
             } else {
@@ -146,7 +134,7 @@ public class GroupService {
     //TODO: GroupService/eventbuilderservice
     public void updateRole(User user, UUID groupId) throws EventException {
         UpdateRoleEvent updateRoleEvent;
-        Group group = projectionService.projectSingleGroupById(groupId);
+        Group group = projectionService.projectSingleGroup(groupId);
         validationService.throwIfNotInGroup(group, user);
 
         if (group.getRoles().get(user.getId()) == ADMIN) {
@@ -165,12 +153,12 @@ public class GroupService {
 
     //TODO: GroupService
     public void addUsersFromCsv(Account account, MultipartFile file, String groupId) {
-        Group group = projectionService.projectSingleGroupById(UUID.fromString(groupId));
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
         List<User> newUserList = CsvService.readCsvFile(file);
         removeOldUsersFromNewUsers(group.getMembers(), newUserList);
 
-        UUID groupUUID = getUUID(groupId);
+        UUID groupUUID = IdService.stringToUUID(groupId);
 
         Long newUserMaximum = adjustUserMaximum((long) newUserList.size(), (long) group.getMembers().size(), group.getUserMaximum());
         if (newUserMaximum > group.getUserMaximum()) {
@@ -178,11 +166,6 @@ public class GroupService {
         }
 
         addUserList(newUserList, groupUUID);
-    }
-
-    //TODO: GroupService
-    public static UUID getUUID(String id) {
-        return UUID.fromString(Objects.requireNonNullElse(id, "00000000-0000-0000-0000-000000000000"));
     }
 
     //TODO: GroupService/eventbuilderservice
@@ -205,8 +188,8 @@ public class GroupService {
     //TODO: GroupService oder in Group?
     public Group getParent(UUID parentId) {
         Group parent = new Group();
-        if (!idIsEmpty(parentId)) {
-            parent = projectionService.projectSingleGroupById(parentId);
+        if (!IdService.idIsEmpty(parentId)) {
+            parent = projectionService.projectSingleGroup(parentId);
         }
         return parent;
     }

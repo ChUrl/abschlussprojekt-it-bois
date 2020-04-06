@@ -34,7 +34,7 @@ public class ValidationService {
     //TODO: make static or change return + assignment
     public List<Group> checkSearch(String search, List<Group> groups, Account account) {
         if (search != null) {
-            groups = searchService.findGroupWith(search, account);
+            groups = searchService.searchPublicGroups(search, account.getName());
         }
         return groups;
     }
@@ -68,7 +68,7 @@ public class ValidationService {
     }
 
     boolean checkIfGroupEmpty(UUID groupId) {
-        return projectionService.projectSingleGroupById(groupId).getMembers().isEmpty();
+        return projectionService.projectSingleGroup(groupId).getMembers().isEmpty();
     }
 
     public void throwIfNoAdmin(Group group, User user) {

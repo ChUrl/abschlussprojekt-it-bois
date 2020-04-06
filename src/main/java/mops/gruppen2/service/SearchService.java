@@ -1,6 +1,5 @@
 package mops.gruppen2.service;
 
-import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.exception.EventException;
@@ -15,7 +14,9 @@ public class SearchService {
 
     private final ProjectionService projectionService;
 
-    public SearchService(ProjectionService projectionService) {this.projectionService = projectionService;}
+    public SearchService(ProjectionService projectionService) {
+        this.projectionService = projectionService;
+    }
 
     /**
      * Sortiert die übergebene Liste an Gruppen, sodass Veranstaltungen am Anfang der Liste sind.
@@ -46,14 +47,26 @@ public class SearchService {
      *
      * @throws EventException Projektionsfehler
      */
-    //TODO: ProjectionService/SearchSortService
-    //Todo Rename
+    //TODO: remove account
     @Cacheable("groups")
-    public List<Group> findGroupWith(String search, Account account) throws EventException {
+    public List<Group> searchPublicGroups(String search, String userId) throws EventException {
+        List<Group> groups = projectionService.projectPublicGroups();
+        projectionService.removeUserGroups(groups, userId);
+        sortByGroupType(groups);
+
         if (search.isEmpty()) {
-            return projectionService.projectPublicGroups(account.getName());
+            return groups;
         }
 
-        return projectionService.projectPublicGroups(account.getName()).parallelStream().filter(group -> group.getTitle().toLowerCase().contains(search.toLowerCase()) || group.getDescription().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
+        return groups.stream()
+                     .filter(group -> groupMetaContains(group, search))
+                     .collect(Collectors.toList());
+    }
+
+    private static boolean groupMetaContains(Group group, String string) {
+        String meta = group.getTitle().toLowerCase() + " " + group.getDescription().toLowerCase();
+        String pattern = string.toLowerCase();
+
+        return meta.contains(pattern);
     }
 }

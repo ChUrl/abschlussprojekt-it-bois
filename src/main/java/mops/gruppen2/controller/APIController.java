@@ -9,6 +9,7 @@ import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.service.APIService;
 import mops.gruppen2.service.EventStoreService;
+import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.ProjectionService;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Api zum Datenabgleich mit Gruppenfindung.
@@ -48,24 +48,16 @@ public class APIController {
     @GetMapping("/getGroupIdsOfUser/{userId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich ein Teilnehmer befindet")
-    public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen") @PathVariable String userId) {
-        return projectionService.projectGroupsByUser(userId).stream()
-                                .map(group -> group.getId().toString())
-                                .collect(Collectors.toList());
+    public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen")
+                                          @PathVariable String userId) {
+        return IdService.uuidsToString(eventStoreService.findExistingUserGroups(userId));
     }
 
     @GetMapping("/getGroup/{groupId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
     public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe") @PathVariable String groupId) throws EventException {
-        List<Event> eventList = eventStoreService.getEventsOfGroup(UUID.fromString(groupId));
-        List<Group> groups = ProjectionService.projectEventList(eventList);
-
-        if (groups.isEmpty()) {
-            return null;
-        }
-
-        return groups.get(0);
+        return projectionService.projectSingleGroup(UUID.fromString(groupId));
     }
 
 }

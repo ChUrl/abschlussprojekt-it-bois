@@ -62,7 +62,7 @@ public class EventStoreService {
 
     //########################################### DTOs ###########################################
 
-    public static List<EventDTO> getDTOsFromEvents(List<Event> events) {
+    static List<EventDTO> getDTOsFromEvents(List<Event> events) {
         return events.stream()
                      .map(EventStoreService::getDTOFromEvent)
                      .collect(Collectors.toList());
@@ -75,7 +75,7 @@ public class EventStoreService {
      *
      * @return EventDTO (Neues DTO)
      */
-    public static EventDTO getDTOFromEvent(Event event) {
+    static EventDTO getDTOFromEvent(Event event) {
         try {
             String payload = JsonService.serializeEvent(event);
             return new EventDTO(null,
@@ -102,7 +102,7 @@ public class EventStoreService {
                         .collect(Collectors.toList());
     }
 
-    static Event getEventFromDTO(EventDTO dto) throws BadPayloadException {
+    static Event getEventFromDTO(EventDTO dto) {
         try {
             return JsonService.deserializeEvent(dto.getEvent_payload());
         } catch (JsonProcessingException e) {
@@ -111,20 +111,11 @@ public class EventStoreService {
         }
     }
 
-    /**
-     * Gibt den Eventtyp als String wieder.
-     *
-     * @param event Event dessen Typ abgefragt werden soll
-     *
-     * @return Der Name des Typs des Events
-     */
-    private static String getEventType(Event event) {
-        int lastDot = event.getClass().getName().lastIndexOf('.');
+    // ######################################## QUERIES ##########################################
 
-        return event.getClass().getName().substring(lastDot + 1);
+    public List<Event> getGroupEvents(UUID groupId) {
+        return getEventsFromDTOs(eventStore.findEventDTOsByGroup(Collections.singletonList(groupId.toString())));
     }
-
-    //######################################## GET EVENTS ########################################
 
     /**
      * Sucht in der DB alle Zeilen raus welche eine der Gruppen_ids hat.
@@ -144,10 +135,6 @@ public class EventStoreService {
         return getEventsFromDTOs(eventDTOS);
     }
 
-    public List<Event> getGroupEvents(UUID groupId) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByGroup(Collections.singletonList(groupId.toString())));
-    }
-
     /**
      * Findet alle Events, welche ab dem neuen Status hinzugekommen sind.
      * Sucht alle Events mit event_id > status.
@@ -157,65 +144,10 @@ public class EventStoreService {
      * @return Liste von neueren Events
      */
     public List<Event> getNewEvents(Long status) {
-        List<String> groupIdsThatChanged = eventStore.findGroupIdsWhereEventIdGreaterThanStatus(status);
+        List<String> changedGroupIds = eventStore.findGroupIdsWhereEventIdGreaterThanStatus(status);
+        List<EventDTO> groupEventDTOS = eventStore.findEventDTOsByGroup(changedGroupIds);
 
-        List<EventDTO> groupEventDTOS = eventStore.findEventDTOsByGroup(groupIdsThatChanged);
         return getEventsFromDTOs(groupEventDTOS);
-    }
-
-    public long getMaxEventId() {
-        long highestEvent = 0;
-
-        try {
-            highestEvent = eventStore.findMaxEventId();
-        } catch (NullPointerException e) {
-            LOG.debug("Eine maxId von 0 wurde zurückgegeben, da keine Events vorhanden sind.");
-        }
-
-        return highestEvent;
-    }
-
-    /**
-     * Gibt eine Liste mit allen Events zurück, die zu der Gruppe gehören.
-     *
-     * @param groupId Gruppe die betrachtet werden soll
-     *
-     * @return Liste aus Events
-     */
-    public List<Event> getEventsOfGroup(UUID groupId) {
-        List<EventDTO> eventDTOList = eventStore.findEventDTOsByGroup(Collections.singletonList(groupId.toString()));
-        return getEventsFromDTOs(eventDTOList);
-    }
-
-    /**
-     * Gibt eine Liste aus GruppenIds zurück, in denen sich der User befindet.
-     *
-     * @param userId Die Id des Users
-     *
-     * @return Liste aus GruppenIds
-     */
-    public List<UUID> findGroupIdsByUser(String userId) {
-        return eventStore.findGroupIdsByUserAndType(userId, "AddUserEvent").stream().map(UUID::fromString).collect(Collectors.toList());
-    }
-
-    /**
-     * Gibt true zurück, falls der User aktuell in der Gruppe ist, sonst false.
-     *
-     * @param groupId Id der Gruppe
-     * @param userId  Id des zu überprüfenden Users
-     *
-     * @return true or false
-     */
-    //TODO: irgendwie fischig
-    boolean userInGroup(UUID groupId, String userId) {
-        return eventStore.countEventDTOsByGroupIdAndUserAndType(groupId.toString(), userId, "AddUserEvent")
-               > eventStore.countEventDTOsByGroupIdAndUserAndType(groupId.toString(), userId, "DeleteUserEvent");
-    }
-
-    private static List<String> uuidsToString(List<UUID> ids) {
-        return ids.stream()
-                  .map(UUID::toString)
-                  .collect(Collectors.toList());
     }
 
     /**
@@ -224,8 +156,8 @@ public class EventStoreService {
      * @return GruppenIds (UUID) als Liste
      */
     List<UUID> findExistingGroupIds() {
-        List<Event> createEvents = findLatestEventsFromGroupByType("CreateGroupEvent",
-                                                                   "DeleteGroupEvent");
+        List<Event> createEvents = findLatestEventsFromGroupsByType("CreateGroupEvent",
+                                                                    "DeleteGroupEvent");
 
         return createEvents.stream()
                            .filter(event -> event instanceof CreateGroupEvent)
@@ -238,8 +170,8 @@ public class EventStoreService {
      *
      * @return GruppenIds (UUID) als Liste
      */
-    List<UUID> findExistingUserGroups(String userId) {
-        List<Event> userEvents = findLatestEventsFromGroupByUser(userId);
+    public List<UUID> findExistingUserGroups(String userId) {
+        List<Event> userEvents = findLatestEventsFromGroupsByUser(userId);
 
         return userEvents.stream()
                          .filter(event -> event instanceof AddUserEvent)
@@ -247,9 +179,25 @@ public class EventStoreService {
                          .collect(Collectors.toList());
     }
 
-    // ######################################## QUERIES ##########################################
 
-    List<Event> findEventsByTypes(String... types) {
+    // #################################### SIMPLE QUERIES #######################################
+
+
+    /**
+     * Ermittelt die Id des letzten Events.
+     *
+     * @return Letzte EventId
+     */
+    public long getMaxEventId() {
+        try {
+            return eventStore.findMaxEventId();
+        } catch (NullPointerException e) {
+            LOG.debug("Eine maxId von 0 wurde zurückgegeben, da keine Events vorhanden sind.");
+            return 0;
+        }
+    }
+
+    List<Event> findEventsByType(String... types) {
         return getEventsFromDTOs(eventStore.findEventDTOsByType(Arrays.asList(types)));
     }
 
@@ -257,16 +205,32 @@ public class EventStoreService {
         return getEventsFromDTOs(eventStore.findEventDTOsByType(Collections.singletonList(type)));
     }
 
-    List<Event> findEventsByGroupsAndTypes(List<UUID> groupIds, String... types) {
+    List<Event> findEventsByGroupAndType(List<UUID> groupIds, String... types) {
         return getEventsFromDTOs(eventStore.findEventDTOsByGroupAndType(Arrays.asList(types),
-                                                                        uuidsToString(groupIds)));
+                                                                        IdService.uuidsToString(groupIds)));
     }
 
-    List<Event> findLatestEventsFromGroupByUser(String userId) {
+    List<Event> findLatestEventsFromGroupsByUser(String userId) {
         return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByUser(userId));
     }
 
-    List<Event> findLatestEventsFromGroupByType(String... types) {
+    List<Event> findLatestEventsFromGroupsByType(String... types) {
         return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByType(Arrays.asList(types)));
+    }
+
+
+    // ######################################### HELPERS #########################################
+
+    /**
+     * Gibt den Eventtyp als String wieder.
+     *
+     * @param event Event dessen Typ abgefragt werden soll
+     *
+     * @return Der Name des Typs des Events
+     */
+    private static String getEventType(Event event) {
+        int lastDot = event.getClass().getName().lastIndexOf('.');
+
+        return event.getClass().getName().substring(lastDot + 1);
     }
 }

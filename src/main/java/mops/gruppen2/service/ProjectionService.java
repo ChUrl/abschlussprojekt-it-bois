@@ -2,7 +2,6 @@ package mops.gruppen2.service;
 
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
@@ -75,21 +74,18 @@ public class ProjectionService {
      */
     @Cacheable("groups")
     //TODO: remove userID param
-    public List<Group> projectPublicGroups(String userId) throws EventException {
+    public List<Group> projectPublicGroups() throws EventException {
         List<UUID> groupIds = eventStoreService.findExistingGroupIds();
-        List<Event> events = eventStoreService.findEventsByGroupsAndTypes(groupIds,
-                                                                          "CreateGroupEvent",
-                                                                          "UpdateGroupDescriptionEvent",
-                                                                          "UpdateGroupTitleEvent",
-                                                                          "UpdateUserMaxEvent");
+        List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
+                                                                        "CreateGroupEvent",
+                                                                        "UpdateGroupDescriptionEvent",
+                                                                        "UpdateGroupTitleEvent",
+                                                                        "UpdateUserMaxEvent");
 
         List<Group> groups = projectEventList(events);
 
-        SearchService.sortByGroupType(groups); //TODO: auslagern?
-
         return groups.stream()
                      .filter(group -> group.getVisibility() == Visibility.PUBLIC)
-                     .filter(group -> !eventStoreService.userInGroup(group.getId(), userId)) //TODO: slow
                      .collect(Collectors.toList());
     }
 
@@ -102,9 +98,9 @@ public class ProjectionService {
     @Cacheable("groups")
     public List<Group> projectLectures() {
         List<UUID> groupIds = eventStoreService.findExistingGroupIds();
-        List<Event> events = eventStoreService.findEventsByGroupsAndTypes(groupIds,
-                                                                          "CreateGroupEvent",
-                                                                          "UpdateGroupTitleEvent");
+        List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
+                                                                        "CreateGroupEvent",
+                                                                        "UpdateGroupTitleEvent");
 
         List<Group> lectures = projectEventList(events);
 
@@ -113,47 +109,49 @@ public class ProjectionService {
                        .collect(Collectors.toList());
     }
 
-    @Cacheable("groups")
-    public List<Group> projectGroupsByUser(String userId) throws EventException {
-        return projectGroupsByUser(new User(userId));
-    }
-
     /**
      * Projiziert Gruppen, in welchen der User aktuell teilnimmt.
      * Die Gruppen enthalten nur Metainformationen: Titel und Beschreibung.
      *
-     * @param user Der User
+     * @param userId Die Id
      *
      * @return Liste aus Gruppen
      */
     @Cacheable("groups")
-    public List<Group> projectGroupsByUser(User user) {
-        List<UUID> groupIds = eventStoreService.findExistingUserGroups(user.getId());
-        List<Event> groupEvents = eventStoreService.findEventsByGroupsAndTypes(groupIds,
-                                                                               "CreateGroupEvent",
-                                                                               "UpdateGroupTitleEvent",
-                                                                               "UpdateGroupDescriptionEvent",
-                                                                               "DeleteGroupEvent");
+    public List<Group> projectUserGroups(String userId) {
+        List<UUID> groupIds = eventStoreService.findExistingUserGroups(userId);
+        List<Event> groupEvents = eventStoreService.findEventsByGroupAndType(groupIds,
+                                                                             "CreateGroupEvent",
+                                                                             "UpdateGroupTitleEvent",
+                                                                             "UpdateGroupDescriptionEvent",
+                                                                             "DeleteGroupEvent");
 
         return projectEventList(groupEvents);
     }
 
     /**
      * Gibt die Gruppe zurück, die zu der übergebenen Id passt.
+     * Enthält alle verfügbaren Informationen, also auch User (langsam).
      *
      * @param groupId Die Id der gesuchten Gruppe
      *
      * @return Die gesuchte Gruppe
      *
-     * @throws EventException Wenn die Gruppe nicht gefunden wird
+     * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
      */
-    public Group projectSingleGroupById(UUID groupId) throws GroupNotFoundException {
+    public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
         try {
             List<Event> events = eventStoreService.getGroupEvents(groupId);
             return projectEventList(events).get(0);
         } catch (IndexOutOfBoundsException e) {
             throw new GroupNotFoundException(ProjectionService.class.toString());
         }
+    }
+
+    void removeUserGroups(List<Group> groups, String userId) {
+        List<UUID> userGroups = eventStoreService.findExistingUserGroups(userId);
+
+        groups.removeIf(group -> userGroups.contains(group.getId()));
     }
 }
 
