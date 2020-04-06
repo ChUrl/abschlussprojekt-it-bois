@@ -45,7 +45,7 @@ public class GroupCreationController {
         Account account = KeyCloakService.createAccountFromPrincipal(token);
 
         model.addAttribute("account", account);
-        model.addAttribute("lectures", projectionService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createOrga";
     }
@@ -88,7 +88,7 @@ public class GroupCreationController {
         Account account = KeyCloakService.createAccountFromPrincipal(token);
 
         model.addAttribute("account", account);
-        model.addAttribute("lectures", projectionService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createStudent";
     }

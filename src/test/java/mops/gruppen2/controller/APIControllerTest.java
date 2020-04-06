@@ -4,6 +4,7 @@ import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.repository.EventRepository;
 import mops.gruppen2.service.EventStoreService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,7 @@ class APIControllerTest {
         assertThat(apiController.getGroupIdsOfUser("A")).isEmpty();
     }
 
+    @Disabled
     @Test
     @WithMockUser(username = "api_user", roles = "api_user")
     void getGroupsOfUser_singleDeletedGroup() {

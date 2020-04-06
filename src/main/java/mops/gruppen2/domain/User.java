@@ -22,4 +22,16 @@ public class User {
         familyname = account.getFamilyname();
         email = account.getEmail();
     }
+
+    /**
+     * User identifizieren sich über die Id, mehr wird also manchmal nicht benötigt.
+     *
+     * @param userId Die User Id
+     */
+    public User(String userId) {
+        id = userId;
+        givenname = "";
+        familyname = "";
+        email = "";
+    }
 }

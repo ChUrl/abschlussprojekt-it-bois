@@ -121,7 +121,7 @@ public class GroupService {
     //TODO: GroupService/eventbuilderservice
     void addUserList(List<User> newUsers, UUID groupId) {
         for (User user : newUsers) {
-            Group group = projectionService.getGroupById(groupId);
+            Group group = projectionService.projectSingleGroupById(groupId);
             if (group.getMembers().contains(user)) {
                 LOG.info("Benutzer {} ist bereits in Gruppe", user.getId());
             } else {
@@ -146,7 +146,7 @@ public class GroupService {
     //TODO: GroupService/eventbuilderservice
     public void updateRole(User user, UUID groupId) throws EventException {
         UpdateRoleEvent updateRoleEvent;
-        Group group = projectionService.getGroupById(groupId);
+        Group group = projectionService.projectSingleGroupById(groupId);
         validationService.throwIfNotInGroup(group, user);
 
         if (group.getRoles().get(user.getId()) == ADMIN) {
@@ -165,7 +165,7 @@ public class GroupService {
 
     //TODO: GroupService
     public void addUsersFromCsv(Account account, MultipartFile file, String groupId) {
-        Group group = projectionService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.projectSingleGroupById(UUID.fromString(groupId));
 
         List<User> newUserList = CsvService.readCsvFile(file);
         removeOldUsersFromNewUsers(group.getMembers(), newUserList);
@@ -206,7 +206,7 @@ public class GroupService {
     public Group getParent(UUID parentId) {
         Group parent = new Group();
         if (!idIsEmpty(parentId)) {
-            parent = projectionService.getGroupById(parentId);
+            parent = projectionService.projectSingleGroupById(parentId);
         }
         return parent;
     }

@@ -51,9 +51,9 @@ public class SearchService {
     @Cacheable("groups")
     public List<Group> findGroupWith(String search, Account account) throws EventException {
         if (search.isEmpty()) {
-            return projectionService.getAllGroupWithVisibilityPublic(account.getName());
+            return projectionService.projectPublicGroups(account.getName());
         }
 
-        return projectionService.getAllGroupWithVisibilityPublic(account.getName()).parallelStream().filter(group -> group.getTitle().toLowerCase().contains(search.toLowerCase()) || group.getDescription().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
+        return projectionService.projectPublicGroups(account.getName()).parallelStream().filter(group -> group.getTitle().toLowerCase().contains(search.toLowerCase()) || group.getDescription().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
     }
 }

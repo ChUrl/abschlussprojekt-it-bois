@@ -70,7 +70,7 @@ class GroupServiceTest {
     void rightClassForSuccessfulGroup() {
         List<Event> eventList = completePrivateGroup(1);
 
-        List<Group> groups = projectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectEventList(eventList);
         assertThat(groups.get(0)).isInstanceOf(Group.class);
     }
 
@@ -79,7 +79,7 @@ class GroupServiceTest {
     void projectEventList_SingleGroup() {
         List<Event> eventList = completePrivateGroup(5);
 
-        List<Group> groups = projectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectEventList(eventList);
 
         assertThat(groups).hasSize(1);
         assertThat(groups.get(0).getMembers()).hasSize(5);
@@ -92,7 +92,7 @@ class GroupServiceTest {
         List<Event> eventList = completePrivateGroups(10, 2);
         eventList.addAll(completePublicGroups(10, 5));
 
-        List<Group> groups = projectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectEventList(eventList);
 
         assertThat(groups).hasSize(20);
         assertThat(groups.stream().map(group -> group.getMembers().size()).reduce(Integer::sum).get()).isEqualTo(70);
@@ -122,7 +122,7 @@ class GroupServiceTest {
         Group group = TestBuilder.apply(test1, test2);
 
         assertThat(group.getType()).isEqualTo(null);
-        assertThat(projectionService.getAllGroupWithVisibilityPublic("errer")).isEmpty();
+        assertThat(projectionService.projectPublicGroups("errer")).isEmpty();
     }
 
     //TODO: ProjectionServiceTest
@@ -132,7 +132,7 @@ class GroupServiceTest {
                                   deleteGroupEvent(uuidMock(0)),
                                   createPublicGroupEvent());
 
-        assertThat(projectionService.getAllGroupWithVisibilityPublic("test1").size()).isEqualTo(1);
+        assertThat(projectionService.projectPublicGroups("test1").size()).isEqualTo(1);
     }
 
     //TODO: ProjectionServiceTest
@@ -145,7 +145,7 @@ class GroupServiceTest {
                                   createPublicGroupEvent(),
                                   createPrivateGroupEvent());
 
-        assertThat(projectionService.getAllGroupWithVisibilityPublic("test1").size()).isEqualTo(3);
+        assertThat(projectionService.projectPublicGroups("test1").size()).isEqualTo(3);
     }
 
     //TODO: ProjectionServiceTest
@@ -156,8 +156,8 @@ class GroupServiceTest {
                                   createPrivateGroupEvent(),
                                   createPublicGroupEvent());
 
-        assertThat(projectionService.getAllGroupWithVisibilityPublic("kobold")).hasSize(1);
-        assertThat(projectionService.getAllGroupWithVisibilityPublic("peter")).hasSize(2);
+        assertThat(projectionService.projectPublicGroups("kobold")).hasSize(1);
+        assertThat(projectionService.projectPublicGroups("peter")).hasSize(2);
     }
 
     //TODO: ProjectionServiceTest
@@ -169,7 +169,7 @@ class GroupServiceTest {
                                   createLectureEvent(),
                                   createLectureEvent());
 
-        assertThat(projectionService.getAllLecturesWithVisibilityPublic().size()).isEqualTo(4);
+        assertThat(projectionService.projectLectures().size()).isEqualTo(4);
     }
 
     //TODO: SearchServiceTest

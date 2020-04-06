@@ -42,14 +42,14 @@ public class APIController {
     public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers") @PathVariable Long lastEventId) throws EventException {
         List<Event> events = eventStoreService.getNewEvents(lastEventId);
 
-        return APIService.wrap(eventStoreService.getMaxEventId(), projectionService.projectEventList(events));
+        return APIService.wrap(eventStoreService.getMaxEventId(), ProjectionService.projectEventList(events));
     }
 
     @GetMapping("/getGroupIdsOfUser/{userId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich ein Teilnehmer befindet")
     public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen") @PathVariable String userId) {
-        return projectionService.getUserGroups(userId).stream()
+        return projectionService.projectGroupsByUser(userId).stream()
                                 .map(group -> group.getId().toString())
                                 .collect(Collectors.toList());
     }
@@ -59,7 +59,7 @@ public class APIController {
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
     public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe") @PathVariable String groupId) throws EventException {
         List<Event> eventList = eventStoreService.getEventsOfGroup(UUID.fromString(groupId));
-        List<Group> groups = projectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectEventList(eventList);
 
         if (groups.isEmpty()) {
             return null;

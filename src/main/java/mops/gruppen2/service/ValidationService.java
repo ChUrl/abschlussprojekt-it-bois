@@ -68,7 +68,7 @@ public class ValidationService {
     }
 
     boolean checkIfGroupEmpty(UUID groupId) {
-        return projectionService.getGroupById(groupId).getMembers().isEmpty();
+        return projectionService.projectSingleGroupById(groupId).getMembers().isEmpty();
     }
 
     public void throwIfNoAdmin(Group group, User user) {

@@ -66,7 +66,7 @@ public class SearchAndInviteController {
                                            @RequestParam("id") String groupId) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = projectionService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.projectSingleGroupById(UUID.fromString(groupId));
         UUID parentId = group.getParent();
         Group parent = groupService.getParent(parentId);
         User user = new User(account);
@@ -89,7 +89,7 @@ public class SearchAndInviteController {
                                Model model,
                                @PathVariable("link") String link) {
 
-        Group group = projectionService.getGroupById(inviteService.getGroupIdFromLink(link));
+        Group group = projectionService.projectSingleGroupById(inviteService.getGroupIdFromLink(link));
 
         validationService.throwIfGroupNotExisting(group.getTitle());
 
@@ -111,7 +111,7 @@ public class SearchAndInviteController {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
         User user = new User(account);
-        Group group = projectionService.getGroupById(UUID.fromString(groupId));
+        Group group = projectionService.projectSingleGroupById(UUID.fromString(groupId));
 
         validationService.throwIfUserAlreadyInGroup(group, user);
         validationService.throwIfGroupFull(group);
