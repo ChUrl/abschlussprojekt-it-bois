@@ -1,12 +1,11 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.CreateGroupEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,17 +15,15 @@ import java.util.UUID;
 
 
 @Service
+@Log4j2
 public class ControllerService {
 
-    private static final Logger LOG = LoggerFactory.getLogger("controllerServiceLogger");
     private final EventStoreService eventStoreService;
-    private final ValidationService validationService;
     private final InviteService inviteService;
     private final GroupService groupService;
 
-    public ControllerService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService, GroupService groupService) {
+    public ControllerService(EventStoreService eventStoreService, InviteService inviteService, GroupService groupService) {
         this.eventStoreService = eventStoreService;
-        this.validationService = validationService;
         this.inviteService = inviteService;
         this.groupService = groupService;
     }

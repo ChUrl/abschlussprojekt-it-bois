@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.api.GroupRequestWrapper;
-import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.service.APIService;
 import mops.gruppen2.service.EventStoreService;
@@ -39,10 +38,10 @@ public class APIController {
     @GetMapping("/updateGroups/{lastEventId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich etwas geändert hat")
-    public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers") @PathVariable Long lastEventId) throws EventException {
-        List<Event> events = eventStoreService.getNewEvents(lastEventId);
-
-        return APIService.wrap(eventStoreService.getMaxEventId(), ProjectionService.projectEventList(events));
+    public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers")
+                                            @PathVariable Long lastEventId) throws EventException {
+        return APIService.wrap(eventStoreService.findMaxEventId(),
+                               projectionService.projectNewGroups(lastEventId));
     }
 
     @GetMapping("/getGroupIdsOfUser/{userId}")
@@ -56,7 +55,8 @@ public class APIController {
     @GetMapping("/getGroup/{groupId}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
-    public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe") @PathVariable String groupId) throws EventException {
+    public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe")
+                              @PathVariable String groupId) throws EventException {
         return projectionService.projectSingleGroup(UUID.fromString(groupId));
     }
 

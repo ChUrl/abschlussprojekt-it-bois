@@ -1,5 +1,6 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.api.GroupRequestWrapper;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Log4j2
 public class APIService {
 
     // private APIService() {}

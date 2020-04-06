@@ -1,5 +1,6 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import static mops.gruppen2.domain.Role.ADMIN;
 
 @Service
+@Log4j2
 public class ValidationService {
 
     private final SearchService searchService;

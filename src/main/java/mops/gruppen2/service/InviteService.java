@@ -1,19 +1,18 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.dto.InviteLinkDTO;
 import mops.gruppen2.domain.exception.InvalidInviteException;
 import mops.gruppen2.domain.exception.NoInviteExistException;
 import mops.gruppen2.repository.InviteRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@Log4j2
 public class InviteService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InviteService.class);
     private final InviteRepository inviteRepository;
 
     public InviteService(InviteRepository inviteRepository) {
@@ -32,7 +31,7 @@ public class InviteService {
         try {
             return UUID.fromString(inviteRepository.findGroupIdByLink(link));
         } catch (Exception e) {
-            LOG.error("Gruppe zu Link ({}) konnte nicht gefunden werden!", link);
+            log.error("Gruppe zu Link ({}) konnte nicht gefunden werden!", link);
             throw new InvalidInviteException(link);
         }
     }
@@ -41,7 +40,7 @@ public class InviteService {
         try {
             return inviteRepository.findLinkByGroupId(groupId.toString());
         } catch (Exception e) {
-            LOG.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", groupId);
+            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", groupId);
             throw new NoInviteExistException(groupId.toString());
         }
     }

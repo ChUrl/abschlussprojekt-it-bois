@@ -1,6 +1,7 @@
 package mops.gruppen2.controller;
 
 import mops.gruppen2.Gruppen2Application;
+import mops.gruppen2.domain.exception.GroupNotFoundException;
 import mops.gruppen2.repository.EventRepository;
 import mops.gruppen2.service.EventStoreService;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import static mops.gruppen2.TestBuilder.deleteUserEvent;
 import static mops.gruppen2.TestBuilder.updateGroupTitleEvent;
 import static mops.gruppen2.TestBuilder.uuidMock;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Gruppen2Application.class)
@@ -146,7 +148,7 @@ class APIControllerTest {
     @Test
     @WithMockUser(username = "api_user", roles = "api_user")
     void getGroupFromId_noGroup() {
-        assertThat(apiController.getGroupById(uuidMock(0).toString())).isEqualTo(null);
+        assertThrows(GroupNotFoundException.class, () -> apiController.getGroupById(uuidMock(0).toString()));
     }
 
     @Test

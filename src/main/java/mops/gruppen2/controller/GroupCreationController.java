@@ -3,6 +3,7 @@ package mops.gruppen2.controller;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.service.ControllerService;
 import mops.gruppen2.service.GroupService;
+import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.KeyCloakService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
@@ -64,7 +65,7 @@ public class GroupCreationController {
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = GroupService.getUUID(parent);
+        UUID parentUUID = IdService.stringToUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
 
@@ -105,7 +106,7 @@ public class GroupCreationController {
                                            @RequestParam(value = "parent", required = false) String parent) {
 
         Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = GroupService.getUUID(parent);
+        UUID parentUUID = IdService.stringToUUID(parent);
 
         validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
 

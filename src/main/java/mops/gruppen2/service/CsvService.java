@@ -3,11 +3,10 @@ package mops.gruppen2.service;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.WrongFileException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,9 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public final class CsvService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CsvService.class);
 
     private CsvService() {}
 
@@ -43,7 +41,7 @@ public final class CsvService {
                 List<User> userList = read(file.getInputStream());
                 return userList.stream().distinct().collect(Collectors.toList()); //filters duplicates from list
             } catch (IOException ex) {
-                LOG.warn("File konnte nicht gelesen werden");
+                log.error("File konnte nicht gelesen werden");
                 throw new WrongFileException(file.getOriginalFilename());
             }
         }

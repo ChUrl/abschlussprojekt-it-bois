@@ -1,5 +1,6 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
@@ -14,8 +15,6 @@ import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.event.UpdateUserMaxEvent;
 import mops.gruppen2.domain.exception.EventException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,14 +27,13 @@ import static mops.gruppen2.domain.Role.ADMIN;
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen
  */
 @Service
+@Log4j2
 public class GroupService {
 
     private final EventStoreService eventStoreService;
     private final ValidationService validationService;
     private final InviteService inviteService;
     private final ProjectionService projectionService;
-
-    private static final Logger LOG = LoggerFactory.getLogger(GroupService.class);
 
     public GroupService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService, ProjectionService projectionService) {
         this.eventStoreService = eventStoreService;
@@ -111,7 +109,7 @@ public class GroupService {
         for (User user : newUsers) {
             Group group = projectionService.projectSingleGroup(groupId);
             if (group.getMembers().contains(user)) {
-                LOG.info("Benutzer {} ist bereits in Gruppe", user.getId());
+                log.info("Benutzer {} ist bereits in Gruppe", user.getId());
             } else {
                 AddUserEvent addUserEvent = new AddUserEvent(groupId, user.getId(), user.getGivenname(), user.getFamilyname(), user.getEmail());
                 eventStoreService.saveEvent(addUserEvent);

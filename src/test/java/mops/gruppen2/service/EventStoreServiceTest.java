@@ -68,7 +68,7 @@ class EventStoreServiceTest {
     void getDTO() {
         Event event = createPublicGroupEvent();
 
-        EventDTO dto = eventStoreService.getDTOFromEvent(event);
+        EventDTO dto = EventStoreService.getDTOFromEvent(event);
 
         assertThat(dto.getGroup_id()).isEqualTo(event.getGroupId().toString());
         assertThat(dto.getUser_id()).isEqualTo(event.getUserId());
@@ -81,8 +81,8 @@ class EventStoreServiceTest {
         eventStoreService.saveAll(addUserEvents(10, uuidMock(0)),
                                   addUserEvents(5, uuidMock(1)));
 
-        assertThat(eventStoreService.getEventsOfGroup(uuidMock(0))).hasSize(10);
-        assertThat(eventStoreService.getEventsOfGroup(uuidMock(1))).hasSize(5);
+        assertThat(eventStoreService.findGroupEvents(uuidMock(0))).hasSize(10);
+        assertThat(eventStoreService.findGroupEvents(uuidMock(1))).hasSize(5);
     }
 
     @Test
@@ -93,7 +93,7 @@ class EventStoreServiceTest {
                                   addUserEvent(uuidMock(3), "A"),
                                   addUserEvent(uuidMock(3), "B"));
 
-        assertThat(eventStoreService.findGroupIdsByUser("A")).hasSize(4);
-        assertThat(eventStoreService.findGroupIdsByUser("B")).hasSize(1);
+        assertThat(eventStoreService.findExistingUserGroups("A")).hasSize(4);
+        assertThat(eventStoreService.findExistingUserGroups("B")).hasSize(1);
     }
 }
