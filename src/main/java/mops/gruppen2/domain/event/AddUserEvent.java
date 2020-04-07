@@ -36,6 +36,13 @@ public class AddUserEvent extends Event {
         email = user.getEmail();
     }
 
+    public AddUserEvent(Group group, User user) {
+        super(group.getId(), user.getId());
+        givenname = user.getGivenname();
+        familyname = user.getFamilyname();
+        email = user.getEmail();
+    }
+
     @Override
     protected void applyEvent(Group group) throws EventException {
         User user = new User(userId, givenname, familyname, email);

@@ -32,8 +32,9 @@ public final class CsvService {
                 return userList.stream()
                                .distinct()
                                .collect(Collectors.toList()); //filter duplicates from list
-            } catch (IOException ex) {
-                log.error("File konnte nicht gelesen werden:\n{}", ex.getMessage());
+            } catch (IOException e) {
+                log.error("File konnte nicht gelesen werden:\n{}", e.getMessage());
+                e.printStackTrace();
                 throw new WrongFileException(file.getOriginalFilename());
             }
         }

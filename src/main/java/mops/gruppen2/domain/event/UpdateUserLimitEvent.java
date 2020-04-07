@@ -3,6 +3,7 @@ package mops.gruppen2.domain.event;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.BadParameterException;
 import mops.gruppen2.domain.exception.EventException;
 
@@ -16,6 +17,11 @@ public class UpdateUserLimitEvent extends Event {
 
     public UpdateUserLimitEvent(UUID groupId, String userId, long userLimit) {
         super(groupId, userId);
+        this.userLimit = userLimit;
+    }
+
+    public UpdateUserLimitEvent(Group group, User user, long userLimit) {
+        super(group.getId(), user.getId());
         this.userLimit = userLimit;
     }
 

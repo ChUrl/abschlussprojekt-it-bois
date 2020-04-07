@@ -3,6 +3,7 @@ package mops.gruppen2.domain.event;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.BadParameterException;
 
 import java.util.UUID;
@@ -18,6 +19,11 @@ public class UpdateGroupTitleEvent extends Event {
 
     public UpdateGroupTitleEvent(UUID groupId, String userId, String newGroupTitle) {
         super(groupId, userId);
+        this.newGroupTitle = newGroupTitle.trim();
+    }
+
+    public UpdateGroupTitleEvent(Group group, User user, String newGroupTitle) {
+        super(group.getId(), user.getId());
         this.newGroupTitle = newGroupTitle.trim();
     }
 

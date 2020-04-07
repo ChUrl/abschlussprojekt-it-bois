@@ -80,7 +80,7 @@ public class GroupDetailsController {
         model.addAttribute("private", Visibility.PRIVATE);
 
         if (validationService.checkIfAdmin(group, user)) {
-            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroupId(group.getId()));
+            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroup(group.getId()));
         }
 
         return "detailsMember";
@@ -124,8 +124,8 @@ public class GroupDetailsController {
         validationService.throwIfNoAdmin(group, user);
         validationService.checkFields(title, description);
 
-        groupService.updateTitle(account, IdService.stringToUUID(groupId), title);
-        groupService.updateDescription(account, IdService.stringToUUID(groupId), description);
+        groupService.updateTitle(user, group, title);
+        groupService.updateDescription(user, group, description);
 
         return "redirect:/gruppen2/details/" + groupId;
     }
@@ -160,13 +160,10 @@ public class GroupDetailsController {
         Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         User principle = new User(account);
-        User user = new User(userId, "", "", "");
+        User user = new User(userId);
 
         validationService.throwIfNoAdmin(group, principle);
-
-        //TODO: checkIfAdmin checkt nicht, dass die rolle geändert wurde. oder die rolle wird nicht geändert
-
-        groupService.changeRole(account, user, group);
+        groupService.toggleMemberRole(user, group);
 
         if (!validationService.checkIfAdmin(group, principle)) {
             return "redirect:/gruppen2/details/" + groupId;
@@ -183,11 +180,12 @@ public class GroupDetailsController {
                                 @RequestParam("group_id") String groupId) {
 
         Account account = new Account(token);
+        User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
         validationService.throwIfNewUserLimitIsValid(userLimit, group);
 
-        groupService.updateUserLimit(account, group, userLimit);
+        groupService.updateUserLimit(user, group, userLimit);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }
@@ -206,7 +204,7 @@ public class GroupDetailsController {
 
         validationService.throwIfNoAdmin(group, principle);
 
-        groupService.deleteUser(account, user, group);
+        groupService.deleteUser(user, group);
 
         if (!validationService.checkIfUserInGroup(group, principle)) {
             return "redirect:/gruppen2";
@@ -229,7 +227,7 @@ public class GroupDetailsController {
         validationService.throwIfUserAlreadyInGroup(group, user);
         validationService.throwIfGroupFull(group);
 
-        groupService.addUser(account, UUID.fromString(groupId));
+        groupService.addUser(user, group);
 
         model.addAttribute("account", account);
 
@@ -246,7 +244,7 @@ public class GroupDetailsController {
         User user = new User(account);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.deleteUser(account, user, group);
+        groupService.deleteUser(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -263,7 +261,7 @@ public class GroupDetailsController {
 
         validationService.throwIfNoAdmin(group, user);
 
-        groupService.deleteGroup(user.getId(), UUID.fromString(groupId));
+        groupService.deleteGroup(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -276,9 +274,10 @@ public class GroupDetailsController {
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Account account = new Account(token);
+        User user = new User(account);
         Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
 
-        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, account);
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }

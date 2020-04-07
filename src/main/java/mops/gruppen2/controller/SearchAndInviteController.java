@@ -115,7 +115,7 @@ public class SearchAndInviteController {
         validationService.throwIfUserAlreadyInGroup(group, user);
         validationService.throwIfGroupFull(group);
 
-        groupService.addUser(account, UUID.fromString(groupId));
+        groupService.addUser(user, group);
 
         return "redirect:/gruppen2/details/" + groupId;
     }

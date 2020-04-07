@@ -3,6 +3,7 @@ package mops.gruppen2.controller;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.service.ControllerService;
 import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
@@ -74,8 +75,9 @@ public class GroupCreationController {
         validationService.checkFields(description, title, userLimit, isInfinite);
 
         Account account = new Account(token);
+        User user = new User(account);
         UUID parentUUID = IdService.stringToUUID(parent);
-        Group group = groupService.createGroup(account,
+        Group group = groupService.createGroup(user,
                                                title,
                                                description,
                                                getVisibility(isPrivate),
@@ -83,7 +85,7 @@ public class GroupCreationController {
                                                getUserLimit(isInfinite, userLimit),
                                                parentUUID);
 
-        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, account);
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/" + uuidToString(group.getId());
     }
@@ -113,8 +115,9 @@ public class GroupCreationController {
         validationService.checkFields(description, title, userLimit, isInfinite);
 
         Account account = new Account(token);
+        User user = new User(account);
         UUID parentUUID = IdService.stringToUUID(parent);
-        Group group = groupService.createGroup(account,
+        Group group = groupService.createGroup(user,
                                                title,
                                                description,
                                                getVisibility(isPrivate),

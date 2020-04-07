@@ -58,7 +58,7 @@ class GroupServiceTest {
 
     @BeforeEach
     void setUp() {
-        groupService = new GroupService(eventStoreService, validationService, inviteService, projectionService);
+        groupService = new GroupService(eventStoreService, validationService, inviteService);
         eventRepository.deleteAll();
         //noinspection SqlResolve
         template.execute("ALTER TABLE event ALTER COLUMN event_id RESTART WITH 1");

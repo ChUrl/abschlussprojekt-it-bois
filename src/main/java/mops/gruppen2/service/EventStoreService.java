@@ -38,14 +38,12 @@ public class EventStoreService {
      */
     public void saveEvent(Event event) {
         eventStore.save(getDTOFromEvent(event));
-        log.trace("Ein Event wurde gespeichert!");
     }
 
     public void saveAll(Event... events) {
         for (Event event : events) {
             eventStore.save(getDTOFromEvent(event));
         }
-        log.trace("{} Events wurden gespeichert!", events.length);
     }
 
     /**
@@ -59,7 +57,6 @@ public class EventStoreService {
             for (Event event : eventlist) {
                 eventStore.save(getDTOFromEvent(event));
             }
-            log.trace("{} Events wurden gespeichert!", eventlist.size());
         }
     }
 
@@ -90,6 +87,7 @@ public class EventStoreService {
                                 payload);
         } catch (JsonProcessingException e) {
             log.error("Event ({}) konnte nicht serialisiert werden!", e.getMessage());
+            e.printStackTrace();
             throw new BadPayloadException(EventStoreService.class.toString());
         }
     }
@@ -112,6 +110,7 @@ public class EventStoreService {
             return JsonService.deserializeEvent(dto.getEvent_payload());
         } catch (JsonProcessingException e) {
             log.error("Payload\n {}\n konnte nicht deserialisiert werden!", e.getMessage());
+            e.printStackTrace();
             throw new BadPayloadException(EventStoreService.class.toString());
         }
     }
@@ -213,6 +212,7 @@ public class EventStoreService {
             return eventStore.findMaxEventId();
         } catch (NullPointerException e) {
             log.trace("Eine maxId von 0 wurde zurückgegeben, da keine Events vorhanden sind.");
+            e.printStackTrace();
             return 0;
         }
     }

@@ -48,7 +48,6 @@ public class ProjectionService {
         Map<UUID, Group> groupMap = new HashMap<>();
 
         events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupId())));
-        log.trace("{} Events wurden projiziert!", events.size());
 
         return new ArrayList<>(groupMap.values());
     }
@@ -66,7 +65,6 @@ public class ProjectionService {
         Group group = new Group();
 
         events.forEach(event -> event.apply(group));
-        log.trace("{} Events wurden projiziert!", events.size());
 
         return group;
     }
@@ -175,6 +173,7 @@ public class ProjectionService {
     /**
      * Gibt die Gruppe zurück, die zu der übergebenen Id passt.
      * Enthält alle verfügbaren Informationen, also auch User (langsam).
+     * Gibt eine leere Gruppe zurück, falls die Id leer ist.
      *
      * @param groupId Die Id der gesuchten Gruppe
      *
@@ -183,11 +182,16 @@ public class ProjectionService {
      * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
      */
     public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
+        if (IdService.idIsEmpty(groupId)) {
+            return new Group();
+        }
+
         try {
             List<Event> events = eventStoreService.findGroupEvents(groupId);
             return projectGroups(events).get(0);
         } catch (IndexOutOfBoundsException e) {
             log.error("Gruppe {} wurde nicht gefunden!", groupId.toString());
+            e.printStackTrace();
             throw new GroupNotFoundException(ProjectionService.class.toString());
         }
     }

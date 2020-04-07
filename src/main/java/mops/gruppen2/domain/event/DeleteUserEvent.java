@@ -20,15 +20,19 @@ public class DeleteUserEvent extends Event {
         super(groupId, userId);
     }
 
+    public DeleteUserEvent(Group group, User user) {
+        super(group.getId(), user.getId());
+    }
+
     @Override
     protected void applyEvent(Group group) throws EventException {
         for (User user : group.getMembers()) {
-            if (user.getId().equals(this.userId)) {
+            if (user.getId().equals(userId)) {
                 group.getMembers().remove(user);
                 group.getRoles().remove(user.getId());
                 return;
             }
         }
-        throw new UserNotFoundException(this.getClass().toString());
+        throw new UserNotFoundException(getClass().toString());
     }
 }

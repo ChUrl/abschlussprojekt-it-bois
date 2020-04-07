@@ -41,6 +41,7 @@ public class ValidationService {
         return groups;
     }
 
+    //TODO: what the fuck
     public void throwIfGroupNotExisting(String title) {
         if (title == null) {
             throw new GroupNotFoundException("@details");
@@ -69,8 +70,13 @@ public class ValidationService {
         }
     }
 
+    //TODO: necessary?
     boolean checkIfGroupEmpty(UUID groupId) {
         return projectionService.projectSingleGroup(groupId).getMembers().isEmpty();
+    }
+
+    boolean checkIfGroupEmpty(Group group) {
+        return group.getMembers().isEmpty();
     }
 
     public void throwIfNoAdmin(Group group, User user) {
@@ -93,15 +99,15 @@ public class ValidationService {
         return false;
     }
 
-    void throwIfLastAdmin(Account account, Group group) {
-        if (checkIfLastAdmin(account, group)) {
+    void throwIfLastAdmin(User user, Group group) {
+        if (checkIfLastAdmin(user, group)) {
             throw new NoAdminAfterActionException("Du bist letzter Admin!");
         }
     }
 
-    boolean checkIfLastAdmin(Account account, Group group) {
+    boolean checkIfLastAdmin(User user, Group group) {
         for (Map.Entry<String, Role> entry : group.getRoles().entrySet()) {
-            if (entry.getValue() == ADMIN && !(entry.getKey().equals(account.getName()))) {
+            if (entry.getValue() == ADMIN && !(entry.getKey().equals(user.getId()))) {
                 return false;
             }
         }

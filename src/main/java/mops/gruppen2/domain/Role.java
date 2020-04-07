@@ -2,5 +2,9 @@ package mops.gruppen2.domain;
 
 public enum Role {
     ADMIN,
-    MEMBER
+    MEMBER;
+
+    public Role toggle() {
+        return this == ADMIN ? MEMBER : ADMIN;
+    }
 }

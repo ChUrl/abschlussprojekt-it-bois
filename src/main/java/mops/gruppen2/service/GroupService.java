@@ -1,7 +1,6 @@
 package mops.gruppen2.service;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.Role;
@@ -24,8 +23,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static mops.gruppen2.domain.Role.ADMIN;
-
 /**
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen.
  * Es werden übergebene Gruppen bearbeitet und dementsprechend Events erzeugt und gespeichert.
@@ -38,13 +35,11 @@ public class GroupService {
     private final EventStoreService eventStoreService;
     private final ValidationService validationService;
     private final InviteService inviteService;
-    private final ProjectionService projectionService;
 
-    public GroupService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService, ProjectionService projectionService) {
+    public GroupService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService) {
         this.eventStoreService = eventStoreService;
         this.validationService = validationService;
         this.inviteService = inviteService;
-        this.projectionService = projectionService;
     }
 
 
@@ -56,11 +51,11 @@ public class GroupService {
      * Zudem wird der Gruppentitel und die Gruppenbeschreibung erzeugt, welche vorher der Methode übergeben wurden.
      * Aus diesen Event-Objekten wird eine Liste erzeugt, welche daraufhin mithilfe des EventServices gesichert wird.
      *
-     * @param account     Keycloak-Account
+     * @param user        Keycloak-Account
      * @param title       Gruppentitel
      * @param description Gruppenbeschreibung
      */
-    public Group createGroup(Account account,
+    public Group createGroup(User user,
                              String title,
                              String description,
                              Visibility visibility,
@@ -73,18 +68,20 @@ public class GroupService {
 
         //TODO: etwas auslagern?
         events.add(new CreateGroupEvent(groupId,
-                                        account.getName(),
+                                        user.getId(),
                                         parent,
                                         groupType,
                                         visibility,
                                         userLimit));
-        events.add(new AddUserEvent(groupId, new User(account)));
-        events.add(new UpdateGroupTitleEvent(groupId, account.getName(), title));
-        events.add(new UpdateGroupDescriptionEvent(groupId, account.getName(), description));
-        events.add(new UpdateRoleEvent(groupId, account.getName(), ADMIN));
+        events.add(new AddUserEvent(groupId, user));
+        events.add(new UpdateGroupTitleEvent(groupId, user.getId(), title));
+        events.add(new UpdateGroupDescriptionEvent(groupId, user.getId(), description));
+        events.add(new UpdateRoleEvent(groupId, user.getId(), Role.ADMIN));
 
         inviteService.createLink(groupId);
         eventStoreService.saveAll(events);
+
+        log.trace("Es wurde eine Gruppe erstellt. ({})", visibility);
 
         return ProjectionService.projectSingleGroup(events);
     }
@@ -100,82 +97,17 @@ public class GroupService {
      *
      * @param newUsers Userliste
      * @param group    Gruppe
-     * @param account  Ausführender User
+     * @param user     Ausführender User
      */
-    public void addUsersToGroup(List<User> newUsers, Group group, Account account) {
-        updateUserLimit(account, group, getAdjustedUserLimit(newUsers, group));
+    public void addUsersToGroup(List<User> newUsers, Group group, User user) {
+        updateUserLimit(user, group, getAdjustedUserLimit(newUsers, group));
 
         List<Event> events = newUsers.stream()
-                                     .filter(user -> !group.getMembers().contains(user))
-                                     .map(user -> new AddUserEvent(group.getId(), user))
+                                     .filter(newUser -> !group.getMembers().contains(newUser))
+                                     .map(newUser -> new AddUserEvent(group.getId(), newUser))
                                      .collect(Collectors.toList());
 
         eventStoreService.saveAll(events);
-    }
-
-    void toggleMemberRole(User user, UUID groupId) throws EventException {
-        UpdateRoleEvent updateRoleEvent;
-        Group group = projectionService.projectSingleGroup(groupId);
-        validationService.throwIfNotInGroup(group, user);
-
-        if (group.getRoles().get(user.getId()) == ADMIN) {
-            updateRoleEvent = new UpdateRoleEvent(group.getId(), user.getId(), Role.MEMBER);
-        } else {
-            updateRoleEvent = new UpdateRoleEvent(group.getId(), user.getId(), ADMIN);
-        }
-
-        eventStoreService.saveEvent(updateRoleEvent);
-    }
-
-    public void deleteUser(Account account, User user, Group group) throws EventException {
-        changeRoleIfLastAdmin(account, group);
-
-        validationService.throwIfNotInGroup(group, user);
-
-        deleteUser(user, group.getId());
-
-        if (validationService.checkIfGroupEmpty(group.getId())) {
-            deleteGroup(user.getId(), group.getId());
-        }
-    }
-
-    private void promoteVeteranMember(Account account, Group group) {
-        if (validationService.checkIfLastAdmin(account, group)) {
-            User newAdmin = getVeteranMember(account, group);
-            toggleMemberRole(newAdmin, group.getId());
-        }
-    }
-
-    public void changeRoleIfLastAdmin(Account account, Group group) {
-        if (group.getMembers().size() <= 1) {
-            return;
-        }
-        promoteVeteranMember(account, group);
-    }
-
-    public void changeRole(Account account, User user, Group group) {
-        if (user.getId().equals(account.getName())) {
-            if (group.getMembers().size() <= 1) {
-                validationService.throwIfLastAdmin(account, group);
-            }
-            promoteVeteranMember(account, group);
-        }
-        toggleMemberRole(user, group.getId());
-    }
-
-
-    // ############################### GRUPEN ANFRAGEN ###########################################
-
-
-    static User getVeteranMember(Account account, Group group) {
-        List<User> members = group.getMembers();
-        String newAdminId;
-        if (members.get(0).getId().equals(account.getName())) {
-            newAdminId = members.get(1).getId();
-        } else {
-            newAdminId = members.get(0).getId();
-        }
-        return new User(newAdminId);
     }
 
     /**
@@ -188,50 +120,74 @@ public class GroupService {
      *
      * @return Das neue Teilnehmermaximum
      */
-    static long getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return Math.max(group.getMembers().size() + newUsers.size(),
-                        group.getMembers().size());
+    private static long getAdjustedUserLimit(List<User> newUsers, Group group) {
+        return Math.max(group.getMembers().size() + newUsers.size(), group.getMembers().size());
+    }
+
+    /**
+     * Wechselt die Rolle eines Teilnehmers von Admin zu Member oder andersherum.
+     *
+     * @param user  Teilnehmer, welcher geändert wird
+     * @param group Gruppe, in welcher sih der Teilnehmer befindet
+     *
+     * @throws EventException Falls der User nicht gefunden wird
+     */
+    public void toggleMemberRole(User user, Group group) throws EventException {
+        validationService.throwIfNotInGroup(group, user);
+
+        Role role = group.getRoles().get(user.getId());
+        Event updateRoleEvent = new UpdateRoleEvent(group, user, role.toggle());
+
+        eventStoreService.saveEvent(updateRoleEvent);
     }
 
 
     // ################################# SINGLE EVENTS ###########################################
 
 
-    public void deleteUser(User user, UUID groupId) {
-        DeleteUserEvent event = new DeleteUserEvent(groupId, user.getId());
+    public void addUser(User user, Group group) {
+        validationService.throwIfUserAlreadyInGroup(group, user);
+
+        AddUserEvent event = new AddUserEvent(group, user);
         eventStoreService.saveEvent(event);
     }
 
-    public void deleteGroup(String userId, UUID groupId) {
-        DeleteGroupEvent event = new DeleteGroupEvent(groupId, userId);
-        inviteService.destroyLink(groupId);
+    public void deleteUser(User user, Group group) throws EventException {
+        validationService.throwIfNotInGroup(group, user);
+        validationService.throwIfLastAdmin(user, group);
+
+        DeleteUserEvent event = new DeleteUserEvent(group, user);
+        eventStoreService.saveEvent(event);
+
+        if (validationService.checkIfGroupEmpty(group)) {
+            deleteGroup(user, group);
+        }
+    }
+
+    public void deleteGroup(User user, Group group) {
+        inviteService.destroyLink(group);
+
+        DeleteGroupEvent event = new DeleteGroupEvent(group, user);
+        eventStoreService.saveEvent(event);
+
+        log.trace("Eine Gruppe wurde gelöscht ({})", group);
+    }
+
+    //TODO: Validate title
+    public void updateTitle(User user, Group group, String title) {
+        UpdateGroupTitleEvent event = new UpdateGroupTitleEvent(group, user, title);
         eventStoreService.saveEvent(event);
     }
 
-    public void updateDescription(Account account, UUID groupId, String description) {
-        UpdateGroupDescriptionEvent event = new UpdateGroupDescriptionEvent(groupId,
-                                                                            account.getName(),
-                                                                            description);
+    //TODO: Validate description
+    public void updateDescription(User user, Group group, String description) {
+        UpdateGroupDescriptionEvent event = new UpdateGroupDescriptionEvent(group, user, description);
         eventStoreService.saveEvent(event);
     }
 
-    public void updateUserLimit(Account account, Group group, long userLimit) {
-        UpdateUserLimitEvent event = new UpdateUserLimitEvent(group.getId(),
-                                                              account.getName(),
-                                                              userLimit);
+    //TODO: Validate limit
+    public void updateUserLimit(User user, Group group, long userLimit) {
+        UpdateUserLimitEvent event = new UpdateUserLimitEvent(group, user, userLimit);
         eventStoreService.saveEvent(event);
     }
-
-    public void addUser(Account account, UUID groupId) {
-        AddUserEvent event = new AddUserEvent(groupId, new User(account));
-        eventStoreService.saveEvent(event);
-    }
-
-    public void updateTitle(Account account, UUID groupId, String title) {
-        UpdateGroupTitleEvent event = new UpdateGroupTitleEvent(groupId,
-                                                                account.getName(),
-                                                                title);
-        eventStoreService.saveEvent(event);
-    }
-
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 
 import java.util.UUID;
@@ -19,6 +20,11 @@ public class UpdateRoleEvent extends Event {
 
     public UpdateRoleEvent(UUID groupId, String userId, Role newRole) {
         super(groupId, userId);
+        this.newRole = newRole;
+    }
+
+    public UpdateRoleEvent(Group group, User user, Role newRole) {
+        super(group.getId(), user.getId());
         this.newRole = newRole;
     }
 
