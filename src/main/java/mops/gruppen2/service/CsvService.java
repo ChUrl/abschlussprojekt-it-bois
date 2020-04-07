@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,20 +31,21 @@ public final class CsvService {
         return reader.<User>readValues(stream).readAll();
     }
 
-    //TODO: CsvService
     static List<User> readCsvFile(MultipartFile file) throws EventException {
         if (file == null) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         if (!file.isEmpty()) {
             try {
                 List<User> userList = read(file.getInputStream());
-                return userList.stream().distinct().collect(Collectors.toList()); //filters duplicates from list
+                return userList.stream()
+                               .distinct()
+                               .collect(Collectors.toList()); //filter duplicates from list
             } catch (IOException ex) {
-                log.error("File konnte nicht gelesen werden");
+                log.error("File konnte nicht gelesen werden:\n{}", ex.getMessage());
                 throw new WrongFileException(file.getOriginalFilename());
             }
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

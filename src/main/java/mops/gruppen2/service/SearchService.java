@@ -21,27 +21,9 @@ public class SearchService {
     }
 
     /**
-     * Sortiert die übergebene Liste an Gruppen, sodass Veranstaltungen am Anfang der Liste sind.
-     *
-     * @param groups Die Liste von Gruppen die sortiert werden soll
-     */
-    //TODO: ProjectionService/SearchSortService
-    static void sortByGroupType(List<Group> groups) {
-        groups.sort((Group g1, Group g2) -> {
-            if (g1.getType() == GroupType.LECTURE) {
-                return -1;
-            }
-            if (g2.getType() == GroupType.LECTURE) {
-                return 0;
-            }
-
-            return 1;
-        });
-    }
-
-    /**
-     * Filtert alle öffentliche Gruppen nach dem Suchbegriff und gibt diese als Liste von Gruppen zurück.
-     * Groß und Kleinschreibung wird nicht beachtet.
+     * Filtert alle öffentliche Gruppen nach dem Suchbegriff und gibt diese als sortierte Liste zurück.
+     * Groß- und Kleinschreibung wird nicht beachtet.
+     * Der Suchbegriff wird im Gruppentitel und in der Beschreibung gesucht.
      *
      * @param search Der Suchstring
      *
@@ -49,7 +31,6 @@ public class SearchService {
      *
      * @throws EventException Projektionsfehler
      */
-    //TODO: remove account
     @Cacheable("groups")
     public List<Group> searchPublicGroups(String search, String userId) throws EventException {
         List<Group> groups = projectionService.projectPublicGroups();
@@ -63,14 +44,25 @@ public class SearchService {
         log.trace("Es wurde gesucht nach: {}", search);
 
         return groups.stream()
-                     .filter(group -> groupMetaContains(group, search))
+                     .filter(group -> group.toString().toLowerCase().contains(search.toLowerCase()))
                      .collect(Collectors.toList());
     }
 
-    private static boolean groupMetaContains(Group group, String string) {
-        String meta = group.getTitle().toLowerCase() + " " + group.getDescription().toLowerCase();
-        String pattern = string.toLowerCase();
+    /**
+     * Sortiert die übergebene Liste an Gruppen, sodass Veranstaltungen am Anfang der Liste sind.
+     *
+     * @param groups Die Liste von Gruppen die sortiert werden soll
+     */
+    private static void sortByGroupType(List<Group> groups) {
+        groups.sort((Group g1, Group g2) -> {
+            if (g1.getType() == GroupType.LECTURE) {
+                return -1;
+            }
+            if (g2.getType() == GroupType.LECTURE) {
+                return 0;
+            }
 
-        return meta.contains(pattern);
+            return 1;
+        });
     }
 }

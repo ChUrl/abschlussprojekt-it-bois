@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(exclude = {"givenname", "familyname", "email"})
+@NoArgsConstructor // Für Jackson: CSV-Import
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
+    @EqualsAndHashCode.Include
     private String id;
+
     private String givenname;
     private String familyname;
     private String email;

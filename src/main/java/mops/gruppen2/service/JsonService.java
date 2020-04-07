@@ -16,7 +16,7 @@ public final class JsonService {
     private JsonService() {}
 
     /**
-     * Übersetzt mithilfe der Jackson-Library eine Java-Event-Repräsentation zu einem JSON-Event-Payload.
+     * Übersetzt eine Java-Event-Repräsentation zu einem JSON-Event-Payload.
      *
      * @param event Java-Event-Repräsentation
      *
@@ -31,7 +31,7 @@ public final class JsonService {
     }
 
     /**
-     * Übersetzt mithilfe der Jackson-Library einen JSON-Event-Payload zu einer Java-Event-Repräsentation.
+     * Übersetzt eine JSON-Event-Payload zu einer Java-Event-Repräsentation.
      *
      * @param json JSON-Event-Payload als String
      *
