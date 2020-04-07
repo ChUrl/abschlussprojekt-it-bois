@@ -1,8 +1,10 @@
 package mops.gruppen2.controller;
 
 import mops.gruppen2.domain.Account;
+import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.service.ControllerService;
+import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.ProjectionService;
@@ -22,8 +24,9 @@ import javax.annotation.security.RolesAllowed;
 import java.util.UUID;
 
 import static mops.gruppen2.service.ControllerService.getGroupType;
-import static mops.gruppen2.service.ControllerService.getUserMaximum;
+import static mops.gruppen2.service.ControllerService.getUserLimit;
 import static mops.gruppen2.service.ControllerService.getVisibility;
+import static mops.gruppen2.service.IdService.uuidToString;
 
 @Controller
 @SessionScope
@@ -64,25 +67,25 @@ public class GroupCreationController {
                                        @RequestParam("visibility") boolean isPrivate,
                                        @RequestParam("lecture") boolean isLecture,
                                        @RequestParam("maxInfiniteUsers") boolean isInfinite,
-                                       @RequestParam("userMaximum") long maxUsers,
+                                       @RequestParam("userMaximum") long userLimit,
                                        @RequestParam(value = "parent", required = false) String parent,
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
+        validationService.checkFields(description, title, userLimit, isInfinite);
+
         Account account = new Account(token);
         UUID parentUUID = IdService.stringToUUID(parent);
+        Group group = groupService.createGroup(account,
+                                               title,
+                                               description,
+                                               getVisibility(isPrivate),
+                                               getGroupType(isLecture),
+                                               getUserLimit(isInfinite, userLimit),
+                                               parentUUID);
 
-        validationService.checkFields(description, title, maxUsers, isInfinite);
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, account);
 
-        groupService.createGroupAsOrga(account,
-                                       title,
-                                       description,
-                                       getVisibility(isPrivate),
-                                       getGroupType(isLecture),
-                                       getUserMaximum(isInfinite, maxUsers),
-                                       parentUUID,
-                                       file);
-
-        return "redirect:/gruppen2";
+        return "redirect:/gruppen2/details/" + uuidToString(group.getId());
     }
 
     @RolesAllowed("ROLE_studentin")
@@ -90,9 +93,7 @@ public class GroupCreationController {
     public String createGroupAsStudent(KeycloakAuthenticationToken token,
                                        Model model) {
 
-        Account account = new Account(token);
-
-        model.addAttribute("account", account);
+        model.addAttribute("account", new Account(token));
         model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createStudent";
@@ -106,22 +107,21 @@ public class GroupCreationController {
                                            @RequestParam("description") String description,
                                            @RequestParam("visibility") boolean isPrivate,
                                            @RequestParam("maxInfiniteUsers") boolean isInfinite,
-                                           @RequestParam("userMaximum") long maxUsers,
+                                           @RequestParam("userMaximum") long userLimit,
                                            @RequestParam(value = "parent", required = false) String parent) {
+
+        validationService.checkFields(description, title, userLimit, isInfinite);
 
         Account account = new Account(token);
         UUID parentUUID = IdService.stringToUUID(parent);
+        Group group = groupService.createGroup(account,
+                                               title,
+                                               description,
+                                               getVisibility(isPrivate),
+                                               GroupType.SIMPLE,
+                                               getUserLimit(isInfinite, userLimit),
+                                               parentUUID);
 
-        validationService.checkFields(description, title, maxUsers, isInfinite);
-
-        groupService.createGroup(account,
-                                 title,
-                                 description,
-                                 getVisibility(isPrivate),
-                                 GroupType.SIMPLE,
-                                 getUserMaximum(isInfinite, maxUsers),
-                                 parentUUID);
-
-        return "redirect:/gruppen2";
+        return "redirect:/gruppen2/details/" + uuidToString(group.getId());
     }
 }

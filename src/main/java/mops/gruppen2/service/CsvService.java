@@ -22,16 +22,7 @@ public final class CsvService {
 
     private CsvService() {}
 
-    static List<User> read(InputStream stream) throws IOException {
-        CsvMapper mapper = new CsvMapper();
-
-        CsvSchema schema = mapper.schemaFor(User.class).withHeader().withColumnReordering(true);
-        ObjectReader reader = mapper.readerFor(User.class).with(schema);
-
-        return reader.<User>readValues(stream).readAll();
-    }
-
-    static List<User> readCsvFile(MultipartFile file) throws EventException {
+    public static List<User> readCsvFile(MultipartFile file) throws EventException {
         if (file == null) {
             return Collections.emptyList();
         }
@@ -47,5 +38,14 @@ public final class CsvService {
             }
         }
         return Collections.emptyList();
+    }
+
+    private static List<User> read(InputStream stream) throws IOException {
+        CsvMapper mapper = new CsvMapper();
+
+        CsvSchema schema = mapper.schemaFor(User.class).withHeader().withColumnReordering(true);
+        ObjectReader reader = mapper.readerFor(User.class).with(schema);
+
+        return reader.<User>readValues(stream).readAll();
     }
 }

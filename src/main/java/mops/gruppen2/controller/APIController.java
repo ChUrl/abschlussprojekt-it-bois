@@ -39,7 +39,7 @@ public class APIController {
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich etwas geändert hat")
     public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers")
-                                            @PathVariable Long lastEventId) throws EventException {
+                                            @PathVariable long lastEventId) throws EventException {
         return APIService.wrap(eventStoreService.findMaxEventId(),
                                projectionService.projectNewGroups(lastEventId));
     }
@@ -49,7 +49,7 @@ public class APIController {
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich ein Teilnehmer befindet")
     public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen")
                                           @PathVariable String userId) {
-        return IdService.uuidsToString(eventStoreService.findExistingUserGroups(userId));
+        return IdService.uuidToString(eventStoreService.findExistingUserGroups(userId));
     }
 
     @GetMapping("/getGroup/{groupId}")

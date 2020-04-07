@@ -13,6 +13,6 @@ import java.util.List;
 @Getter
 public class GroupRequestWrapper {
 
-    private final Long status;
+    private final long status;
     private final List<Group> groupList;
 }

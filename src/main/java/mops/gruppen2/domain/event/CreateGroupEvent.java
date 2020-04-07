@@ -15,14 +15,14 @@ public class CreateGroupEvent extends Event {
     private Visibility groupVisibility;
     private UUID groupParent;
     private GroupType groupType;
-    private Long groupUserMaximum;
+    private long groupUserLimit;
 
-    public CreateGroupEvent(UUID groupId, String userId, UUID parent, GroupType type, Visibility visibility, Long userMaximum) {
+    public CreateGroupEvent(UUID groupId, String userId, UUID parent, GroupType type, Visibility visibility, long userLimit) {
         super(groupId, userId);
         groupParent = parent;
         groupType = type;
         groupVisibility = visibility;
-        groupUserMaximum = userMaximum;
+        groupUserLimit = userLimit;
     }
 
     @Override
@@ -31,6 +31,6 @@ public class CreateGroupEvent extends Event {
         group.setParent(groupParent);
         group.setType(groupType);
         group.setVisibility(groupVisibility);
-        group.setUserMaximum(groupUserMaximum);
+        group.setUserLimit(groupUserLimit);
     }
 }

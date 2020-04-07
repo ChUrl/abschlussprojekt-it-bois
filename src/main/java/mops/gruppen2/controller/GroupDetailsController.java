@@ -5,7 +5,9 @@ import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
+import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
+import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.InviteService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
@@ -55,7 +57,7 @@ public class GroupDetailsController {
         UUID parentId = group.getParent();
         String actualURL = request.getRequestURL().toString();
         String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
-        Group parent = groupService.getParent(parentId);
+        Group parent = projectionService.projectSingleGroup(parentId);
 
         validationService.throwIfGroupNotExisting(group.getTitle());
 
@@ -122,7 +124,8 @@ public class GroupDetailsController {
         validationService.throwIfNoAdmin(group, user);
         validationService.checkFields(title, description);
 
-        groupService.changeMetaData(account, group, title, description);
+        groupService.updateTitle(account, IdService.stringToUUID(groupId), title);
+        groupService.updateDescription(account, IdService.stringToUUID(groupId), description);
 
         return "redirect:/gruppen2/details/" + groupId;
     }
@@ -176,15 +179,15 @@ public class GroupDetailsController {
     @PostMapping("/details/members/changeMaximum")
     @CacheEvict(value = "groups", allEntries = true)
     public String changeMaxSize(KeycloakAuthenticationToken token,
-                                @RequestParam("maximum") Long maximum,
+                                @RequestParam("maximum") long userLimit,
                                 @RequestParam("group_id") String groupId) {
 
         Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        validationService.throwIfNewMaximumIsValid(maximum, group);
+        validationService.throwIfNewUserLimitIsValid(userLimit, group);
 
-        groupService.updateMaxUser(account, UUID.fromString(groupId), maximum);
+        groupService.updateUserLimit(account, group, userLimit);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }
@@ -260,7 +263,7 @@ public class GroupDetailsController {
 
         validationService.throwIfNoAdmin(group, user);
 
-        groupService.deleteGroupEvent(user.getId(), UUID.fromString(groupId));
+        groupService.deleteGroup(user.getId(), UUID.fromString(groupId));
 
         return "redirect:/gruppen2";
     }
@@ -273,7 +276,9 @@ public class GroupDetailsController {
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
         Account account = new Account(token);
-        groupService.addUsersFromCsv(account, file, groupId);
+        Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
+
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, account);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }

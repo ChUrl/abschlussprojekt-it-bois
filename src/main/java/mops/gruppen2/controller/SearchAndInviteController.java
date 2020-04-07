@@ -67,7 +67,7 @@ public class SearchAndInviteController {
         Account account = new Account(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         UUID parentId = group.getParent();
-        Group parent = groupService.getParent(parentId);
+        Group parent = projectionService.projectSingleGroup(parentId);
         User user = new User(account);
 
         model.addAttribute("account", account);

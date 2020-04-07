@@ -161,7 +161,7 @@ public class EventStoreService {
      *
      * @return Liste von neuen und alten Events
      */
-    List<Event> findChangedGroupEvents(Long status) {
+    List<Event> findChangedGroupEvents(long status) {
         List<String> changedGroupIds = eventStore.findGroupIdsWhereEventIdGreaterThanStatus(status);
         List<EventDTO> groupEventDTOS = eventStore.findEventDTOsByGroup(changedGroupIds);
 
@@ -227,7 +227,7 @@ public class EventStoreService {
 
     List<Event> findEventsByGroupAndType(List<UUID> groupIds, String... types) {
         return getEventsFromDTOs(eventStore.findEventDTOsByGroupAndType(Arrays.asList(types),
-                                                                        IdService.uuidsToString(groupIds)));
+                                                                        IdService.uuidToString(groupIds)));
     }
 
     /**

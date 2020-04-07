@@ -25,7 +25,7 @@ class CreateGroupEventTest {
         assertThat(group.getMembers()).hasSize(0);
         assertThat(group.getType()).isEqualTo(GroupType.SIMPLE);
         assertThat(group.getVisibility()).isEqualTo(Visibility.PUBLIC);
-        assertThat(group.getUserMaximum()).isEqualTo(100);
+        assertThat(group.getUserLimit()).isEqualTo(100);
         assertThat(group.getId()).isEqualTo(uuidMock(0));
         assertThat(group.getParent()).isEqualTo(uuidMock(1));
     }

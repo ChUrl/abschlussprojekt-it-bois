@@ -44,7 +44,7 @@ class AddUserEventTest {
     @Test
     void applyEvent_groupFull() {
         Event createEvent = createPublicGroupEvent(uuidMock(0));
-        Event maxSizeEvent = new UpdateUserMaxEvent(uuidMock(0), "A", 2L);
+        Event maxSizeEvent = new UpdateUserLimitEvent(uuidMock(0), "A", 2L);
         Event addEventA = addUserEvent(uuidMock(0), "A");
         Event addEventB = addUserEvent(uuidMock(0), "B");
         Event addEventC = addUserEvent(uuidMock(0), "C");

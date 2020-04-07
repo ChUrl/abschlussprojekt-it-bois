@@ -34,6 +34,7 @@ public class ProjectionService {
 
     // ################################## STATISCHE PROJEKTIONEN #################################
 
+
     /**
      * Konstruiert Gruppen aus einer Liste von Events.
      *
@@ -43,13 +44,31 @@ public class ProjectionService {
      *
      * @throws EventException Projektionsfehler
      */
-    static List<Group> projectEventList(List<Event> events) throws EventException {
+    static List<Group> projectGroups(List<Event> events) throws EventException {
         Map<UUID, Group> groupMap = new HashMap<>();
 
         events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupId())));
         log.trace("{} Events wurden projiziert!", events.size());
 
         return new ArrayList<>(groupMap.values());
+    }
+
+    /**
+     * Projiziert Events, geht aber davon aus, dass alle zu derselben Gruppe gehören.
+     *
+     * @param events Eventliste
+     *
+     * @return Eine projizierte Gruppe
+     *
+     * @throws EventException Projektionsfehler, z.B. falls Events von verschiedenen Gruppen übergeben werden
+     */
+    static Group projectSingleGroup(List<Event> events) throws EventException {
+        Group group = new Group();
+
+        events.forEach(event -> event.apply(group));
+        log.trace("{} Events wurden projiziert!", events.size());
+
+        return group;
     }
 
     /**
@@ -84,7 +103,7 @@ public class ProjectionService {
     public List<Group> projectNewGroups(long status) {
         List<Event> events = eventStoreService.findChangedGroupEvents(status);
 
-        return projectEventList(events);
+        return projectGroups(events);
     }
 
     /**
@@ -106,7 +125,7 @@ public class ProjectionService {
                                                                         "UpdateGroupTitleEvent",
                                                                         "UpdateUserMaxEvent");
 
-        List<Group> groups = projectEventList(events);
+        List<Group> groups = projectGroups(events);
 
         return groups.stream()
                      .filter(group -> group.getVisibility() == Visibility.PUBLIC)
@@ -126,7 +145,7 @@ public class ProjectionService {
                                                                         "CreateGroupEvent",
                                                                         "UpdateGroupTitleEvent");
 
-        List<Group> lectures = projectEventList(events);
+        List<Group> lectures = projectGroups(events);
 
         return lectures.stream()
                        .filter(group -> group.getType() == GroupType.LECTURE)
@@ -150,7 +169,7 @@ public class ProjectionService {
                                                                              "UpdateGroupDescriptionEvent",
                                                                              "DeleteGroupEvent");
 
-        return projectEventList(groupEvents);
+        return projectGroups(groupEvents);
     }
 
     /**
@@ -166,7 +185,7 @@ public class ProjectionService {
     public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
         try {
             List<Event> events = eventStoreService.findGroupEvents(groupId);
-            return projectEventList(events).get(0);
+            return projectGroups(events).get(0);
         } catch (IndexOutOfBoundsException e) {
             log.error("Gruppe {} wurde nicht gefunden!", groupId.toString());
             throw new GroupNotFoundException(ProjectionService.class.toString());

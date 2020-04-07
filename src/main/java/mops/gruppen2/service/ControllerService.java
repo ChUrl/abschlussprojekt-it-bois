@@ -24,13 +24,13 @@ public final class ControllerService {
      * Wenn die maximale Useranzahl unendlich ist, wird das Maximum auf 100000 gesetzt.
      * Praktisch gibt es also maximal 100000 Nutzer pro Gruppe.
      *
-     * @param isInfinite  Gibt an, ob es unendlich viele User geben soll
-     * @param userMaximum Das Maximum an Usern, falls es eins gibt
+     * @param isInfinite Gibt an, ob es unendlich viele User geben soll
+     * @param userLimit  Das Maximum an Usern, falls es eins gibt
      *
      * @return Maximum an Usern
      */
-    public static long getUserMaximum(boolean isInfinite, long userMaximum) {
-        return isInfinite ? Long.MAX_VALUE : userMaximum;
+    public static long getUserLimit(boolean isInfinite, long userLimit) {
+        return isInfinite ? Long.MAX_VALUE : userLimit;
     }
 
 }

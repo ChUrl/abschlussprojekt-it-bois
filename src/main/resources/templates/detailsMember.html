@@ -100,11 +100,11 @@
             </div>
             <div class="col-4" style="white-space: nowrap; float: right; background: white; display: inline-block; margin-bottom: 100px; margin-top: -8px">
                 <h2>Mitglieder</h2>
-                <div th:switch="${group.getUserMaximum() != 100000}">
+                <div th:switch="${group.getUserLimit() != 100000}">
                     <h4 th:case="${true}">
                         <a th:text="${group.getMembers().size()}"></a>
                         <a>von maximal</a>
-                        <a th:text="${group.getUserMaximum()}"></a>
+                        <a th:text="${group.getUserLimit()}"></a>
                         <a>Benutzern.</a>
                     </h4>
                     <h4 th:case="${false}"> unbegrenzte Teilnehmeranzahl</h4>

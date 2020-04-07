@@ -35,13 +35,13 @@ public final class IdService {
         return UUID.fromString(groupId);
     }
 
-    public static List<String> uuidsToString(List<UUID> groupIds) {
+    public static List<String> uuidToString(List<UUID> groupIds) {
         return groupIds.stream()
                        .map(UUID::toString)
                        .collect(Collectors.toList());
     }
 
-    public static String uuidsToString(UUID groupId) {
+    public static String uuidToString(UUID groupId) {
         return groupId.toString();
     }
 

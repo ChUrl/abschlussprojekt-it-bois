@@ -26,7 +26,7 @@ class DeleteGroupEventTest {
         assertThat(group.getMembers()).isEmpty();
         assertThat(group.getType()).isEqualTo(null);
         assertThat(group.getVisibility()).isEqualTo(null);
-        assertThat(group.getUserMaximum()).isEqualTo(0);
+        assertThat(group.getUserLimit()).isEqualTo(0);
         assertThat(group.getId()).isEqualTo(uuidMock(0));
         assertThat(group.getParent()).isEqualTo(null);
     }

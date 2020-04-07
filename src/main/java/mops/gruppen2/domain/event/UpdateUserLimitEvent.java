@@ -10,21 +10,21 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-public class UpdateUserMaxEvent extends Event {
+public class UpdateUserLimitEvent extends Event {
 
-    private Long userMaximum;
+    private long userLimit;
 
-    public UpdateUserMaxEvent(UUID groupId, String userId, Long userMaximum) {
+    public UpdateUserLimitEvent(UUID groupId, String userId, long userLimit) {
         super(groupId, userId);
-        this.userMaximum = userMaximum;
+        this.userLimit = userLimit;
     }
 
     @Override
     protected void applyEvent(Group group) throws EventException {
-        if (userMaximum <= 0 || userMaximum < group.getMembers().size()) {
+        if (userLimit <= 0 || userLimit < group.getMembers().size()) {
             throw new BadParameterException("Usermaximum zu klein.");
         }
 
-        group.setUserMaximum(userMaximum);
+        group.setUserLimit(userLimit);
     }
 }

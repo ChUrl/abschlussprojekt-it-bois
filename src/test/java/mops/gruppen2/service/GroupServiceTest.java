@@ -70,7 +70,7 @@ class GroupServiceTest {
     void rightClassForSuccessfulGroup() {
         List<Event> eventList = completePrivateGroup(1);
 
-        List<Group> groups = ProjectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectGroups(eventList);
         assertThat(groups.get(0)).isInstanceOf(Group.class);
     }
 
@@ -79,7 +79,7 @@ class GroupServiceTest {
     void projectEventList_SingleGroup() {
         List<Event> eventList = completePrivateGroup(5);
 
-        List<Group> groups = ProjectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectGroups(eventList);
 
         assertThat(groups).hasSize(1);
         assertThat(groups.get(0).getMembers()).hasSize(5);
@@ -92,7 +92,7 @@ class GroupServiceTest {
         List<Event> eventList = completePrivateGroups(10, 2);
         eventList.addAll(completePublicGroups(10, 5));
 
-        List<Group> groups = ProjectionService.projectEventList(eventList);
+        List<Group> groups = ProjectionService.projectGroups(eventList);
 
         assertThat(groups).hasSize(20);
         assertThat(groups.stream().map(group -> group.getMembers().size()).reduce(Integer::sum).get()).isEqualTo(70);

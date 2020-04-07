@@ -44,7 +44,7 @@ public class AddUserEvent extends Event {
             throw new UserAlreadyExistsException(getClass().toString());
         }
 
-        if (group.getMembers().size() >= group.getUserMaximum()) {
+        if (group.getMembers().size() >= group.getUserLimit()) {
             throw new GroupFullException(getClass().toString());
         }
 

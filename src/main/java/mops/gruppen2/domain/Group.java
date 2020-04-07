@@ -27,7 +27,7 @@ public class Group {
 
     private String title;
     private String description;
-    private Long userMaximum;
+    private long userLimit;
 
     //TODO: List to Hashmap
     private final List<User> members = new ArrayList<>();

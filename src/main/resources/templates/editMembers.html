@@ -37,11 +37,11 @@
         <div class="row">
             <div class="col-10">
                 <h1>Mitglieder bearbeiten</h1>
-                <div th:switch="${group.getUserMaximum() != 100000}">
+                <div th:switch="${group.getUserLimit() != 100000}">
                     <h5 th:case="${true}">
                         <a th:text="${group.getMembers().size()}"></a>
                         <a>von maximal</a>
-                        <a th:text="${group.getUserMaximum()}"></a>
+                        <a th:text="${group.getUserLimit()}"></a>
                         <a>Benutzern.</a>
                     </h5>
                     <h5 th:case="${false}"> unbegrenzte Teilnehmeranzahl</h5>

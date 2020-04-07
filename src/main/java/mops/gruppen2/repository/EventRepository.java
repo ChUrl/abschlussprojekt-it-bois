@@ -20,7 +20,7 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
 
     @Query("SELECT DISTINCT group_id FROM event"
            + " WHERE event_id > :status")
-    List<String> findGroupIdsWhereEventIdGreaterThanStatus(@Param("status") Long status);
+    List<String> findGroupIdsWhereEventIdGreaterThanStatus(@Param("status") long status);
 
     // ####################################### EVENT DTOs ########################################
 
@@ -68,15 +68,4 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
 
     @Query("SELECT MAX(event_id) FROM event")
     Long findMaxEventId();
-
-    @Query("SELECT COUNT(*) FROM event"
-           + " WHERE event_type = :type AND group_id = :groupId")
-    Long countEventDTOsByGroupAndType(@Param("type") String type,
-                                      @Param("groupId") String groupId);
-
-    @Query("SELECT COUNT(*) FROM event"
-           + " WHERE group_id = :groupId AND user_id = :userId AND event_type = :type")
-    Long countEventDTOsByGroupIdAndUserAndType(@Param("groupId") String groupId,
-                                               @Param("userId") String userId,
-                                               @Param("type") String type);
 }
