@@ -99,8 +99,11 @@ public class ValidationService {
         return false;
     }
 
+    /**
+     * Schmeißt keine Exception, wenn der User der letzte User ist.
+     */
     void throwIfLastAdmin(User user, Group group) {
-        if (checkIfLastAdmin(user, group)) {
+        if (!checkIfLastMember(user, group) && checkIfLastAdmin(user, group)) {
             throw new NoAdminAfterActionException("Du bist letzter Admin!");
         }
     }
@@ -112,6 +115,10 @@ public class ValidationService {
             }
         }
         return true;
+    }
+
+    boolean checkIfLastMember(User user, Group group) {
+        return group.getMembers().contains(user) && group.getMembers().size() == 1;
     }
 
     /**

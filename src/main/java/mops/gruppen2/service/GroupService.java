@@ -18,16 +18,14 @@ import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 import mops.gruppen2.domain.exception.EventException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen.
  * Es werden übergebene Gruppen bearbeitet und dementsprechend Events erzeugt und gespeichert.
  */
-//TODO: Der GroupService sollte im Endeffekt größtenteils auf einer übergebenen Gruppe arbeiten.
 @Service
 @Log4j2
 public class GroupService {
@@ -63,27 +61,16 @@ public class GroupService {
                              long userLimit,
                              UUID parent) {
 
-        UUID groupId = UUID.randomUUID();
-        List<Event> events = new ArrayList<>();
+        Group group = createGroup(user, parent, groupType, visibility, userLimit);
 
-        //TODO: etwas auslagern?
-        events.add(new CreateGroupEvent(groupId,
-                                        user.getId(),
-                                        parent,
-                                        groupType,
-                                        visibility,
-                                        userLimit));
-        events.add(new AddUserEvent(groupId, user));
-        events.add(new UpdateGroupTitleEvent(groupId, user.getId(), title));
-        events.add(new UpdateGroupDescriptionEvent(groupId, user.getId(), description));
-        events.add(new UpdateRoleEvent(groupId, user.getId(), Role.ADMIN));
+        addUser(user, group);
+        updateTitle(user, group, title);
+        updateDescription(user, group, description);
+        updateRole(user, group, Role.ADMIN);
 
-        inviteService.createLink(groupId);
-        eventStoreService.saveAll(events);
+        inviteService.createLink(group);
 
-        log.trace("Es wurde eine Gruppe erstellt. ({})", visibility);
-
-        return ProjectionService.projectSingleGroup(events);
+        return group;
     }
 
 
@@ -102,12 +89,7 @@ public class GroupService {
     public void addUsersToGroup(List<User> newUsers, Group group, User user) {
         updateUserLimit(user, group, getAdjustedUserLimit(newUsers, group));
 
-        List<Event> events = newUsers.stream()
-                                     .filter(newUser -> !group.getMembers().contains(newUser))
-                                     .map(newUser -> new AddUserEvent(group.getId(), newUser))
-                                     .collect(Collectors.toList());
-
-        eventStoreService.saveAll(events);
+        newUsers.forEach(newUser -> addUserSilent(newUser, group));
     }
 
     /**
@@ -136,27 +118,58 @@ public class GroupService {
         validationService.throwIfNotInGroup(group, user);
 
         Role role = group.getRoles().get(user.getId());
-        Event updateRoleEvent = new UpdateRoleEvent(group, user, role.toggle());
-
-        eventStoreService.saveEvent(updateRoleEvent);
+        updateRole(user, group, role.toggle());
     }
 
 
     // ################################# SINGLE EVENTS ###########################################
+    // Spezifische Events werden erzeugt, validiert, auf die Gruppe angewandt und gespeichert
 
 
+    //TODO: more validation
+    private Group createGroup(User user, UUID parent, GroupType groupType, Visibility visibility, long userLimit) {
+        Event event = new CreateGroupEvent(UUID.randomUUID(),
+                                           user.getId(),
+                                           parent,
+                                           groupType, visibility,
+                                           userLimit);
+        Group group = ProjectionService.projectSingleGroup(Collections.singletonList(event));
+
+        log.trace("Es wurde eine Gruppe erstellt. ({}, {})", visibility, group.getId());
+
+        eventStoreService.saveEvent(event);
+
+        return group;
+    }
+
+    //TODO: test if exception interrupts runtime
     public void addUser(User user, Group group) {
         validationService.throwIfUserAlreadyInGroup(group, user);
 
-        AddUserEvent event = new AddUserEvent(group, user);
+        Event event = new AddUserEvent(group, user);
+        event.apply(group);
+
         eventStoreService.saveEvent(event);
+    }
+
+    /**
+     * Dasselbe wie addUser(), aber exceptions werden abgefangen und nicht geworfen.
+     */
+    private void addUserSilent(User user, Group group) {
+        try {
+            addUser(user, group);
+        } catch (Exception e) {
+            log.trace("Doppelter User wurde nicht hinzugefügt ({})!", user.getId());
+        }
     }
 
     public void deleteUser(User user, Group group) throws EventException {
         validationService.throwIfNotInGroup(group, user);
         validationService.throwIfLastAdmin(user, group);
 
-        DeleteUserEvent event = new DeleteUserEvent(group, user);
+        Event event = new DeleteUserEvent(group, user);
+        event.apply(group);
+
         eventStoreService.saveEvent(event);
 
         if (validationService.checkIfGroupEmpty(group)) {
@@ -167,27 +180,42 @@ public class GroupService {
     public void deleteGroup(User user, Group group) {
         inviteService.destroyLink(group);
 
-        DeleteGroupEvent event = new DeleteGroupEvent(group, user);
-        eventStoreService.saveEvent(event);
+        log.trace("Eine Gruppe wurde gelöscht ({})", group.getId());
 
-        log.trace("Eine Gruppe wurde gelöscht ({})", group);
+        Event event = new DeleteGroupEvent(group, user);
+        event.apply(group);
+
+        eventStoreService.saveEvent(event);
     }
 
     //TODO: Validate title
     public void updateTitle(User user, Group group, String title) {
-        UpdateGroupTitleEvent event = new UpdateGroupTitleEvent(group, user, title);
+        Event event = new UpdateGroupTitleEvent(group, user, title);
+        event.apply(group);
+
         eventStoreService.saveEvent(event);
     }
 
     //TODO: Validate description
     public void updateDescription(User user, Group group, String description) {
-        UpdateGroupDescriptionEvent event = new UpdateGroupDescriptionEvent(group, user, description);
+        Event event = new UpdateGroupDescriptionEvent(group, user, description);
+        event.apply(group);
+
+        eventStoreService.saveEvent(event);
+    }
+
+    public void updateRole(User user, Group group, Role role) {
+        Event event = new UpdateRoleEvent(group, user, role);
+        event.apply(group);
+
         eventStoreService.saveEvent(event);
     }
 
     //TODO: Validate limit
     public void updateUserLimit(User user, Group group, long userLimit) {
-        UpdateUserLimitEvent event = new UpdateUserLimitEvent(group, user, userLimit);
+        Event event = new UpdateUserLimitEvent(group, user, userLimit);
+        event.apply(group);
+
         eventStoreService.saveEvent(event);
     }
 }

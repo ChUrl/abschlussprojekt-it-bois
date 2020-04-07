@@ -20,18 +20,18 @@ public class InviteService {
         this.inviteRepository = inviteRepository;
     }
 
-    void createLink(UUID groupId) {
+    void createLink(Group group) {
         inviteRepository.save(new InviteLinkDTO(null,
-                                                groupId.toString(),
+                                                group.getId().toString(),
                                                 UUID.randomUUID().toString()));
-    }
 
-    void destroyLink(UUID groupId) {
-        inviteRepository.deleteLinkOfGroup(groupId.toString());
+        log.trace("Link wurde erzeugt! (Gruppe: {})", group.getId());
     }
 
     void destroyLink(Group group) {
         inviteRepository.deleteLinkOfGroup(group.getId().toString());
+
+        log.trace("Link wurde zerstört! (Gruppe: {})", group.getId());
     }
 
     public UUID getGroupIdFromLink(String link) {
@@ -44,13 +44,13 @@ public class InviteService {
         }
     }
 
-    public String getLinkByGroup(UUID groupId) {
+    public String getLinkByGroup(Group group) {
         try {
-            return inviteRepository.findLinkByGroupId(groupId.toString());
+            return inviteRepository.findLinkByGroupId(group.getId().toString());
         } catch (Exception e) {
-            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", groupId);
+            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", group.getId());
             e.printStackTrace();
-            throw new NoInviteExistException(groupId.toString());
+            throw new NoInviteExistException(group.getId().toString());
         }
     }
 }

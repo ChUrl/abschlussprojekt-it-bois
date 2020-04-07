@@ -80,7 +80,7 @@ public class GroupDetailsController {
         model.addAttribute("private", Visibility.PRIVATE);
 
         if (validationService.checkIfAdmin(group, user)) {
-            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroup(group.getId()));
+            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroup(group));
         }
 
         return "detailsMember";

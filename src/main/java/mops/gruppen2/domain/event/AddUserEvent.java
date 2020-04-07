@@ -29,13 +29,6 @@ public class AddUserEvent extends Event {
         this.email = email;
     }
 
-    public AddUserEvent(UUID groupId, User user) {
-        super(groupId, user.getId());
-        givenname = user.getGivenname();
-        familyname = user.getFamilyname();
-        email = user.getEmail();
-    }
-
     public AddUserEvent(Group group, User user) {
         super(group.getId(), user.getId());
         givenname = user.getGivenname();

@@ -4,7 +4,6 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.service.ControllerService;
 import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.IdService;
@@ -35,13 +34,11 @@ import static mops.gruppen2.service.IdService.uuidToString;
 public class GroupCreationController {
 
     private final GroupService groupService;
-    private final ControllerService controllerService;
     private final ValidationService validationService;
     private final ProjectionService projectionService;
 
-    public GroupCreationController(GroupService groupService, ControllerService controllerService, ValidationService validationService, ProjectionService projectionService) {
+    public GroupCreationController(GroupService groupService, ValidationService validationService, ProjectionService projectionService) {
         this.groupService = groupService;
-        this.controllerService = controllerService;
         this.validationService = validationService;
         this.projectionService = projectionService;
     }
