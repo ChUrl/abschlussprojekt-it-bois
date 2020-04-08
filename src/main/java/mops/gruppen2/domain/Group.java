@@ -1,7 +1,9 @@
 package mops.gruppen2.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,22 +16,30 @@ import java.util.UUID;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class Group {
 
-    //TODO: List to Hashmap
-    private final List<User> members;
-    private final Map<String, Role> roles;
+    @EqualsAndHashCode.Include
     private UUID id;
-    private String title;
-    private String description;
-    private Long userMaximum;
-    private GroupType type;
-    private Visibility visibility;
+
+    @ToString.Exclude
     private UUID parent;
 
-    public Group() {
-        members = new ArrayList<>();
-        roles = new HashMap<>();
-    }
+    //TODO: Single Type for Public/Private/Lecture?
+    private GroupType type;
+    private Visibility visibility;
 
+    private String title;
+    private String description;
+
+    // Default + Minimum: 1
+    @ToString.Exclude
+    private long userLimit = 1;
+
+    //TODO: List to Hashmap
+    @ToString.Exclude
+    private final List<User> members = new ArrayList<>();
+    @ToString.Exclude
+    private final Map<String, Role> roles = new HashMap<>();
 }

@@ -1,50 +1,54 @@
 package mops.gruppen2.service;
 
+import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.dto.InviteLinkDTO;
 import mops.gruppen2.domain.exception.InvalidInviteException;
 import mops.gruppen2.domain.exception.NoInviteExistException;
 import mops.gruppen2.repository.InviteRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@Log4j2
 public class InviteService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InviteService.class);
     private final InviteRepository inviteRepository;
 
     public InviteService(InviteRepository inviteRepository) {
         this.inviteRepository = inviteRepository;
     }
 
-    void createLink(UUID groupId) {
-        inviteRepository.save(new InviteLinkDTO(null, groupId.toString(), UUID.randomUUID().toString()));
+    void createLink(Group group) {
+        inviteRepository.save(new InviteLinkDTO(null,
+                                                group.getId().toString(),
+                                                UUID.randomUUID().toString()));
+
+        log.debug("Link wurde erzeugt! (Gruppe: {})", group.getId());
     }
 
-    void destroyLink(UUID groupId) {
-        inviteRepository.deleteLinkOfGroup(groupId.toString());
+    void destroyLink(Group group) {
+        inviteRepository.deleteLinkOfGroup(group.getId().toString());
+
+        log.debug("Link wurde zerstört! (Gruppe: {})", group.getId());
     }
 
     public UUID getGroupIdFromLink(String link) {
         try {
             return UUID.fromString(inviteRepository.findGroupIdByLink(link));
         } catch (Exception e) {
-            LOG.error("Gruppe zu Link ({}) konnte nicht gefunden werden!", link);
+            log.error("Gruppe zu Link ({}) konnte nicht gefunden werden!", link, e);
+            throw new InvalidInviteException(link);
         }
-
-        throw new InvalidInviteException(link);
     }
 
-    public String getLinkByGroupId(UUID groupId) {
+    public String getLinkByGroup(Group group) {
         try {
-            return inviteRepository.findLinkByGroupId(groupId.toString());
+            return inviteRepository.findLinkByGroupId(group.getId().toString());
         } catch (Exception e) {
-            LOG.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", groupId);
+            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", group.getId(), e);
+            throw new NoInviteExistException(group.getId().toString());
         }
-
-        throw new NoInviteExistException(groupId.toString());
     }
 }

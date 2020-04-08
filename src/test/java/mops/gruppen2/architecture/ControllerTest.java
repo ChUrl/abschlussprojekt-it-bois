@@ -11,7 +11,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
-public class ControllerTest {
+class ControllerTest {
 
     @ArchTest
     public static final ArchRule controllerClassesShouldBeAnnotatedWithControllerOrRestControllerAnnotation = classes()

@@ -1,9 +1,14 @@
 package mops.gruppen2.controller;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
-import mops.gruppen2.service.ControllerService;
+import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.User;
+import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
-import mops.gruppen2.service.KeyCloakService;
+import mops.gruppen2.service.IdService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,21 +22,25 @@ import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
-import java.util.UUID;
 
+import static mops.gruppen2.service.ControllerService.getGroupType;
+import static mops.gruppen2.service.ControllerService.getParent;
+import static mops.gruppen2.service.ControllerService.getUserLimit;
+import static mops.gruppen2.service.ControllerService.getVisibility;
+
+@SuppressWarnings("SameReturnValue")
 @Controller
 @SessionScope
 @RequestMapping("/gruppen2")
+@Log4j2
 public class GroupCreationController {
 
     private final GroupService groupService;
-    private final ControllerService controllerService;
-    private final ValidationService validationService;
+    private final ProjectionService projectionService;
 
-    public GroupCreationController(GroupService groupService, ControllerService controllerService, ValidationService validationService) {
+    public GroupCreationController(GroupService groupService, ProjectionService projectionService) {
         this.groupService = groupService;
-        this.controllerService = controllerService;
-        this.validationService = validationService;
+        this.projectionService = projectionService;
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_actuator"})
@@ -39,10 +48,10 @@ public class GroupCreationController {
     public String createGroupAsOrga(KeycloakAuthenticationToken token,
                                     Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("GET to /createOrga\n");
 
-        model.addAttribute("account", account);
-        model.addAttribute("lectures", groupService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("account", new Account(token));
+        model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createOrga";
     }
@@ -53,28 +62,29 @@ public class GroupCreationController {
     public String postCrateGroupAsOrga(KeycloakAuthenticationToken token,
                                        @RequestParam("title") String title,
                                        @RequestParam("description") String description,
-                                       @RequestParam(value = "visibility", required = false) Boolean visibility,
-                                       @RequestParam(value = "lecture", required = false) Boolean lecture,
-                                       @RequestParam("userMaximum") Long userMaximum,
-                                       @RequestParam(value = "maxInfiniteUsers", required = false) Boolean maxInfiniteUsers,
-                                       @RequestParam(value = "parent", required = false) String parent,
+                                       @RequestParam("visibility") boolean isPrivate,
+                                       @RequestParam("lecture") boolean isLecture,
+                                       @RequestParam("maxInfiniteUsers") boolean isInfinite,
+                                       @RequestParam("userMaximum") long userLimit,
+                                       @RequestParam("parent") String parent,
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = controllerService.getUUID(parent);
+        log.info("POST to /createOrga\n");
 
-        validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
+        Account account = new Account(token);
+        User user = new User(account);
 
-        controllerService.createGroupAsOrga(account,
-                                            title,
-                                            description,
-                                            visibility,
-                                            lecture,
-                                            maxInfiniteUsers,
-                                            userMaximum,
-                                            parentUUID,
-                                            file);
-        return "redirect:/gruppen2";
+        Group group = groupService.createGroup(user,
+                                               title,
+                                               description,
+                                               getVisibility(isPrivate),
+                                               getGroupType(isLecture),
+                                               getUserLimit(isInfinite, userLimit),
+                                               getParent(parent, isLecture));
+
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
+
+        return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
     }
 
     @RolesAllowed("ROLE_studentin")
@@ -82,10 +92,10 @@ public class GroupCreationController {
     public String createGroupAsStudent(KeycloakAuthenticationToken token,
                                        Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("GET to /createStudent\n");
 
-        model.addAttribute("account", account);
-        model.addAttribute("lectures", groupService.getAllLecturesWithVisibilityPublic());
+        model.addAttribute("account", new Account(token));
+        model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createStudent";
     }
@@ -96,25 +106,26 @@ public class GroupCreationController {
     public String postCreateGroupAsStudent(KeycloakAuthenticationToken token,
                                            @RequestParam("title") String title,
                                            @RequestParam("description") String description,
-                                           @RequestParam("userMaximum") Long userMaximum,
-                                           @RequestParam(value = "visibility", required = false) Boolean visibility,
-                                           @RequestParam(value = "maxInfiniteUsers", required = false) Boolean maxInfiniteUsers,
-                                           @RequestParam(value = "parent", required = false) String parent) {
+                                           @RequestParam("visibility") boolean isPrivate,
+                                           @RequestParam("maxInfiniteUsers") boolean isInfinite,
+                                           @RequestParam("userMaximum") long userLimit,
+                                           @RequestParam("parent") String parent) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        UUID parentUUID = controllerService.getUUID(parent);
+        log.info("POST to /createStudent\n");
 
-        validationService.checkFields(description, title, userMaximum, maxInfiniteUsers);
+        ValidationService.validateTitle(title);
+        ValidationService.validateDescription(description);
 
-        controllerService.createGroup(account,
-                                      title,
-                                      description,
-                                      visibility,
-                                      null,
-                                      maxInfiniteUsers,
-                                      userMaximum,
-                                      parentUUID);
+        Account account = new Account(token);
+        User user = new User(account);
+        Group group = groupService.createGroup(user,
+                                               title,
+                                               description,
+                                               getVisibility(isPrivate),
+                                               GroupType.SIMPLE,
+                                               getUserLimit(isInfinite, userLimit),
+                                               getParent(parent, false));
 
-        return "redirect:/gruppen2";
+        return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
     }
 }

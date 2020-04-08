@@ -23,7 +23,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li class="active">
-                <a th:href="@{/gruppen2/findGroup}" href="/findGroup">Suche</a>
+                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
             </li>
         </ul>
     </nav>
@@ -34,8 +34,8 @@
             <div class="col-10">
                 <h1>Gruppensuche</h1>
                 <div class="shadow-sm p-2"
-                     style="border: 10px solid aliceblue; border-radius: 5px; background: aliceblue">
-                    <form method="get" th:action="@{/gruppen2/findGroup}">
+                     style="border: 10px solid aliceblue; border-radius: 5px; background: aliceblue;">
+                    <form method="get" th:action="@{/gruppen2/search}">
                         <div class="form-group">
                             <label for="suchleiste">Suchbegriff:</label>
                             <input class="form-control" id="suchleiste"
@@ -43,14 +43,12 @@
                                    th:name="suchbegriff" type="text">
                         </div>
                         <button class="btn btn-primary"
-                                style="background: #52a1eb; border-style: none"
+                                style="background: #52a1eb; border-style: none;"
                                 type="submit">Suchen
                         </button>
-                        <button class="btn btn-primary"
-                                style="background: deepskyblue; border-style: none"
-                                type="submit">
-                            <a href="/gruppen2/findGroup?suchbegriff=" style="color: white">Alle
-                                                                                            anzeigen</a>
+                        <button class="btn btn-primary" style="background: deepskyblue; border-style: none;" type="submit">
+                            <a href="/gruppen2/search?suchbegriff=" style="color: white;">Alle
+                                                                                          anzeigen</a>
                         </button>
                     </form>
                 </div>
@@ -65,7 +63,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="gruppe : ${gruppen}" th:switch="${gruppe.getUserMaximum() != 100000}">
+                    <tr th:each="gruppe : ${gruppen}" th:switch="${gruppe.getUserLimit() != 100000}">
                         <th scope="row">
                             <span class="badge badge-pill badge-success"
                                   style="background: lightseagreen; margin-right: 25px;"
@@ -77,7 +75,7 @@
                             Beschreibung
                         </td>
                         <td th:case="${true}">
-                            <a th:text="${gruppe.getUserMaximum()}"></a>
+                            <a th:text="${gruppe.getUserLimit()}"></a>
                         </td>
                         <td th:case="${false}">unbegrenzt</td>
                     </tr>

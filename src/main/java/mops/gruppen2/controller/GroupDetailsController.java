@@ -1,14 +1,16 @@
 package mops.gruppen2.controller;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
-import mops.gruppen2.service.ControllerService;
+import mops.gruppen2.service.CsvService;
+import mops.gruppen2.service.GroupService;
+import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.InviteService;
-import mops.gruppen2.service.KeyCloakService;
-import mops.gruppen2.service.UserService;
+import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,21 +28,21 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
+@SuppressWarnings("SameReturnValue")
 @Controller
 @SessionScope
 @RequestMapping("/gruppen2")
+@Log4j2
 public class GroupDetailsController {
 
-    private final ControllerService controllerService;
-    private final UserService userService;
-    private final ValidationService validationService;
     private final InviteService inviteService;
+    private final GroupService groupService;
+    private final ProjectionService projectionService;
 
-    public GroupDetailsController(ControllerService controllerService, UserService userService, ValidationService validationService, InviteService inviteService) {
-        this.controllerService = controllerService;
-        this.userService = userService;
-        this.validationService = validationService;
+    public GroupDetailsController(InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
         this.inviteService = inviteService;
+        this.groupService = groupService;
+        this.projectionService = projectionService;
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin", "ROLE_actuator"})
@@ -50,36 +52,38 @@ public class GroupDetailsController {
                                    HttpServletRequest request,
                                    @PathVariable("id") String groupId) {
 
-        Group group = userService.getGroupById(UUID.fromString(groupId));
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        User user = new User(account);
-        UUID parentId = group.getParent();
-        String actualURL = request.getRequestURL().toString();
-        String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
-        Group parent = controllerService.getParent(parentId);
+        log.info("GET to /details\n");
 
-        validationService.throwIfGroupNotExisting(group.getTitle());
+        Account account = new Account(token);
+        User user = new User(account);
 
         model.addAttribute("account", account);
-        if (!validationService.checkIfUserInGroup(group, user)) {
-            validationService.throwIfNoAccessToPrivate(group, user);
-            model.addAttribute("group", group);
-            model.addAttribute("parentId", parentId);
-            model.addAttribute("parent", parent);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        model.addAttribute("group", group);
+
+        // Parent Badge
+        UUID parentId = group.getParent();
+        Group parent = projectionService.projectParent(parentId);
+
+        // Detailseite für private Gruppen
+        if (!ValidationService.checkIfGroupAccess(group, user)) {
             return "detailsNoMember";
         }
 
-        model.addAttribute("parentId", parentId);
-        model.addAttribute("parent", parent);
-        model.addAttribute("group", group);
         model.addAttribute("roles", group.getRoles());
         model.addAttribute("user", user);
         model.addAttribute("admin", Role.ADMIN);
         model.addAttribute("public", Visibility.PUBLIC);
         model.addAttribute("private", Visibility.PRIVATE);
+        model.addAttribute("parent", parent);
 
-        if (validationService.checkIfAdmin(group, user)) {
-            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroupId(group.getId()));
+        // Invitelink Anzeige für Admins
+        if (ValidationService.checkIfAdmin(group, user)) {
+            String actualURL = request.getRequestURL().toString();
+            String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
+
+            model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroup(group));
         }
 
         return "detailsMember";
@@ -91,11 +95,13 @@ public class GroupDetailsController {
                                  Model model,
                                  @PathVariable("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        log.info("GET to /details/changeMetadata\n");
 
-        validationService.throwIfNoAdmin(group, user);
+        Account account = new Account(token);
+        User user = new User(account);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("account", account);
         model.addAttribute("title", group.getTitle());
@@ -116,14 +122,15 @@ public class GroupDetailsController {
                                      @RequestParam("description") String description,
                                      @RequestParam("groupId") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("POST to /details/changeMetadata\n");
+
+        Account account = new Account(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
 
-        validationService.throwIfNoAdmin(group, user);
-        validationService.checkFields(title, description);
-
-        controllerService.changeMetaData(account, group, title, description);
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
+        groupService.updateTitle(user, group, title);
+        groupService.updateDescription(user, group, description);
 
         return "redirect:/gruppen2/details/" + groupId;
     }
@@ -134,11 +141,13 @@ public class GroupDetailsController {
                               Model model,
                               @PathVariable("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        log.info("GET to /details/members\n");
+
+        Account account = new Account(token);
         User user = new User(account);
 
-        validationService.throwIfNoAdmin(group, user);
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("account", account);
         model.addAttribute("members", group.getMembers());
@@ -155,18 +164,17 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
-        User principle = new User(account);
-        User user = new User(userId, "", "", "");
+        log.info("POST to /details/members/changeRole\n");
 
-        validationService.throwIfNoAdmin(group, principle);
+        Account account = new Account(token);
+        User user = new User(account);
 
-        //TODO: checkIfAdmin checkt nicht, dass die rolle geändert wurde. oder die rolle wird nicht geändert
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
+        groupService.toggleMemberRole(new User(userId), group);
 
-        controllerService.changeRole(account, user, group);
-
-        if (!validationService.checkIfAdmin(group, principle)) {
+        // Falls sich der User selbst die Rechte genommen hat
+        if (!ValidationService.checkIfAdmin(group, user)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
@@ -177,15 +185,16 @@ public class GroupDetailsController {
     @PostMapping("/details/members/changeMaximum")
     @CacheEvict(value = "groups", allEntries = true)
     public String changeMaxSize(KeycloakAuthenticationToken token,
-                                @RequestParam("maximum") Long maximum,
+                                @RequestParam("maximum") long userLimit,
                                 @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        log.info("POST to /details/members/changeMaximum\n");
 
-        validationService.throwIfNewMaximumIsValid(maximum, group);
+        Account account = new Account(token);
+        User user = new User(account);
 
-        controllerService.updateMaxUser(account, UUID.fromString(groupId), maximum);
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        groupService.updateUserLimit(user, group, userLimit);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }
@@ -197,17 +206,15 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        User principle = new User(account);
-        User user = new User(userId, "", "", "");
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        log.info("POST to /details/members/deleteUser\n");
 
-        validationService.throwIfNoAdmin(group, principle);
+        Account account = new Account(token);
+        User user = new User(account);
 
-        controllerService.deleteUser(account, user, group);
-
-        if (!validationService.checkIfUserInGroup(group, principle)) {
-            return "redirect:/gruppen2";
+        // Der eingeloggte User kann sich nicht selbst entfernen
+        if (!userId.equals(user.getId())) {
+            Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+            groupService.deleteUser(new User(userId), group);
         }
 
         return "redirect:/gruppen2/details/members/" + groupId;
@@ -220,16 +227,15 @@ public class GroupDetailsController {
                             Model model,
                             @RequestParam("id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("POST to /detailsBeitreten\n");
+
+        Account account = new Account(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
-
-        validationService.throwIfUserAlreadyInGroup(group, user);
-        validationService.throwIfGroupFull(group);
-
-        controllerService.addUser(account, UUID.fromString(groupId));
 
         model.addAttribute("account", account);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        groupService.addUser(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -240,11 +246,13 @@ public class GroupDetailsController {
     public String leaveGroup(KeycloakAuthenticationToken token,
                              @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
+        log.info("POST to /leaveGroup\n");
 
-        controllerService.deleteUser(account, user, group);
+        Account account = new Account(token);
+        User user = new User(account);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        groupService.deleteUser(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -255,13 +263,13 @@ public class GroupDetailsController {
     public String deleteGroup(KeycloakAuthenticationToken token,
                               @RequestParam("group_id") String groupId) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("POST to /deleteGroup\n");
+
+        Account account = new Account(token);
         User user = new User(account);
-        Group group = userService.getGroupById(UUID.fromString(groupId));
 
-        validationService.throwIfNoAdmin(group, user);
-
-        controllerService.deleteGroupEvent(user.getId(), UUID.fromString(groupId));
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        groupService.deleteGroup(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -273,8 +281,13 @@ public class GroupDetailsController {
                                   @RequestParam("group_id") String groupId,
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
-        controllerService.addUsersFromCsv(account, file, groupId);
+        log.info("POST to /details/members/addUsersFromCsv\n");
+
+        Account account = new Account(token);
+        User user = new User(account);
+
+        Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
+        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/members/" + groupId;
     }

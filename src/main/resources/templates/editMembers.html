@@ -27,7 +27,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li>
-                <a th:href="@{/gruppen2/findGroup}" href="/findGroup">Suche</a>
+                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
             </li>
         </ul>
     </nav>
@@ -37,16 +37,17 @@
         <div class="row">
             <div class="col-10">
                 <h1>Mitglieder bearbeiten</h1>
-                <div th:switch="${group.getUserMaximum() != 100000}">
+                <!--TODO: Anzeige bei unbegrenzt-->
+                <div th:switch="${group.getUserLimit() != 100000}">
                     <h5 th:case="${true}">
                         <a th:text="${group.getMembers().size()}"></a>
                         <a>von maximal</a>
-                        <a th:text="${group.getUserMaximum()}"></a>
+                        <a th:text="${group.getUserLimit()}"></a>
                         <a>Benutzern.</a>
                     </h5>
                     <h5 th:case="${false}"> unbegrenzte Teilnehmeranzahl</h5>
                 </div>
-                <div class="shadow p-2" style="border: 10px solid aliceblue; background: aliceblue">
+                <div class="shadow p-2" style="border: 10px solid aliceblue; background: aliceblue;">
                     <div class="form-group pt-4" th:if="${account.getRoles().contains('orga')}">
                         <form th:action="@{/gruppen2/details/members/addUsersFromCsv}"
                               enctype="multipart/form-data"
@@ -61,10 +62,10 @@
                                 </div>
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary"
-                                            style="background: #52a1eb; border-style: none"
+                                            style="background: #52a1eb; border-style: none;"
                                             th:name="group_id" th:value="${group.getId()}"
                                             type="submit">
-                                        <a style="color: white">Hinzufügen</a>
+                                        <a style="color: white;">Hinzufügen</a>
                                     </button>
                                 </div>
                             </div>
@@ -73,29 +74,31 @@
                     <div class="form-group pt-4">
                         <form method="post" th:action="@{/gruppen2/details/members/changeMaximum}">
                             <div class="input-group mb-3" id="userMaximum">
+                                <label for="teilnehmerzahl"></label>
                                 <input class="form-control"
+                                       id="teilnehmerzahl"
                                        placeholder="Maximale Teilnehmerzahl ändern..."
                                        th:name="maximum"
                                        type="number" th:min="${group.getMembers().size()}"
                                        max="10000">
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary"
-                                            style="background: #52a1eb; border-style: none"
+                                            style="background: #52a1eb; border-style: none;"
                                             th:name="group_id" th:value="${group.getId()}"
                                             type="submit">
-                                        <a style="color: white">Speichern</a>
+                                        <a style="color: white;">Speichern</a>
                                     </button>
                                 </div>
                             </div>
                         </form>
                     </div>
 
-                    <table class="table" style="table-layout: fixed">
+                    <table class="table" style="table-layout: fixed;">
                         <thead>
                         <tr>
                             <th scope="col">Mitglied</th>
-                            <th scope="col" style="width: 180px">Rolle</th>
-                            <th scope="col" style="width: 280px">Optionen</th>
+                            <th scope="col" style="width: 180px;">Rolle</th>
+                            <th scope="col" style="width: 280px;">Optionen</th>
                         </tr>
                         </thead>
                         <tbody class="table-striped">
@@ -123,7 +126,7 @@
                                                type="hidden">
                                         <input th:name="user_id" th:value="${member.getId()}"
                                                type="hidden">
-                                        <button class="btn btn-danger btn-sm" style="margin: 5px"
+                                        <button class="btn btn-danger btn-sm" style="margin: 5px;"
                                                 th:if='!${account.getName().equals(member.getId())}'>
                                             Mitglied entfernen
                                         </button>
@@ -134,7 +137,7 @@
                         </tbody>
                     </table>
                     <form method="get" th:action="@{/gruppen2/details/{id}(id=${group.getId()})}">
-                        <button class="btn btn-primary" style="background: #52a1eb; border-style: none" type="submit">
+                        <button class="btn btn-primary" style="background: #52a1eb; border-style: none;" type="submit">
                             Fertig
                         </button>
                     </form>

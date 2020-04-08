@@ -17,8 +17,7 @@ class DeleteGroupEventTest {
                                                  "A",
                                                  uuidMock(1),
                                                  GroupType.SIMPLE,
-                                                 Visibility.PUBLIC,
-                                                 100L);
+                                                 Visibility.PUBLIC);
         Event deleteEvent = new DeleteGroupEvent(uuidMock(0), "A");
 
         Group group = TestBuilder.apply(createEvent, deleteEvent);
@@ -26,7 +25,7 @@ class DeleteGroupEventTest {
         assertThat(group.getMembers()).isEmpty();
         assertThat(group.getType()).isEqualTo(null);
         assertThat(group.getVisibility()).isEqualTo(null);
-        assertThat(group.getUserMaximum()).isEqualTo(0);
+        assertThat(group.getUserLimit()).isEqualTo(0);
         assertThat(group.getId()).isEqualTo(uuidMock(0));
         assertThat(group.getParent()).isEqualTo(null);
     }

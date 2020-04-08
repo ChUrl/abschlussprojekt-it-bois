@@ -1,10 +1,11 @@
 package mops.gruppen2.controller;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
+import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.PageNotFoundException;
-import mops.gruppen2.service.KeyCloakService;
-import mops.gruppen2.service.UserService;
+import mops.gruppen2.service.ProjectionService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,13 +15,15 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+@SuppressWarnings("SameReturnValue")
 @Controller
+@Log4j2
 public class GruppenfindungController {
 
-    private final UserService userService;
+    private final ProjectionService projectionService;
 
-    public GruppenfindungController(UserService userService) {
-        this.userService = userService;
+    public GruppenfindungController(ProjectionService projectionService) {
+        this.projectionService = projectionService;
     }
 
     @GetMapping("")
@@ -33,12 +36,15 @@ public class GruppenfindungController {
     public String index(KeycloakAuthenticationToken token,
                         Model model) {
 
-        Account account = KeyCloakService.createAccountFromPrincipal(token);
+        log.info("GET to /gruppen2\n");
+
+        Account account = new Account(token);
         User user = new User(account);
 
         model.addAttribute("account", account);
-        model.addAttribute("gruppen", userService.getUserGroups(user));
+        model.addAttribute("gruppen", projectionService.projectUserGroups(user));
         model.addAttribute("user", user);
+        model.addAttribute("lecture", GroupType.LECTURE);
 
         return "index";
     }

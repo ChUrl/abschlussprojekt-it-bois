@@ -2,6 +2,8 @@ package mops.gruppen2.domain.event;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
@@ -16,6 +18,8 @@ import java.util.UUID;
  */
 @Getter
 @NoArgsConstructor // For Jackson
+@ToString
+@Log4j2
 public class AddUserEvent extends Event {
 
     private String givenname;
@@ -29,6 +33,13 @@ public class AddUserEvent extends Event {
         this.email = email;
     }
 
+    public AddUserEvent(Group group, User user) {
+        super(group.getId(), user.getId());
+        givenname = user.getGivenname();
+        familyname = user.getFamilyname();
+        email = user.getEmail();
+    }
+
     @Override
     protected void applyEvent(Group group) throws EventException {
         User user = new User(userId, givenname, familyname, email);
@@ -37,11 +48,14 @@ public class AddUserEvent extends Event {
             throw new UserAlreadyExistsException(getClass().toString());
         }
 
-        if (group.getMembers().size() >= group.getUserMaximum()) {
+        if (group.getMembers().size() >= group.getUserLimit()) {
             throw new GroupFullException(getClass().toString());
         }
 
         group.getMembers().add(user);
         group.getRoles().put(userId, Role.MEMBER);
+
+        log.trace("\t\t\t\t\tNeue Members: {}", group.getMembers());
+        log.trace("\t\t\t\t\tNeue Rollen: {}", group.getRoles());
     }
 }

@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   dbmysql:
-    image: mysql:5.7
+    image: mysql:8.0
     container_name: 'dbmysql'
     environment:
       MYSQL_DATABASE: 'gruppen2'

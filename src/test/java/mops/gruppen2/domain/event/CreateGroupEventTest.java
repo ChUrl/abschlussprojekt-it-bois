@@ -17,15 +17,13 @@ class CreateGroupEventTest {
                                                  "A",
                                                  uuidMock(1),
                                                  GroupType.SIMPLE,
-                                                 Visibility.PUBLIC,
-                                                 100L);
+                                                 Visibility.PUBLIC);
 
         Group group = TestBuilder.apply(createEvent);
 
         assertThat(group.getMembers()).hasSize(0);
         assertThat(group.getType()).isEqualTo(GroupType.SIMPLE);
         assertThat(group.getVisibility()).isEqualTo(Visibility.PUBLIC);
-        assertThat(group.getUserMaximum()).isEqualTo(100);
         assertThat(group.getId()).isEqualTo(uuidMock(0));
         assertThat(group.getParent()).isEqualTo(uuidMock(1));
     }

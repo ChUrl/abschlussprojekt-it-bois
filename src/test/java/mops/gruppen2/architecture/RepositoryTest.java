@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
-public class RepositoryTest {
+class RepositoryTest {
 
     @ArchTest
     public static final ArchRule repositoryClassesThatAreAnnotatedWithRepositoryShouldHaveRepositoryInName = classes()
