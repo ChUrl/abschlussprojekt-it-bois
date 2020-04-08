@@ -53,7 +53,6 @@ public class SearchAndInviteController {
         log.info("GET to /searchPage\n");
 
         Account account = new Account(token);
-        User user = new User(account);
 
         model.addAttribute("account", account);
         model.addAttribute("gruppen", Collections.emptyList()); // TODO: verschönern

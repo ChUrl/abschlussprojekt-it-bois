@@ -91,8 +91,8 @@ class APIControllerTest {
         assertThat(apiController.updateGroups(0L).getGroupList()).hasSize(2);
         assertThat(apiController.updateGroups(4L).getGroupList()).hasSize(1);
         assertThat(apiController.updateGroups(6L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(7L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(7);
+        assertThat(apiController.updateGroups(7L).getGroupList()).hasSize(1);
+        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(9);
     }
 
     @Test
