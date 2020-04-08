@@ -3,6 +3,7 @@ package mops.gruppen2.service;
 import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.TestBuilder;
 import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.repository.EventRepository;
@@ -58,7 +59,7 @@ class GroupServiceTest {
 
     @BeforeEach
     void setUp() {
-        groupService = new GroupService(eventStoreService, validationService, inviteService);
+        groupService = new GroupService(eventStoreService, inviteService);
         eventRepository.deleteAll();
         //noinspection SqlResolve
         template.execute("ALTER TABLE event ALTER COLUMN event_id RESTART WITH 1");
@@ -184,7 +185,7 @@ class GroupServiceTest {
                                   updateGroupTitleEvent(uuidMock(0)),
                                   updateGroupDescriptionEvent(uuidMock(0)));
 
-        assertThat(searchService.searchPublicGroups("", "jens")).isEmpty();
+        assertThat(searchService.searchPublicGroups("", new User("jens"))).isEmpty();
     }
 
     //TODO: SearchServiceTest
@@ -193,7 +194,7 @@ class GroupServiceTest {
         eventStoreService.saveAll(completePublicGroups(10, 0),
                                   completePrivateGroups(10, 0));
 
-        assertThat(searchService.searchPublicGroups("", "jens")).hasSize(10);
+        assertThat(searchService.searchPublicGroups("", new User("jens"))).hasSize(10);
     }
 
     //TODO: SearchServiceTest
@@ -207,9 +208,9 @@ class GroupServiceTest {
                                   updateGroupDescriptionEvent(uuidMock(1), "KK"),
                                   createPrivateGroupEvent());
 
-        assertThat(searchService.searchPublicGroups("A", "jesus")).hasSize(2);
-        assertThat(searchService.searchPublicGroups("F", "jesus")).hasSize(1);
-        assertThat(searchService.searchPublicGroups("Z", "jesus")).hasSize(0);
+        assertThat(searchService.searchPublicGroups("A", new User("jesus"))).hasSize(2);
+        assertThat(searchService.searchPublicGroups("F", new User("jesus"))).hasSize(1);
+        assertThat(searchService.searchPublicGroups("Z", new User("jesus"))).hasSize(0);
     }
 
 }

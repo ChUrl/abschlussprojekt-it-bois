@@ -4,18 +4,22 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor // Für Jackson: CSV-Import
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class User {
 
     @EqualsAndHashCode.Include
     private String id;
 
     private String givenname;
+    @ToString.Exclude
     private String familyname;
+    @ToString.Exclude
     private String email;
 
     public User(Account account) {

@@ -23,22 +23,19 @@ public final class CsvService {
     private CsvService() {}
 
     public static List<User> readCsvFile(MultipartFile file) throws EventException {
-        if (file == null) {
+        if (file == null || file.isEmpty()) {
             return Collections.emptyList();
         }
-        if (!file.isEmpty()) {
-            try {
-                List<User> userList = read(file.getInputStream());
-                return userList.stream()
-                               .distinct()
-                               .collect(Collectors.toList()); //filter duplicates from list
-            } catch (IOException e) {
-                log.error("File konnte nicht gelesen werden:\n{}", e.getMessage());
-                e.printStackTrace();
-                throw new WrongFileException(file.getOriginalFilename());
-            }
+
+        try {
+            List<User> userList = read(file.getInputStream());
+            return userList.stream()
+                           .distinct()
+                           .collect(Collectors.toList()); //filter duplicates from list
+        } catch (IOException e) {
+            log.error("File konnte nicht gelesen werden!", e);
+            throw new WrongFileException(file.getOriginalFilename());
         }
-        return Collections.emptyList();
     }
 
     private static List<User> read(InputStream stream) throws IOException {

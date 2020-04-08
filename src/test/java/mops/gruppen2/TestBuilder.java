@@ -14,6 +14,7 @@ import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.event.UpdateGroupDescriptionEvent;
 import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
+import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,6 +94,7 @@ public class TestBuilder {
         eventList.add(createPublicGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
+        eventList.add(new UpdateUserLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -105,6 +107,7 @@ public class TestBuilder {
         eventList.add(createPrivateGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
+        eventList.add(new UpdateUserLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -170,8 +173,7 @@ public class TestBuilder {
                 faker.random().hex(),
                 null,
                 GroupType.SIMPLE,
-                visibility,
-                10000000L
+                visibility
         );
     }
 
@@ -185,8 +187,7 @@ public class TestBuilder {
                 faker.random().hex(),
                 null,
                 GroupType.LECTURE,
-                Visibility.PUBLIC,
-                10000000L
+                Visibility.PUBLIC
         );
     }
 
@@ -284,6 +285,10 @@ public class TestBuilder {
                 faker.random().hex(),
                 title
         );
+    }
+
+    public static Event updateUserLimitMaxEvent(UUID groupId) {
+        return new UpdateUserLimitEvent(groupId, firstname(), Long.MAX_VALUE);
     }
 
     public static Event updateRoleEvent(UUID groupId, String userId, Role role) {

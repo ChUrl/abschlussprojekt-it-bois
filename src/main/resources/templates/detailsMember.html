@@ -24,7 +24,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li>
-                <a href="/findGroup" th:href="@{/gruppen2/findGroup}">Suche</a>
+                <a href="/searchPage" th:href="@{/gruppen2/searchPage}">Suche</a>
             </li>
         </ul>
     </nav>
@@ -54,7 +54,7 @@
                     <span class="badge badge-pill badge-success" style="background: lightseagreen"
                           th:if='${group.getType() == group.getType().LECTURE}'>Veranstaltung</span>
                     <span class="badge badge-pill badge-info" style="background: mediumorchid"
-                          th:text="${parent.getTitle()}">Parent</span>
+                          th:text="${parent?.getTitle()}">Parent</span>
 
                     <div class="input-group mb-3" style="margin-top: 10px"
                          th:if="${roles.get(user.getId()) == admin}">

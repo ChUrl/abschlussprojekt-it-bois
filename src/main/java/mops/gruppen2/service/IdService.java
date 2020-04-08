@@ -13,7 +13,7 @@ public final class IdService {
 
     private IdService() {}
 
-    public static List<UUID> stringToUUIDs(List<String> groupIds) {
+    public static List<UUID> stringsToUUID(List<String> groupIds) {
         return groupIds.stream()
                        .map(IdService::stringToUUID)
                        .collect(Collectors.toList());
@@ -28,14 +28,10 @@ public final class IdService {
      * @return Id als UUID
      */
     public static UUID stringToUUID(String groupId) {
-        if (groupId == null || groupId.isEmpty()) {
-            return UUID.fromString("00000000-0000-0000-0000-000000000000");
-        }
-
-        return UUID.fromString(groupId);
+        return groupId.isEmpty() ? emptyUUID() : UUID.fromString(groupId);
     }
 
-    public static List<String> uuidToString(List<UUID> groupIds) {
+    public static List<String> uuidsToString(List<UUID> groupIds) {
         return groupIds.stream()
                        .map(UUID::toString)
                        .collect(Collectors.toList());
@@ -45,11 +41,11 @@ public final class IdService {
         return groupId.toString();
     }
 
-    public static boolean idIsEmpty(UUID id) {
-        if (id == null) {
-            return true;
-        }
+    public static boolean isEmpty(UUID id) {
+        return id == null || emptyUUID().equals(id);
+    }
 
-        return "00000000-0000-0000-0000-000000000000".equals(id.toString());
+    public static UUID emptyUUID() {
+        return UUID.fromString("00000000-0000-0000-0000-000000000000");
     }
 }

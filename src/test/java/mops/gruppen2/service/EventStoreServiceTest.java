@@ -1,6 +1,7 @@
 package mops.gruppen2.service;
 
 import mops.gruppen2.Gruppen2Application;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.dto.EventDTO;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.repository.EventRepository;
@@ -93,7 +94,7 @@ class EventStoreServiceTest {
                                   addUserEvent(uuidMock(3), "A"),
                                   addUserEvent(uuidMock(3), "B"));
 
-        assertThat(eventStoreService.findExistingUserGroups("A")).hasSize(4);
-        assertThat(eventStoreService.findExistingUserGroups("B")).hasSize(1);
+        assertThat(eventStoreService.findExistingUserGroups(new User("A"))).hasSize(4);
+        assertThat(eventStoreService.findExistingUserGroups(new User("B"))).hasSize(1);
     }
 }

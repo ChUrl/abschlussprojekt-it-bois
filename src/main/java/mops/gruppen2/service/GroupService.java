@@ -18,7 +18,6 @@ import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 import mops.gruppen2.domain.exception.EventException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,12 +30,10 @@ import java.util.UUID;
 public class GroupService {
 
     private final EventStoreService eventStoreService;
-    private final ValidationService validationService;
     private final InviteService inviteService;
 
-    public GroupService(EventStoreService eventStoreService, ValidationService validationService, InviteService inviteService) {
+    public GroupService(EventStoreService eventStoreService, InviteService inviteService) {
         this.eventStoreService = eventStoreService;
-        this.validationService = validationService;
         this.inviteService = inviteService;
     }
 
@@ -45,9 +42,7 @@ public class GroupService {
 
 
     /**
-     * Erzeugt eine neue Gruppe, fügt den User, der die Gruppe erstellt hat, hinzu und setzt seine Rolle als Admin fest.
-     * Zudem wird der Gruppentitel und die Gruppenbeschreibung erzeugt, welche vorher der Methode übergeben wurden.
-     * Aus diesen Event-Objekten wird eine Liste erzeugt, welche daraufhin mithilfe des EventServices gesichert wird.
+     * Erzeugt eine neue Gruppe und erzeugt nötige Events für die Initiale Setzung der Attribute.
      *
      * @param user        Keycloak-Account
      * @param title       Gruppentitel
@@ -61,12 +56,18 @@ public class GroupService {
                              long userLimit,
                              UUID parent) {
 
-        Group group = createGroup(user, parent, groupType, visibility, userLimit);
+        // Regeln:
+        // isPrivate -> !isLecture
+        // isLecture -> !isPrivate
+        ValidationService.validateFlags(visibility, groupType);
+        Group group = createGroup(user, parent, groupType, visibility);
 
+        // Die Reihenfolge ist wichtig, da der ausführende User Admin sein muss
         addUser(user, group);
+        updateRole(user, group, Role.ADMIN);
         updateTitle(user, group, title);
         updateDescription(user, group, description);
-        updateRole(user, group, Role.ADMIN);
+        updateUserLimit(user, group, userLimit);
 
         inviteService.createLink(group);
 
@@ -78,7 +79,7 @@ public class GroupService {
 
 
     /**
-     * Fügt eine Liste von Usern zu einer Gruppe hinzu (in der Datenbank).
+     * Fügt eine Liste von Usern zu einer Gruppe hinzu.
      * Duplikate werden übersprungen, die erzeugten Events werden gespeichert.
      * Dabei wird das Teilnehmermaximum eventuell angehoben.
      *
@@ -103,7 +104,7 @@ public class GroupService {
      * @return Das neue Teilnehmermaximum
      */
     private static long getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return Math.max(group.getMembers().size() + newUsers.size(), group.getMembers().size());
+        return Math.max(group.getMembers().size() + newUsers.size(), group.getUserLimit());
     }
 
     /**
@@ -115,7 +116,8 @@ public class GroupService {
      * @throws EventException Falls der User nicht gefunden wird
      */
     public void toggleMemberRole(User user, Group group) throws EventException {
-        validationService.throwIfNotInGroup(group, user);
+        ValidationService.throwIfNoMember(group, user);
+        ValidationService.throwIfLastAdmin(user, group);
 
         Role role = group.getRoles().get(user.getId());
         updateRole(user, group, role.toggle());
@@ -126,25 +128,26 @@ public class GroupService {
     // Spezifische Events werden erzeugt, validiert, auf die Gruppe angewandt und gespeichert
 
 
-    //TODO: more validation
-    private Group createGroup(User user, UUID parent, GroupType groupType, Visibility visibility, long userLimit) {
+    /**
+     * Erzeugt eine Gruppe, speichert diese und gibt diese zurück.
+     */
+    private Group createGroup(User user, UUID parent, GroupType groupType, Visibility visibility) {
         Event event = new CreateGroupEvent(UUID.randomUUID(),
                                            user.getId(),
                                            parent,
-                                           groupType, visibility,
-                                           userLimit);
-        Group group = ProjectionService.projectSingleGroup(Collections.singletonList(event));
-
-        log.trace("Es wurde eine Gruppe erstellt. ({}, {})", visibility, group.getId());
+                                           groupType,
+                                           visibility);
+        Group group = new Group();
+        event.apply(group);
 
         eventStoreService.saveEvent(event);
 
         return group;
     }
 
-    //TODO: test if exception interrupts runtime
     public void addUser(User user, Group group) {
-        validationService.throwIfUserAlreadyInGroup(group, user);
+        ValidationService.throwIfMember(group, user);
+        ValidationService.throwIfGroupFull(group);
 
         Event event = new AddUserEvent(group, user);
         event.apply(group);
@@ -159,45 +162,48 @@ public class GroupService {
         try {
             addUser(user, group);
         } catch (Exception e) {
-            log.trace("Doppelter User wurde nicht hinzugefügt ({})!", user.getId());
+            log.debug("Doppelter User {} wurde nicht zu Gruppe {} hinzugefügt!", user, group);
         }
     }
 
     public void deleteUser(User user, Group group) throws EventException {
-        validationService.throwIfNotInGroup(group, user);
-        validationService.throwIfLastAdmin(user, group);
+        ValidationService.throwIfNoMember(group, user);
+        ValidationService.throwIfLastAdmin(user, group);
 
-        Event event = new DeleteUserEvent(group, user);
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
-
-        if (validationService.checkIfGroupEmpty(group)) {
+        if (ValidationService.checkIfGroupEmpty(group)) {
             deleteGroup(user, group);
+        } else {
+            Event event = new DeleteUserEvent(group, user);
+            event.apply(group);
+
+            eventStoreService.saveEvent(event);
         }
     }
 
     public void deleteGroup(User user, Group group) {
-        inviteService.destroyLink(group);
-
-        log.trace("Eine Gruppe wurde gelöscht ({})", group.getId());
+        ValidationService.throwIfNoAdmin(group, user);
 
         Event event = new DeleteGroupEvent(group, user);
         event.apply(group);
+        inviteService.destroyLink(group);
 
         eventStoreService.saveEvent(event);
     }
 
-    //TODO: Validate title
     public void updateTitle(User user, Group group, String title) {
+        ValidationService.throwIfNoAdmin(group, user);
+        ValidationService.validateTitle(title);
+
         Event event = new UpdateGroupTitleEvent(group, user, title);
         event.apply(group);
 
         eventStoreService.saveEvent(event);
     }
 
-    //TODO: Validate description
     public void updateDescription(User user, Group group, String description) {
+        ValidationService.throwIfNoAdmin(group, user);
+        ValidationService.validateDescription(description);
+
         Event event = new UpdateGroupDescriptionEvent(group, user, description);
         event.apply(group);
 
@@ -205,14 +211,22 @@ public class GroupService {
     }
 
     public void updateRole(User user, Group group, Role role) {
+        ValidationService.throwIfNoMember(group, user);
+
         Event event = new UpdateRoleEvent(group, user, role);
         event.apply(group);
 
         eventStoreService.saveEvent(event);
     }
 
-    //TODO: Validate limit
     public void updateUserLimit(User user, Group group, long userLimit) {
+        ValidationService.throwIfNoAdmin(group, user);
+        ValidationService.validateUserLimit(userLimit, group);
+
+        if (userLimit == group.getUserLimit()) {
+            return;
+        }
+
         Event event = new UpdateUserLimitEvent(group, user, userLimit);
         event.apply(group);
 

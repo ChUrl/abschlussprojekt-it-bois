@@ -23,7 +23,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li>
-                <a href="/findGroup" th:href="@{/gruppen2/findGroup}">Suche</a>
+                <a href="/searchPage" th:href="@{/gruppen2/searchPage}">Suche</a>
             </li>
         </ul>
     </nav>
@@ -50,7 +50,7 @@
                             <h3 style="color: dodgerblue; font-weight: bold; font-optical-sizing: auto; overflow-wrap: break-word">
                                 <span class="badge badge-pill badge-success"
                                       style="background: lightseagreen; margin-right: 25px; float: right"
-                                      th:if='${gruppe.getType() == gruppe.getType().LECTURE}'>Veranstaltung</span>
+                                      th:if='${gruppe.getType() == lecture}'>Veranstaltung</span>
                                 <a th:href="@{/gruppen2/details/{id}(id=${gruppe.getId()})}"
                                    th:text="${gruppe.getTitle()}"></a>
                             </h3>

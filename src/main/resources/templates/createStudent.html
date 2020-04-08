@@ -27,7 +27,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li>
-                <a th:href="@{/gruppen2/findGroup}" href="/findGroup">Suche</a>
+                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
             </li>
         </ul>
     </nav>
@@ -50,8 +50,9 @@
                             <textarea class="form-control" id="description" required rows="3" th:name="description"></textarea>
                         </div>
                         <div class="custom-control custom-checkbox">
-                            <!--DO NOT WRAP-->
-                            <input type="hidden" name="maxInfiniteUsers" value="0"/><input class="custom-control-input" type="checkbox" id="maxInfiniteUsers" onclick="this.previousSibling.value=1-this.previousSibling.value"/>
+                            <!--DUMMY-->
+                            <input type="hidden" id="maxInfiniteUsersDummy" name="maxInfiniteUsers" value="0"/>
+                            <input class="custom-control-input" type="checkbox" id="maxInfiniteUsers" onchange="$('#maxInfiniteUsersDummy').val(this.checked ? 1 : 0)"/>
                             <label class="custom-control-label" for="maxInfiniteUsers">Anzahl
                                                                                        unbegrenzt</label>
                         </div>
@@ -61,15 +62,15 @@
                                    type="number" min="1" max="10000">
                         </div>
                         <div class="custom-control custom-checkbox">
-                            <!--DO NOT WRAP-->
-                            <input type="hidden" name="visibility" value="0"/><input class="custom-control-input" type="checkbox" id="visibility" onclick="this.previousSibling.value=1-this.previousSibling.value"/>
+                            <!--DUMMY-->
+                            <input type="hidden" id="visibilityDummy" name="visibility" value="0"/>
+                            <input class="custom-control-input" type="checkbox" id="visibility" onchange="$('#visibilityDummy').val(this.checked ? 1 : 0)"/>
                             <label class="custom-control-label" for="visibility">Privat</label>
                         </div>
                         <div class="form-group" id="lectureParent">
-                            <label for="parent"></label>
+                            <label for="parent">Veranstaltungszugehörigkeit</label>
                             <select class="form-control" id="parent" name="parent">
-                                <option disabled selected>--Bitte Veranstaltung auswählen--
-                                </option>
+                                <option value="" selected>--Keine--</option>
                                 <option th:each="lecture : ${lectures}" th:name="parent" th:value="${lecture.getId()}" th:text="${lecture.getTitle()}">
                                 </option>
                             </select>

@@ -2,6 +2,8 @@ package mops.gruppen2.domain.event;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.BadParameterException;
@@ -13,6 +15,8 @@ import java.util.UUID;
  */
 @Getter
 @NoArgsConstructor // For Jackson
+@ToString
+@Log4j2
 public class UpdateGroupDescriptionEvent extends Event {
 
     private String newGroupDescription;
@@ -34,5 +38,7 @@ public class UpdateGroupDescriptionEvent extends Event {
         }
 
         group.setDescription(newGroupDescription);
+
+        log.trace("\t\t\t\t\tNeue Beschreibung: {}", group.getDescription());
     }
 }

@@ -3,6 +3,7 @@ package mops.gruppen2.service;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
@@ -62,6 +63,10 @@ public class ProjectionService {
      * @throws EventException Projektionsfehler, z.B. falls Events von verschiedenen Gruppen übergeben werden
      */
     static Group projectSingleGroup(List<Event> events) throws EventException {
+        if (events.isEmpty()) {
+            throw new GroupNotFoundException(ProjectionService.class.toString());
+        }
+
         Group group = new Group();
 
         events.forEach(event -> event.apply(group));
@@ -154,18 +159,17 @@ public class ProjectionService {
      * Projiziert Gruppen, in welchen der User aktuell teilnimmt.
      * Die Gruppen enthalten nur Metainformationen: Titel und Beschreibung.
      *
-     * @param userId Die Id
+     * @param user Die Id
      *
      * @return Liste aus Gruppen
      */
     @Cacheable("groups")
-    public List<Group> projectUserGroups(String userId) {
-        List<UUID> groupIds = eventStoreService.findExistingUserGroups(userId);
+    public List<Group> projectUserGroups(User user) {
+        List<UUID> groupIds = eventStoreService.findExistingUserGroups(user);
         List<Event> groupEvents = eventStoreService.findEventsByGroupAndType(groupIds,
                                                                              "CreateGroupEvent",
                                                                              "UpdateGroupTitleEvent",
-                                                                             "UpdateGroupDescriptionEvent",
-                                                                             "DeleteGroupEvent");
+                                                                             "UpdateGroupDescriptionEvent");
 
         return projectGroups(groupEvents);
     }
@@ -182,28 +186,38 @@ public class ProjectionService {
      * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
      */
     public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
-        if (IdService.idIsEmpty(groupId)) {
-            return new Group();
+        if (IdService.isEmpty(groupId)) {
+            throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
         }
 
         try {
             List<Event> events = eventStoreService.findGroupEvents(groupId);
-            return projectGroups(events).get(0);
-        } catch (IndexOutOfBoundsException e) {
-            log.error("Gruppe {} wurde nicht gefunden!", groupId.toString());
-            e.printStackTrace();
-            throw new GroupNotFoundException(ProjectionService.class.toString());
+            return projectSingleGroup(events);
+        } catch (Exception e) {
+            log.error("Gruppe {} wurde nicht gefunden!", groupId.toString(), e);
+            throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
         }
+    }
+
+    /**
+     * Projiziert eine einzelne Gruppe, welche leer sein darf.
+     */
+    public Group projectParent(UUID parentId) {
+        if (IdService.isEmpty(parentId)) {
+            return new Group();
+        }
+
+        return projectSingleGroup(parentId);
     }
 
     /**
      * Entfernt alle Gruppen, in welchen ein User teilnimmt, aus einer Gruppenliste.
      *
      * @param groups Gruppenliste, aus der entfernt wird
-     * @param userId User, welcher teilnimmt
+     * @param user   User, welcher teilnimmt
      */
-    void removeUserGroups(List<Group> groups, String userId) {
-        List<UUID> userGroups = eventStoreService.findExistingUserGroups(userId);
+    void removeUserGroups(List<Group> groups, User user) {
+        List<UUID> userGroups = eventStoreService.findExistingUserGroups(user);
 
         groups.removeIf(group -> userGroups.contains(group.getId()));
     }

@@ -2,6 +2,8 @@ package mops.gruppen2.domain.event;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
@@ -14,6 +16,8 @@ import java.util.UUID;
  */
 @Getter
 @NoArgsConstructor // For Jackson
+@ToString
+@Log4j2
 public class UpdateRoleEvent extends Event {
 
     private Role newRole;
@@ -32,6 +36,9 @@ public class UpdateRoleEvent extends Event {
     protected void applyEvent(Group group) throws UserNotFoundException {
         if (group.getRoles().containsKey(userId)) {
             group.getRoles().put(userId, newRole);
+
+            log.trace("\t\t\t\t\tNeue Rollen: {}", group.getRoles());
+
             return;
         }
 

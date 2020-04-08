@@ -22,6 +22,7 @@ import static mops.gruppen2.TestBuilder.createPublicGroupEvent;
 import static mops.gruppen2.TestBuilder.deleteGroupEvent;
 import static mops.gruppen2.TestBuilder.deleteUserEvent;
 import static mops.gruppen2.TestBuilder.updateGroupTitleEvent;
+import static mops.gruppen2.TestBuilder.updateUserLimitMaxEvent;
 import static mops.gruppen2.TestBuilder.uuidMock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,13 +37,13 @@ class APIControllerTest {
     private EventRepository eventRepository;
     @Autowired
     private APIController apiController;
+    @Autowired
     private EventStoreService eventStoreService;
     @Autowired
     private JdbcTemplate template;
 
     @BeforeEach
     void setUp() {
-        eventStoreService = new EventStoreService(eventRepository);
         eventRepository.deleteAll();
         //noinspection SqlResolve
         template.execute("ALTER TABLE event ALTER COLUMN event_id RESTART WITH 1");
@@ -61,6 +62,7 @@ class APIControllerTest {
     @WithMockUser(username = "api_user", roles = "api_user")
     void updateGroup_singleGroup() {
         eventStoreService.saveAll(createPublicGroupEvent(uuidMock(0)),
+                                  updateUserLimitMaxEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)),
@@ -69,7 +71,7 @@ class APIControllerTest {
         assertThat(apiController.updateGroups(0L).getGroupList()).hasSize(1);
         assertThat(apiController.updateGroups(4L).getGroupList()).hasSize(1);
         assertThat(apiController.updateGroups(10L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(5);
+        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(6);
     }
 
 
@@ -77,9 +79,11 @@ class APIControllerTest {
     @WithMockUser(username = "api_user", roles = "api_user")
     void updateGroup_multipleGroups() {
         eventStoreService.saveAll(createPublicGroupEvent(uuidMock(0)),
+                                  updateUserLimitMaxEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)),
                                   createPrivateGroupEvent(uuidMock(1)),
+                                  updateUserLimitMaxEvent(uuidMock(1)),
                                   addUserEvent(uuidMock(1)),
                                   addUserEvent(uuidMock(1)),
                                   addUserEvent(uuidMock(1)));

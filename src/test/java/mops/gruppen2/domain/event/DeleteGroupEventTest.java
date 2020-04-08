@@ -17,8 +17,7 @@ class DeleteGroupEventTest {
                                                  "A",
                                                  uuidMock(1),
                                                  GroupType.SIMPLE,
-                                                 Visibility.PUBLIC,
-                                                 100L);
+                                                 Visibility.PUBLIC);
         Event deleteEvent = new DeleteGroupEvent(uuidMock(0), "A");
 
         Group group = TestBuilder.apply(createEvent, deleteEvent);

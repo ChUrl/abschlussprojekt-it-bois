@@ -3,7 +3,9 @@ package mops.gruppen2.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.api.GroupRequestWrapper;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.service.APIService;
@@ -25,6 +27,7 @@ import java.util.UUID;
 //TODO: API-Service?
 @RestController
 @RequestMapping("/gruppen2/api")
+@Log4j2
 public class APIController {
 
     private final EventStoreService eventStoreService;
@@ -40,6 +43,7 @@ public class APIController {
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich etwas geändert hat")
     public GroupRequestWrapper updateGroups(@ApiParam("Letzter Status des Anfragestellers")
                                             @PathVariable long lastEventId) throws EventException {
+        log.info("ApiRequest to /updateGroups\n");
         return APIService.wrap(eventStoreService.findMaxEventId(),
                                projectionService.projectNewGroups(lastEventId));
     }
@@ -49,7 +53,8 @@ public class APIController {
     @ApiOperation("Gibt alle Gruppen zurück, in denen sich ein Teilnehmer befindet")
     public List<String> getGroupIdsOfUser(@ApiParam("Teilnehmer dessen groupIds zurückgegeben werden sollen")
                                           @PathVariable String userId) {
-        return IdService.uuidToString(eventStoreService.findExistingUserGroups(userId));
+        log.info("ApiRequest to /getGroupIdsOfUser\n");
+        return IdService.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
     }
 
     @GetMapping("/getGroup/{groupId}")
@@ -57,6 +62,7 @@ public class APIController {
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
     public Group getGroupById(@ApiParam("GruppenId der gefordeten Gruppe")
                               @PathVariable String groupId) throws EventException {
+        log.info("ApiRequest to /getGroup\n");
         return projectionService.projectSingleGroup(UUID.fromString(groupId));
     }
 

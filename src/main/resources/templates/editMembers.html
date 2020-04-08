@@ -27,7 +27,7 @@
                 <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
             </li>
             <li>
-                <a th:href="@{/gruppen2/findGroup}" href="/findGroup">Suche</a>
+                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
             </li>
         </ul>
     </nav>
@@ -37,6 +37,7 @@
         <div class="row">
             <div class="col-10">
                 <h1>Mitglieder bearbeiten</h1>
+                <!--TODO: Anzeige bei unbegrenzt-->
                 <div th:switch="${group.getUserLimit() != 100000}">
                     <h5 th:case="${true}">
                         <a th:text="${group.getMembers().size()}"></a>

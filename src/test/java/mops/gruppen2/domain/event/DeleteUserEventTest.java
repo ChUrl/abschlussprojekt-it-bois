@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.addUserEvent;
 import static mops.gruppen2.TestBuilder.createPublicGroupEvent;
+import static mops.gruppen2.TestBuilder.updateUserLimitMaxEvent;
 import static mops.gruppen2.TestBuilder.uuidMock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,10 +17,11 @@ class DeleteUserEventTest {
     @Test
     void applyEvent() {
         Event createEvent = createPublicGroupEvent(uuidMock(0));
+        Event updateLimitEvent = updateUserLimitMaxEvent(uuidMock(0));
         Event addEvent = addUserEvent(uuidMock(0), "A");
         Event deleteEvent = new DeleteUserEvent(uuidMock(0), "A");
 
-        Group group = TestBuilder.apply(createEvent, addEvent, deleteEvent);
+        Group group = TestBuilder.apply(createEvent, updateLimitEvent, addEvent, deleteEvent);
 
         assertThat(group.getMembers()).hasSize(0);
     }
@@ -27,10 +29,11 @@ class DeleteUserEventTest {
     @Test
     void applyEvent_userNotFound() {
         Event createEvent = createPublicGroupEvent(uuidMock(0));
+        Event updateLimitEvent = updateUserLimitMaxEvent(uuidMock(0));
         Event addEvent = addUserEvent(uuidMock(0), "A");
         Event deleteEvent = new DeleteUserEvent(uuidMock(0), "B");
 
-        Group group = TestBuilder.apply(createEvent, addEvent);
+        Group group = TestBuilder.apply(createEvent, updateLimitEvent, addEvent);
 
         assertThrows(UserNotFoundException.class, () -> deleteEvent.apply(group));
         assertThat(group.getMembers()).hasSize(1);

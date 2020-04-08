@@ -1,5 +1,6 @@
 package mops.gruppen2.controller;
 
+import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.Role;
@@ -30,15 +31,14 @@ import java.util.UUID;
 @Controller
 @SessionScope
 @RequestMapping("/gruppen2")
+@Log4j2
 public class GroupDetailsController {
 
-    private final ValidationService validationService;
     private final InviteService inviteService;
     private final GroupService groupService;
     private final ProjectionService projectionService;
 
-    public GroupDetailsController(ValidationService validationService, InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
-        this.validationService = validationService;
+    public GroupDetailsController(InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
         this.inviteService = inviteService;
         this.groupService = groupService;
         this.projectionService = projectionService;
@@ -51,35 +51,37 @@ public class GroupDetailsController {
                                    HttpServletRequest request,
                                    @PathVariable("id") String groupId) {
 
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        log.info("GET to /details\n");
+
         Account account = new Account(token);
         User user = new User(account);
-        UUID parentId = group.getParent();
-        String actualURL = request.getRequestURL().toString();
-        String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
-        Group parent = projectionService.projectSingleGroup(parentId);
-
-        validationService.throwIfGroupNotExisting(group.getTitle());
 
         model.addAttribute("account", account);
-        if (!validationService.checkIfUserInGroup(group, user)) {
-            validationService.throwIfNoAccessToPrivate(group, user);
-            model.addAttribute("group", group);
-            model.addAttribute("parentId", parentId);
-            model.addAttribute("parent", parent);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        model.addAttribute("group", group);
+
+        // Parent Badge
+        UUID parentId = group.getParent();
+        Group parent = projectionService.projectParent(parentId);
+
+        // Detailseite für private Gruppen
+        if (!ValidationService.checkIfGroupAccess(group, user)) {
             return "detailsNoMember";
         }
 
-        model.addAttribute("parentId", parentId);
-        model.addAttribute("parent", parent);
-        model.addAttribute("group", group);
         model.addAttribute("roles", group.getRoles());
         model.addAttribute("user", user);
         model.addAttribute("admin", Role.ADMIN);
         model.addAttribute("public", Visibility.PUBLIC);
         model.addAttribute("private", Visibility.PRIVATE);
+        model.addAttribute("parent", parent);
 
-        if (validationService.checkIfAdmin(group, user)) {
+        // Invitelink Anzeige für Admins
+        if (ValidationService.checkIfAdmin(group, user)) {
+            String actualURL = request.getRequestURL().toString();
+            String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
+
             model.addAttribute("link", serverURL + "gruppen2/acceptinvite/" + inviteService.getLinkByGroup(group));
         }
 
@@ -92,11 +94,13 @@ public class GroupDetailsController {
                                  Model model,
                                  @PathVariable("id") String groupId) {
 
+        log.info("GET to /details/changeMetadata\n");
+
         Account account = new Account(token);
         User user = new User(account);
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        validationService.throwIfNoAdmin(group, user);
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("account", account);
         model.addAttribute("title", group.getTitle());
@@ -117,13 +121,13 @@ public class GroupDetailsController {
                                      @RequestParam("description") String description,
                                      @RequestParam("groupId") String groupId) {
 
+        log.info("POST to /details/changeMetadata\n");
+
         Account account = new Account(token);
         User user = new User(account);
+
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-
-        validationService.throwIfNoAdmin(group, user);
-        validationService.checkFields(title, description);
-
+        ValidationService.throwIfNoAdmin(group, user);
         groupService.updateTitle(user, group, title);
         groupService.updateDescription(user, group, description);
 
@@ -136,11 +140,13 @@ public class GroupDetailsController {
                               Model model,
                               @PathVariable("id") String groupId) {
 
+        log.info("GET to /details/members\n");
+
         Account account = new Account(token);
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         User user = new User(account);
 
-        validationService.throwIfNoAdmin(group, user);
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("account", account);
         model.addAttribute("members", group.getMembers());
@@ -157,15 +163,17 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
+        log.info("POST to /details/members/changeRole\n");
+
         Account account = new Account(token);
+        User user = new User(account);
+
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-        User principle = new User(account);
-        User user = new User(userId);
+        ValidationService.throwIfNoAdmin(group, user);
+        groupService.toggleMemberRole(new User(userId), group);
 
-        validationService.throwIfNoAdmin(group, principle);
-        groupService.toggleMemberRole(user, group);
-
-        if (!validationService.checkIfAdmin(group, principle)) {
+        // Falls sich der User selbst die Rechte genommen hat
+        if (!ValidationService.checkIfAdmin(group, user)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
@@ -179,12 +187,12 @@ public class GroupDetailsController {
                                 @RequestParam("maximum") long userLimit,
                                 @RequestParam("group_id") String groupId) {
 
+        log.info("POST to /details/members/changeMaximum\n");
+
         Account account = new Account(token);
         User user = new User(account);
+
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-
-        validationService.throwIfNewUserLimitIsValid(userLimit, group);
-
         groupService.updateUserLimit(user, group, userLimit);
 
         return "redirect:/gruppen2/details/members/" + groupId;
@@ -197,17 +205,15 @@ public class GroupDetailsController {
                              @RequestParam("group_id") String groupId,
                              @RequestParam("user_id") String userId) {
 
+        log.info("POST to /details/members/deleteUser\n");
+
         Account account = new Account(token);
-        User principle = new User(account);
-        User user = new User(userId, "", "", "");
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        User user = new User(account);
 
-        validationService.throwIfNoAdmin(group, principle);
-
-        groupService.deleteUser(user, group);
-
-        if (!validationService.checkIfUserInGroup(group, principle)) {
-            return "redirect:/gruppen2";
+        // Der eingeloggte User kann sich nicht selbst entfernen
+        if (!userId.equals(user.getId())) {
+            Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+            groupService.deleteUser(new User(userId), group);
         }
 
         return "redirect:/gruppen2/details/members/" + groupId;
@@ -220,16 +226,15 @@ public class GroupDetailsController {
                             Model model,
                             @RequestParam("id") String groupId) {
 
+        log.info("POST to /detailsBeitreten\n");
+
         Account account = new Account(token);
         User user = new User(account);
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-
-        validationService.throwIfUserAlreadyInGroup(group, user);
-        validationService.throwIfGroupFull(group);
-
-        groupService.addUser(user, group);
 
         model.addAttribute("account", account);
+
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        groupService.addUser(user, group);
 
         return "redirect:/gruppen2";
     }
@@ -240,10 +245,12 @@ public class GroupDetailsController {
     public String leaveGroup(KeycloakAuthenticationToken token,
                              @RequestParam("group_id") String groupId) {
 
+        log.info("POST to /leaveGroup\n");
+
         Account account = new Account(token);
         User user = new User(account);
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
         groupService.deleteUser(user, group);
 
         return "redirect:/gruppen2";
@@ -255,12 +262,12 @@ public class GroupDetailsController {
     public String deleteGroup(KeycloakAuthenticationToken token,
                               @RequestParam("group_id") String groupId) {
 
+        log.info("POST to /deleteGroup\n");
+
         Account account = new Account(token);
         User user = new User(account);
+
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
-
-        validationService.throwIfNoAdmin(group, user);
-
         groupService.deleteGroup(user, group);
 
         return "redirect:/gruppen2";
@@ -273,10 +280,12 @@ public class GroupDetailsController {
                                   @RequestParam("group_id") String groupId,
                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
+        log.info("POST to /details/members/addUsersFromCsv\n");
+
         Account account = new Account(token);
         User user = new User(account);
-        Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
 
+        Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
         groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/members/" + groupId;

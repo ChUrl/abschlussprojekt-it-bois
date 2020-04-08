@@ -3,6 +3,7 @@ package mops.gruppen2.service;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.EventException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -32,16 +33,16 @@ public class SearchService {
      * @throws EventException Projektionsfehler
      */
     @Cacheable("groups")
-    public List<Group> searchPublicGroups(String search, String userId) throws EventException {
+    public List<Group> searchPublicGroups(String search, User user) throws EventException {
         List<Group> groups = projectionService.projectPublicGroups();
-        projectionService.removeUserGroups(groups, userId);
+        projectionService.removeUserGroups(groups, user);
         sortByGroupType(groups);
 
         if (search.isEmpty()) {
             return groups;
         }
 
-        log.trace("Es wurde gesucht nach: {}", search);
+        log.debug("Es wurde gesucht nach: {}", search);
 
         return groups.stream()
                      .filter(group -> group.toString().toLowerCase().contains(search.toLowerCase()))
