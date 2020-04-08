@@ -28,6 +28,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
+@SuppressWarnings("SameReturnValue")
 @Controller
 @SessionScope
 @RequestMapping("/gruppen2")

@@ -99,13 +99,13 @@ public class EventStoreService {
      *
      * @return Liste von Events
      */
-    static List<Event> getEventsFromDTOs(List<EventDTO> eventDTOS) {
+    private static List<Event> getEventsFromDTOs(List<EventDTO> eventDTOS) {
         return eventDTOS.stream()
                         .map(EventStoreService::getEventFromDTO)
                         .collect(Collectors.toList());
     }
 
-    static Event getEventFromDTO(EventDTO dto) {
+    private static Event getEventFromDTO(EventDTO dto) {
         try {
             return JsonService.deserializeEvent(dto.getEvent_payload());
         } catch (JsonProcessingException e) {
@@ -136,7 +136,7 @@ public class EventStoreService {
     }
 
     /**
-     * Sucht alle Events, welche zu einer der übergebenen Gruppen gehören
+     * Sucht alle Events, welche zu einer der übergebenen Gruppen gehören.
      *
      * @param groupIds Liste an IDs
      *
@@ -241,7 +241,7 @@ public class EventStoreService {
      *
      * @return Eine Liste von einem Add- oder DeleteUserEvent pro Gruppe
      */
-    List<Event> findLatestEventsFromGroupsByUser(User user) {
+    private List<Event> findLatestEventsFromGroupsByUser(User user) {
         return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByUser(user.getId()));
     }
 
@@ -253,7 +253,7 @@ public class EventStoreService {
      *
      * @return Eine Liste von einem Event pro Gruppe
      */
-    List<Event> findLatestEventsFromGroupsByType(String... types) {
+    private List<Event> findLatestEventsFromGroupsByType(String... types) {
         return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByType(Arrays.asList(types)));
     }
 }

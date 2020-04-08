@@ -28,6 +28,7 @@ import static mops.gruppen2.service.ControllerService.getParent;
 import static mops.gruppen2.service.ControllerService.getUserLimit;
 import static mops.gruppen2.service.ControllerService.getVisibility;
 
+@SuppressWarnings("SameReturnValue")
 @Controller
 @SessionScope
 @RequestMapping("/gruppen2")

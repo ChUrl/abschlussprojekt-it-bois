@@ -35,6 +35,7 @@ class EventStoreServiceTest {
     @Autowired
     private JdbcTemplate template;
 
+    @SuppressWarnings("SyntaxError")
     @BeforeEach
     void setUp() {
         eventStoreService = new EventStoreService(eventRepository);

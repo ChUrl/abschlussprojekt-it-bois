@@ -29,21 +29,21 @@
 </header>
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <div class="shadow-sm p-4" style="border: 1px solid aliceblue; border-radius: 5px; background: aliceblue">
-            <h1 style="color: black; font-weight: bold; font-optical-sizing: auto; overflow-wrap: break-word" th:text="${group.getTitle()}"></h1>
+        <div class="shadow-sm p-4" style="border: 1px solid aliceblue; border-radius: 5px; background: aliceblue;">
+            <h1 style="color: black; font-weight: bold; font-optical-sizing: auto; overflow-wrap: break-word;" th:text="${group.getTitle()}"></h1>
             <h3>
-                        <span class="badge badge-pill badge-dark" style="background: darkslategray"
+                        <span class="badge badge-pill badge-dark" style="background: darkslategray;"
                               th:if='${group.getVisibility() == group.getVisibility().PRIVATE }'>Private Gruppe</span>
-                <span class="badge badge-pill badge-primary" style="background: #52a1eb"
+                <span class="badge badge-pill badge-primary" style="background: #52a1eb;"
                       th:if="${group.getVisibility() == group.getVisibility().PUBLIC}">Öffentliche Gruppe</span>
                 <span class="badge badge-pill badge-success"
-                      style="background: lightseagreen"
+                      style="background: lightseagreen;"
                       th:if='${group.getType() == lecture}'> Veranstaltung</span>
-                <span class="badge badge-pill badge-info" style="background: mediumorchid"
+                <span class="badge badge-pill badge-info" style="background: mediumorchid;"
                       th:text="${parent?.getTitle()}">Parent</span>
             </h3>
-            <div class="shadow-sm p-4" style="background: white">
-                <p style="overflow-wrap: break-word; font-optical-sizing: auto"
+            <div class="shadow-sm p-4" style="background: white;">
+                <p style="overflow-wrap: break-word; font-optical-sizing: auto;"
                    th:text="${group.getDescription()}"></p>
             </div>
         </div>

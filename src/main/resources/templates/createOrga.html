@@ -43,7 +43,7 @@
             <div class="col-10">
                 <h1>Gruppenerstellung</h1>
                 <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/createOrga}">
-                    <div class="shadow-sm p-2" style=" border: 10px solid aliceblue; background: aliceblue">
+                    <div class="shadow-sm p-2" style=" border: 10px solid aliceblue; background: aliceblue;">
                         <div class="form-group">
                             <label for="titel">Titel</label>
                             <input class="form-control" id="titel" required th:name="title" type="text">
@@ -60,7 +60,7 @@
                                                                                        unbegrenzt</label>
                         </div>
                         <div class="form-group mt-3" id="userMaximum">
-                            <label for="userMaximum">Teilnehmeranzahl</label>
+                            <label for="userMax">Teilnehmeranzahl</label>
                             <input class="form-control" id="userMax" th:name="userMaximum" type="number" min="1" max="100000" value="1">
                         </div>
                         <div class="custom-control custom-checkbox" id="privateCheckbox">
@@ -96,7 +96,7 @@
                         </div>
                         <div class="form-group pt-4">
                             <button class="btn btn-primary"
-                                    style="background: #52a1eb; border-style: none"
+                                    style="background: #52a1eb; border-style: none;"
                                     type="submit">Erstellen
                             </button>
                         </div>

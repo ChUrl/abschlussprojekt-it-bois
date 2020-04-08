@@ -104,7 +104,7 @@ public class GroupService {
      * @return Das neue Teilnehmermaximum
      */
     private static long getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return Math.max(group.getMembers().size() + newUsers.size(), group.getUserLimit());
+        return Math.max((long) group.getMembers().size() + newUsers.size(), group.getUserLimit());
     }
 
     /**
@@ -210,7 +210,7 @@ public class GroupService {
         eventStoreService.saveEvent(event);
     }
 
-    public void updateRole(User user, Group group, Role role) {
+    private void updateRole(User user, Group group, Role role) {
         ValidationService.throwIfNoMember(group, user);
 
         Event event = new UpdateRoleEvent(group, user, role);

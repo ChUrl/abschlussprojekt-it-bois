@@ -42,6 +42,7 @@ class APIControllerTest {
     @Autowired
     private JdbcTemplate template;
 
+    @SuppressWarnings("SyntaxError")
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();

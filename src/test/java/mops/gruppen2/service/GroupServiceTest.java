@@ -57,6 +57,7 @@ class GroupServiceTest {
     @Autowired
     private InviteService inviteService;
 
+    @SuppressWarnings("SyntaxError")
     @BeforeEach
     void setUp() {
         groupService = new GroupService(eventStoreService, inviteService);

@@ -15,6 +15,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+@SuppressWarnings("SameReturnValue")
 @Controller
 @Log4j2
 public class GruppenfindungController {
