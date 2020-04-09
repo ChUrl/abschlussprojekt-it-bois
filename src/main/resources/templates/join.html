@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>Gruppendetails</title>
+    <title>Gruppe Beitreten</title>
     <th:block th:fragment="headcontent">
         <!-- Links, Skripts, Styles hier einfügen! -->
     </th:block>
@@ -12,20 +12,16 @@
 <body>
 
 <header>
-    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation"
-         th:switch="${account.getRoles().contains('orga')}">
+    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation">
         <ul>
             <li>
-                <a href="/" th:href="@{/gruppen2}">Gruppen</a>
+                <a th:href="@{/gruppen2}">Gruppen</a>
             </li>
-            <li th:case="${true}">
-                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
-            </li>
-            <li th:case="${false}">
-                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
+            <li>
+                <a th:href="@{/gruppen2/create}">Erstellen</a>
             </li>
             <li class="active">
-                <a href="/search" th:href="@{/gruppen2/search}">Suche</a>
+                <a th:href="@{/gruppen2/search}">Suche</a>
             </li>
         </ul>
     </nav>

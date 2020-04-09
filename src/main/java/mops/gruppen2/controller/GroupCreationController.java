@@ -41,13 +41,18 @@ public class GroupCreationController {
         this.projectionService = projectionService;
     }
 
-    @RolesAllowed("ROLE_orga")
-    @GetMapping("/create/orga")
-    public String getCreateOrga(Model model) {
+    @RolesAllowed({"ROLE_orga", "ROLE_student"})
+    @GetMapping("/create")
+    public String getCreate(KeycloakAuthenticationToken token,
+                            Model model) {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 
-        return "create_orga";
+        if (token.getAccount().getRoles().contains("orga")) {
+            return "create_orga";
+        }
+
+        return "create_student";
     }
 
     @RolesAllowed("ROLE_orga")
@@ -75,15 +80,6 @@ public class GroupCreationController {
         groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
-    }
-
-    @RolesAllowed("ROLE_studentin")
-    @GetMapping("/create/student")
-    public String getCreateStudent(Model model) {
-
-        model.addAttribute("lectures", projectionService.projectLectures());
-
-        return "create_student";
     }
 
     @RolesAllowed("ROLE_studentin")
