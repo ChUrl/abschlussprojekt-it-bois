@@ -46,20 +46,20 @@
                         <div class="form-group">
                             <label for="title">Titel</label>
                             <input class="form-control" id="title" required
-                                   th:name="title" th:value="${title}" type="text">
+                                   th:name="title" th:value="${group.getTitle()}" type="text">
                         </div>
                         <div class="form-group">
                             <label for="description">Beschreibung</label>
                             <textarea class="form-control" id="description" required rows="3"
                                       th:name="description"
-                                      th:text="${description}"></textarea>
+                                      th:text="${group.getDescription()}"></textarea>
                         </div>
                         <div class="form-group pt-4">
                             <button class="btn btn-primary"
                                     style="background: #52a1eb; border-style: none;"
-                                    th:if="${roles.get(user.getId()) == admin}"
+                                    th:if="${group.getRoles().get(user.getId()) == admin}"
                                     th:name="groupId"
-                                    th:value="${groupId}"
+                                    th:value="${group.getId()}"
                                     type="submit">Speichern
                             </button>
                         </div>

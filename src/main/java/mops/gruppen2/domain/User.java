@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
 @Getter
 @AllArgsConstructor
@@ -22,11 +24,12 @@ public class User {
     @ToString.Exclude
     private String email;
 
-    public User(Account account) {
-        id = account.getName();
-        givenname = account.getGivenname();
-        familyname = account.getFamilyname();
-        email = account.getEmail();
+    public User(KeycloakAuthenticationToken token) {
+        KeycloakPrincipal principal = (KeycloakPrincipal) token.getPrincipal();
+        id = principal.getName();
+        givenname = principal.getKeycloakSecurityContext().getIdToken().getGivenName();
+        familyname = principal.getKeycloakSecurityContext().getIdToken().getFamilyName();
+        email = principal.getKeycloakSecurityContext().getIdToken().getEmail();
     }
 
     /**

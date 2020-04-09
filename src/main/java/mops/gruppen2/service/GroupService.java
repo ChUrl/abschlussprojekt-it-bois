@@ -82,6 +82,7 @@ public class GroupService {
      * Fügt eine Liste von Usern zu einer Gruppe hinzu.
      * Duplikate werden übersprungen, die erzeugten Events werden gespeichert.
      * Dabei wird das Teilnehmermaximum eventuell angehoben.
+     * Prüft, ob der User Admin ist.
      *
      * @param newUsers Userliste
      * @param group    Gruppe
@@ -109,6 +110,7 @@ public class GroupService {
 
     /**
      * Wechselt die Rolle eines Teilnehmers von Admin zu Member oder andersherum.
+     * Überprüft, ob der User Mitglied ist und ob er der letzte Admin ist.
      *
      * @param user  Teilnehmer, welcher geändert wird
      * @param group Gruppe, in welcher sih der Teilnehmer befindet
@@ -145,6 +147,10 @@ public class GroupService {
         return group;
     }
 
+    /**
+     * Erzeugt, speichert ein AddUserEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer schon Mitglied ist und ob Gruppe voll ist.
+     */
     public void addUser(User user, Group group) {
         ValidationService.throwIfMember(group, user);
         ValidationService.throwIfGroupFull(group);
@@ -166,6 +172,10 @@ public class GroupService {
         }
     }
 
+    /**
+     * Erzeugt, speichert ein DeleteUserEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Mitglied ist und ob er der letzte Admin ist.
+     */
     public void deleteUser(User user, Group group) throws EventException {
         ValidationService.throwIfNoMember(group, user);
         ValidationService.throwIfLastAdmin(user, group);
@@ -180,6 +190,10 @@ public class GroupService {
         }
     }
 
+    /**
+     * Erzeugt, speichert ein DeleteGroupEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Admin ist.
+     */
     public void deleteGroup(User user, Group group) {
         ValidationService.throwIfNoAdmin(group, user);
 
@@ -190,28 +204,55 @@ public class GroupService {
         eventStoreService.saveEvent(event);
     }
 
+    /**
+     * Erzeugt, speichert ein UpdateTitleEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Admin ist und ob der Titel valide ist.
+     * Bei keiner Änderung wird nichts erzeugt.
+     */
     public void updateTitle(User user, Group group, String title) {
         ValidationService.throwIfNoAdmin(group, user);
-        ValidationService.validateTitle(title);
+        ValidationService.validateTitle(title.trim());
 
-        Event event = new UpdateGroupTitleEvent(group, user, title);
+        if (title.trim().equals(group.getTitle())) {
+            return;
+        }
+
+        Event event = new UpdateGroupTitleEvent(group, user, title.trim());
         event.apply(group);
 
         eventStoreService.saveEvent(event);
     }
 
+    /**
+     * Erzeugt, speichert ein UpdateDescriptiopnEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Admin ist und ob die Beschreibung valide ist.
+     * Bei keiner Änderung wird nichts erzeugt.
+     */
     public void updateDescription(User user, Group group, String description) {
         ValidationService.throwIfNoAdmin(group, user);
-        ValidationService.validateDescription(description);
+        ValidationService.validateDescription(description.trim());
 
-        Event event = new UpdateGroupDescriptionEvent(group, user, description);
+        if (description.trim().equals(group.getDescription())) {
+            return;
+        }
+
+        Event event = new UpdateGroupDescriptionEvent(group, user, description.trim());
         event.apply(group);
 
         eventStoreService.saveEvent(event);
     }
 
+    /**
+     * Erzeugt, speichert ein UpdateRoleEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Mitglied ist.
+     * Bei keiner Änderung wird nichts erzeugt.
+     */
     private void updateRole(User user, Group group, Role role) {
         ValidationService.throwIfNoMember(group, user);
+
+        if (role == group.getRoles().get(user.getId())) {
+            return;
+        }
 
         Event event = new UpdateRoleEvent(group, user, role);
         event.apply(group);
@@ -219,6 +260,11 @@ public class GroupService {
         eventStoreService.saveEvent(event);
     }
 
+    /**
+     * Erzeugt, speichert ein UpdateUserLimitEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer Admin ist und ob das Limit valide ist.
+     * Bei keiner Änderung wird nichts erzeugt.
+     */
     public void updateUserLimit(User user, Group group, long userLimit) {
         ValidationService.throwIfNoAdmin(group, user);
         ValidationService.validateUserLimit(userLimit, group);

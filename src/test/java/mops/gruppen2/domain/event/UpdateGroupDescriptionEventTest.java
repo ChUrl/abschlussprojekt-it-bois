@@ -26,11 +26,9 @@ class UpdateGroupDescriptionEventTest {
     void applyEvent_badDescription() {
         Event createEvent = createPublicGroupEvent(uuidMock(0));
         Event updateEventA = new UpdateGroupDescriptionEvent(uuidMock(0), "A", "");
-        Event updateEventB = new UpdateGroupDescriptionEvent(uuidMock(0), "A", "  ");
 
         Group group = TestBuilder.apply(createEvent);
 
         assertThrows(BadParameterException.class, () -> updateEventA.apply(group));
-        assertThrows(BadParameterException.class, () -> updateEventB.apply(group));
     }
 }

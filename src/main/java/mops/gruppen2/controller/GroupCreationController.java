@@ -1,7 +1,7 @@
 package mops.gruppen2.controller;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Account;
+import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
@@ -9,7 +9,6 @@ import mops.gruppen2.service.CsvService;
 import mops.gruppen2.service.GroupService;
 import mops.gruppen2.service.IdService;
 import mops.gruppen2.service.ProjectionService;
-import mops.gruppen2.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
@@ -29,10 +27,10 @@ import static mops.gruppen2.service.ControllerService.getUserLimit;
 import static mops.gruppen2.service.ControllerService.getVisibility;
 
 @SuppressWarnings("SameReturnValue")
-@Controller
-@SessionScope
-@RequestMapping("/gruppen2")
 @Log4j2
+@TraceMethodCalls
+@Controller
+@RequestMapping("/gruppen2")
 public class GroupCreationController {
 
     private final GroupService groupService;
@@ -43,37 +41,31 @@ public class GroupCreationController {
         this.projectionService = projectionService;
     }
 
-    @RolesAllowed({"ROLE_orga", "ROLE_actuator"})
+    //TODO: /create/orga
+    @RolesAllowed("ROLE_orga")
     @GetMapping("/createOrga")
-    public String createGroupAsOrga(KeycloakAuthenticationToken token,
-                                    Model model) {
+    public String getCreateOrgaPage(Model model) {
 
-        log.info("GET to /createOrga\n");
-
-        model.addAttribute("account", new Account(token));
         model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createOrga";
     }
 
-    @RolesAllowed({"ROLE_orga", "ROLE_actuator"})
+    //TODO: /create/orga
+    @RolesAllowed("ROLE_orga")
     @PostMapping("/createOrga")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postCrateGroupAsOrga(KeycloakAuthenticationToken token,
-                                       @RequestParam("title") String title,
-                                       @RequestParam("description") String description,
-                                       @RequestParam("visibility") boolean isPrivate,
-                                       @RequestParam("lecture") boolean isLecture,
-                                       @RequestParam("maxInfiniteUsers") boolean isInfinite,
-                                       @RequestParam("userMaximum") long userLimit,
-                                       @RequestParam("parent") String parent,
-                                       @RequestParam(value = "file", required = false) MultipartFile file) {
+    public String postCreateOrga(KeycloakAuthenticationToken token,
+                                 @RequestParam("title") String title,
+                                 @RequestParam("description") String description,
+                                 @RequestParam("visibility") boolean isPrivate,
+                                 @RequestParam("lecture") boolean isLecture,
+                                 @RequestParam("maxInfiniteUsers") boolean isInfinite,
+                                 @RequestParam("userMaximum") long userLimit,
+                                 @RequestParam("parent") String parent,
+                                 @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        log.info("POST to /createOrga\n");
-
-        Account account = new Account(token);
-        User user = new User(account);
-
+        User user = new User(token);
         Group group = groupService.createGroup(user,
                                                title,
                                                description,
@@ -87,37 +79,29 @@ public class GroupCreationController {
         return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
     }
 
+    //TODO: /create/student
     @RolesAllowed("ROLE_studentin")
     @GetMapping("/createStudent")
-    public String createGroupAsStudent(KeycloakAuthenticationToken token,
-                                       Model model) {
+    public String getCreateStudentPage(Model model) {
 
-        log.info("GET to /createStudent\n");
-
-        model.addAttribute("account", new Account(token));
         model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createStudent";
     }
 
+    //TODO: /create/student
     @RolesAllowed("ROLE_studentin")
     @PostMapping("/createStudent")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postCreateGroupAsStudent(KeycloakAuthenticationToken token,
-                                           @RequestParam("title") String title,
-                                           @RequestParam("description") String description,
-                                           @RequestParam("visibility") boolean isPrivate,
-                                           @RequestParam("maxInfiniteUsers") boolean isInfinite,
-                                           @RequestParam("userMaximum") long userLimit,
-                                           @RequestParam("parent") String parent) {
+    public String postCreateStudent(KeycloakAuthenticationToken token,
+                                    @RequestParam("title") String title,
+                                    @RequestParam("description") String description,
+                                    @RequestParam("visibility") boolean isPrivate,
+                                    @RequestParam("maxInfiniteUsers") boolean isInfinite,
+                                    @RequestParam("userMaximum") long userLimit,
+                                    @RequestParam("parent") String parent) {
 
-        log.info("POST to /createStudent\n");
-
-        ValidationService.validateTitle(title);
-        ValidationService.validateDescription(description);
-
-        Account account = new Account(token);
-        User user = new User(account);
+        User user = new User(token);
         Group group = groupService.createGroup(user,
                                                title,
                                                description,

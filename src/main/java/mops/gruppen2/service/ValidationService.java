@@ -66,11 +66,6 @@ public final class ValidationService {
                                                  .count() == 1;
     }
 
-    public static boolean checkIfGroupAccess(Group group, User user) {
-        return (group.getVisibility() == Visibility.PRIVATE && checkIfMember(group, user))
-               || group.getVisibility() == Visibility.PUBLIC;
-    }
-
 
     // ######################################## THROW ############################################
 
@@ -112,15 +107,9 @@ public final class ValidationService {
         }
     }
 
-    public static void throwIfNoGroupAccess(Group group, User user) {
-        if (!checkIfGroupAccess(group, user)) {
-            log.error("Der User {} hat keinen Zugriff auf Gruppe {}!", user, group);
-            throw new NoAccessException(group.toString());
-        }
-    }
-
 
     // ##################################### VALIDATE FIELDS #####################################
+
 
     //TODO: max title length?
     public static void validateTitle(String title) {

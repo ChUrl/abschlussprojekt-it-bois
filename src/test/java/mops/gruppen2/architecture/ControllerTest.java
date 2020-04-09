@@ -23,7 +23,8 @@ class ControllerTest {
     public static final ArchRule controllerClassesShouldHaveControllerInName = classes()
             .that().areAnnotatedWith(Controller.class)
             .or().areAnnotatedWith(RestController.class)
-            .should().haveSimpleNameEndingWith("Controller");
+            .should().haveSimpleNameEndingWith("Controller")
+            .orShould().haveSimpleNameEndingWith("ControllerAdvice");
 
     @ArchTest
     public static final ArchRule controllerClassesShouldBeInControllerPackage = classes()
@@ -34,7 +35,8 @@ class ControllerTest {
     @ArchTest
     public static final ArchRule classesInControllerPackageShouldHaveControllerInName = classes()
             .that().resideInAPackage("..controller..")
-            .should().haveSimpleNameEndingWith("Controller");
+            .should().haveSimpleNameEndingWith("Controller")
+            .orShould().haveSimpleNameEndingWith("ControllerAdvice");
 
     @ArchTest
     public static final ArchRule controllerClassesShouldNotDependOnEachOther = noClasses()
