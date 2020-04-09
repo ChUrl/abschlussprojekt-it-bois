@@ -30,7 +30,7 @@
                 <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li>
-                <a href="/searchPage" th:href="@{/gruppen2/searchPage}">Suche</a>
+                <a href="/search" th:href="@{/gruppen2/search}">Suche</a>
             </li>
         </ul>
     </nav>
@@ -40,7 +40,7 @@
         <div class="row">
             <div class="col-10">
                 <h1>Metadaten ändern</h1>
-                <form method="post" th:action="@{/gruppen2/details/changeMetadata}">
+                <form method="post" th:action="@{/gruppen2/details/{id}/meta/update(id=${group.getId()})}">
                     <div class="shadow-sm p-2"
                          style=" border: 10px solid aliceblue; background: aliceblue;">
                         <div class="form-group">
@@ -58,8 +58,6 @@
                             <button class="btn btn-primary"
                                     style="background: #52a1eb; border-style: none;"
                                     th:if="${group.getRoles().get(user.getId()) == admin}"
-                                    th:name="groupId"
-                                    th:value="${group.getId()}"
                                     type="submit">Speichern
                             </button>
                         </div>
