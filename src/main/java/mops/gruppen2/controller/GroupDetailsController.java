@@ -67,10 +67,10 @@ public class GroupDetailsController {
 
         // Detailseite für nicht-Mitglieder
         if (!ValidationService.checkIfMember(group, user)) {
-            return "detailsNoMember";
+            return "details_nomember";
         }
 
-        return "detailsMember";
+        return "details_member";
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
@@ -128,7 +128,7 @@ public class GroupDetailsController {
 
         model.addAttribute("group", group);
 
-        return "changeMetadata";
+        return "meta";
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
@@ -161,7 +161,7 @@ public class GroupDetailsController {
 
         model.addAttribute("group", group);
 
-        return "editMembers";
+        return "members";
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})

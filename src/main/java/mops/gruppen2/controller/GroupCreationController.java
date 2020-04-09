@@ -47,7 +47,7 @@ public class GroupCreationController {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 
-        return "createOrga";
+        return "create_orga";
     }
 
     @RolesAllowed("ROLE_orga")
@@ -83,7 +83,7 @@ public class GroupCreationController {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 
-        return "createStudent";
+        return "create_student";
     }
 
     @RolesAllowed("ROLE_studentin")

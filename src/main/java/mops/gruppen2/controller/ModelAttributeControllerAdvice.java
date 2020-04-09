@@ -24,6 +24,7 @@ public class ModelAttributeControllerAdvice {
             model.addAttribute("user", new User(token));
         }
 
+        // Add enums
         model.addAttribute("member", Role.MEMBER);
         model.addAttribute("admin", Role.ADMIN);
         model.addAttribute("public", Visibility.PUBLIC);
