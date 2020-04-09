@@ -128,6 +128,7 @@ public class GroupDetailsController {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+
         ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("group", group);
@@ -162,6 +163,7 @@ public class GroupDetailsController {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+
         ValidationService.throwIfNoAdmin(group, user);
 
         model.addAttribute("group", group);
@@ -213,6 +215,7 @@ public class GroupDetailsController {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+
         ValidationService.throwIfNoAdmin(group, user);
 
         groupService.toggleMemberRole(new User(userId), group);
@@ -236,7 +239,9 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        // Der eingeloggte User kann sich nicht selbst entfernen
+        ValidationService.throwIfNoAdmin(group, user);
+
+        // Der eingeloggte User kann sich nicht selbst entfernen (er kann aber verlassen)
         if (!userId.equals(user.getId())) {
             groupService.deleteUser(new User(userId), group);
         }

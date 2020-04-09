@@ -4,6 +4,7 @@ package mops.gruppen2.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.api.GroupRequestWrapper;
@@ -24,6 +25,7 @@ import java.util.UUID;
  * Api zum Datenabgleich.
  */
 @Log4j2
+@TraceMethodCalls
 @RestController
 @RequestMapping("/gruppen2/api")
 public class APIController {
@@ -48,8 +50,6 @@ public class APIController {
     public GroupRequestWrapper update(@ApiParam("Letzte gespeicherte EventId des Anfragestellers")
                                       @PathVariable("id") long eventId) {
 
-        log.info("ApiRequest to /updateGroups (Event-ID: {})\n", eventId);
-
         return APIService.wrap(eventStoreService.findMaxEventId(),
                                projectionService.projectNewGroups(eventId));
     }
@@ -63,8 +63,6 @@ public class APIController {
     public List<String> usergroups(@ApiParam("Nutzer-Id")
                                    @PathVariable("id") String userId) {
 
-        log.info("ApiRequest to /getGroupIdsOfUser (Nutzer-ID: {})\n", userId);
-
         return IdService.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
     }
 
@@ -76,8 +74,6 @@ public class APIController {
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
     public Group getGroupById(@ApiParam("Gruppen-Id der gefordeten Gruppe")
                               @PathVariable("id") String groupId) {
-
-        log.info("ApiRequest to /getGroup (Gruppen-ID: {})\n", groupId);
 
         return projectionService.projectSingleGroup(UUID.fromString(groupId));
     }

@@ -23,12 +23,12 @@ public class UpdateGroupTitleEvent extends Event {
 
     public UpdateGroupTitleEvent(UUID groupId, String userId, String newGroupTitle) {
         super(groupId, userId);
-        this.newGroupTitle = newGroupTitle.trim();
+        this.newGroupTitle = newGroupTitle;
     }
 
     public UpdateGroupTitleEvent(Group group, User user, String newGroupTitle) {
         super(group.getId(), user.getId());
-        this.newGroupTitle = newGroupTitle.trim();
+        this.newGroupTitle = newGroupTitle;
     }
 
     @Override

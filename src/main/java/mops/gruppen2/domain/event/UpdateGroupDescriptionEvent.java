@@ -23,12 +23,12 @@ public class UpdateGroupDescriptionEvent extends Event {
 
     public UpdateGroupDescriptionEvent(UUID groupId, String userId, String newGroupDescription) {
         super(groupId, userId);
-        this.newGroupDescription = newGroupDescription.trim();
+        this.newGroupDescription = newGroupDescription;
     }
 
     public UpdateGroupDescriptionEvent(Group group, User user, String newGroupDescription) {
         super(group.getId(), user.getId());
-        this.newGroupDescription = newGroupDescription.trim();
+        this.newGroupDescription = newGroupDescription;
     }
 
     @Override
