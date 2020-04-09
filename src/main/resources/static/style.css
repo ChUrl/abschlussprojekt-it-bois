@@ -1,0 +1,72 @@
+/*Content Container*/
+.con-div {
+    border-radius: 3px;
+    background: #e6f4ff;
+    transition: 100ms;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+
+.con-div:hover {
+    background: #d4ecff;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .125);
+}
+
+/*Content Heading*/
+.con-h {
+    color: dodgerblue;
+    font-weight: bold;
+    font-optical-sizing: auto;
+    overflow-wrap: break-word;
+    margin-bottom: 5px;
+    transition: 100ms;
+}
+
+.con-div:hover .con-h {
+    margin-left: 5px;
+}
+
+.con-h a {
+    transition: 100ms;
+}
+
+.con-h a:hover {
+    color: #4fa4ff;
+}
+
+/*Content Paragraph*/
+.con-p {
+    background: #fbfbfb;
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-right: 10px;
+    cursor: default;
+    transition: 100ms;
+    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+
+.con-div:hover .con-p {
+    margin-top: 10px;
+    margin-right: 0;
+    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .125);
+}
+
+.con-p span {
+    text-align: center;
+    overflow-wrap: break-word;
+    font-optical-sizing: auto;
+}
+
+/*Badges*/
+.badge-ver {
+    background: lightseagreen;
+}
+
+/*Positioning*/
+.float-r {
+    float: right;
+}
+
+/*Miscellanous*/
+.def-cursor {
+    cursor: default;
+}
