@@ -44,7 +44,7 @@
             <div class="form-group mt-2" th:if="${group.getMembers().size() < group.getUserLimit()}">
                 <h3>Möchtest du dieser privaten Gruppe beitreten?</h3>
                 <div class="text-right">
-                    <form method="post" th:action="@{/gruppen2/acceptinvite}">
+                    <form method="post" th:action="@{/gruppen2/join}">
                         <input name="id" th:value="${group.getId()}" type="hidden"/>
                         <button class="btn btn-primary"
                                 style="background: #52a1eb; border-style: none;"

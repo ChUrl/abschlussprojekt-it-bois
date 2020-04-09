@@ -53,10 +53,10 @@ class APIControllerTest {
     @Test
     @WithMockUser(username = "api_user", roles = "api_user")
     void updateGroup_noGroup() {
-        assertThat(apiController.updateGroups(0L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(4L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(10L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(0);
+        assertThat(apiController.update(0L).getGroupList()).hasSize(0);
+        assertThat(apiController.update(4L).getGroupList()).hasSize(0);
+        assertThat(apiController.update(10L).getGroupList()).hasSize(0);
+        assertThat(apiController.update(0L).getStatus()).isEqualTo(0);
     }
 
     @Test
@@ -69,10 +69,10 @@ class APIControllerTest {
                                   addUserEvent(uuidMock(0)),
                                   addUserEvent(uuidMock(0)));
 
-        assertThat(apiController.updateGroups(0L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(4L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(10L).getGroupList()).hasSize(0);
-        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(6);
+        assertThat(apiController.update(0L).getGroupList()).hasSize(1);
+        assertThat(apiController.update(4L).getGroupList()).hasSize(1);
+        assertThat(apiController.update(10L).getGroupList()).hasSize(0);
+        assertThat(apiController.update(0L).getStatus()).isEqualTo(6);
     }
 
 
@@ -89,17 +89,17 @@ class APIControllerTest {
                                   addUserEvent(uuidMock(1)),
                                   addUserEvent(uuidMock(1)));
 
-        assertThat(apiController.updateGroups(0L).getGroupList()).hasSize(2);
-        assertThat(apiController.updateGroups(4L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(6L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(7L).getGroupList()).hasSize(1);
-        assertThat(apiController.updateGroups(0L).getStatus()).isEqualTo(9);
+        assertThat(apiController.update(0L).getGroupList()).hasSize(2);
+        assertThat(apiController.update(4L).getGroupList()).hasSize(1);
+        assertThat(apiController.update(6L).getGroupList()).hasSize(1);
+        assertThat(apiController.update(7L).getGroupList()).hasSize(1);
+        assertThat(apiController.update(0L).getStatus()).isEqualTo(9);
     }
 
     @Test
     @WithMockUser(username = "api_user", roles = "api_user")
     void getGroupsOfUser_noGroup() {
-        assertThat(apiController.getGroupIdsOfUser("A")).isEmpty();
+        assertThat(apiController.usergroups("A")).isEmpty();
     }
 
     @Test
@@ -110,7 +110,7 @@ class APIControllerTest {
                                   createPrivateGroupEvent(uuidMock(2)),
                                   addUserEvent(uuidMock(0), "A"));
 
-        assertThat(apiController.getGroupIdsOfUser("A")).hasSize(1);
+        assertThat(apiController.usergroups("A")).hasSize(1);
     }
 
     @Test
@@ -120,7 +120,7 @@ class APIControllerTest {
                                   addUserEvent(uuidMock(0), "A"),
                                   deleteUserEvent(uuidMock(0), "A"));
 
-        assertThat(apiController.getGroupIdsOfUser("A")).isEmpty();
+        assertThat(apiController.usergroups("A")).isEmpty();
     }
 
     @Disabled
@@ -131,7 +131,7 @@ class APIControllerTest {
                                   addUserEvent(uuidMock(0), "A"),
                                   deleteGroupEvent(uuidMock(0)));
 
-        assertThat(apiController.getGroupIdsOfUser("A")).isEmpty();
+        assertThat(apiController.usergroups("A")).isEmpty();
     }
 
     @Test
@@ -146,8 +146,8 @@ class APIControllerTest {
                                   addUserEvent(uuidMock(2), "A"),
                                   addUserEvent(uuidMock(2), "B"));
 
-        assertThat(apiController.getGroupIdsOfUser("A")).hasSize(3);
-        assertThat(apiController.getGroupIdsOfUser("B")).hasSize(2);
+        assertThat(apiController.usergroups("A")).hasSize(3);
+        assertThat(apiController.usergroups("B")).hasSize(2);
     }
 
     @Test

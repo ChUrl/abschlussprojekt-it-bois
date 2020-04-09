@@ -1,8 +1,7 @@
 package mops.gruppen2.controller;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.aspect.annotation.TraceMethodCall;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.PageNotFoundException;
 import mops.gruppen2.service.ProjectionService;
@@ -16,8 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 @SuppressWarnings("SameReturnValue")
-@Controller
 @Log4j2
+@Controller
 public class GruppenfindungController {
 
     private final ProjectionService projectionService;
@@ -26,25 +25,21 @@ public class GruppenfindungController {
         this.projectionService = projectionService;
     }
 
+    // For convenience
     @GetMapping("")
     public String redirect() {
         return "redirect:/gruppen2";
     }
 
-    @RolesAllowed({"ROLE_orga", "ROLE_studentin", "ROLE_actuator"})
+    @TraceMethodCall
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/gruppen2")
-    public String index(KeycloakAuthenticationToken token,
-                        Model model) {
+    public String getIndexPage(KeycloakAuthenticationToken token,
+                               Model model) {
 
-        log.info("GET to /gruppen2\n");
+        User user = new User(token);
 
-        Account account = new Account(token);
-        User user = new User(account);
-
-        model.addAttribute("account", account);
         model.addAttribute("gruppen", projectionService.projectUserGroups(user));
-        model.addAttribute("user", user);
-        model.addAttribute("lecture", GroupType.LECTURE);
 
         return "index";
     }
