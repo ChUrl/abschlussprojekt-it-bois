@@ -21,10 +21,10 @@
                 <a th:href="@{/gruppen2}" href="/">Gruppen</a>
             </li>
             <li th:case="${true}">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li>
                 <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>

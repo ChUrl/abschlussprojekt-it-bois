@@ -41,19 +41,17 @@ public class GroupCreationController {
         this.projectionService = projectionService;
     }
 
-    //TODO: /create/orga
     @RolesAllowed("ROLE_orga")
-    @GetMapping("/createOrga")
-    public String getCreateOrgaPage(Model model) {
+    @GetMapping("/create/orga")
+    public String getCreateOrga(Model model) {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createOrga";
     }
 
-    //TODO: /create/orga
     @RolesAllowed("ROLE_orga")
-    @PostMapping("/createOrga")
+    @PostMapping("/create/orga")
     @CacheEvict(value = "groups", allEntries = true)
     public String postCreateOrga(KeycloakAuthenticationToken token,
                                  @RequestParam("title") String title,
@@ -79,19 +77,17 @@ public class GroupCreationController {
         return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
     }
 
-    //TODO: /create/student
     @RolesAllowed("ROLE_studentin")
-    @GetMapping("/createStudent")
-    public String getCreateStudentPage(Model model) {
+    @GetMapping("/create/student")
+    public String getCreateStudent(Model model) {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 
         return "createStudent";
     }
 
-    //TODO: /create/student
     @RolesAllowed("ROLE_studentin")
-    @PostMapping("/createStudent")
+    @PostMapping("/create/student")
     @CacheEvict(value = "groups", allEntries = true)
     public String postCreateStudent(KeycloakAuthenticationToken token,
                                     @RequestParam("title") String title,

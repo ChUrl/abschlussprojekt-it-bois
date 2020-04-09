@@ -25,10 +25,10 @@
                 <a th:href="@{/gruppen2}" href="/">Gruppen</a>
             </li>
             <li th:case="${true}" class="active">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}" class="active">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li>
                 <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
@@ -42,7 +42,7 @@
         <div class="row">
             <div class="col-10">
                 <h1>Gruppenerstellung</h1>
-                <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/createOrga}">
+                <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create/orga}">
                     <div class="shadow-sm p-2" style=" border: 10px solid aliceblue; background: aliceblue;">
                         <div class="form-group">
                             <label for="titel">Titel</label>
