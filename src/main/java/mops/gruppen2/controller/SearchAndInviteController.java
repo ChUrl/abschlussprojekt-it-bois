@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -38,22 +39,20 @@ public class SearchAndInviteController {
         this.searchService = searchService;
     }
 
-    //TODO: /search
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @GetMapping("/searchPage")
-    public String getSearchPage(Model model) {
+    @GetMapping("/search")
+    public String getSearch(Model model) {
         // Noch keine Suche gestartet: leeres Suchergebnis
         model.addAttribute("gruppen", Collections.emptyList());
 
         return "search";
     }
 
-    //TODO: /search/{string}
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @GetMapping("/search")
-    public String getSearch(KeycloakAuthenticationToken token,
-                            Model model,
-                            @RequestParam("suchbegriff") String search) {
+    @PostMapping("/search")
+    public String postSearch(KeycloakAuthenticationToken token,
+                             Model model,
+                             @RequestParam("string") String search) {
 
         User user = new User(token);
         List<Group> groups = searchService.searchPublicGroups(search, user);

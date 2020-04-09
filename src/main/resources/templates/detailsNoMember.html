@@ -16,13 +16,13 @@
                 <a th:href="@{/gruppen2}" href="/">Gruppen</a>
             </li>
             <li th:case="${true}">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li class="active">
-                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
+                <a th:href="@{/gruppen2/search}" href="/search">Suche</a>
             </li>
         </ul>
     </nav>
@@ -46,6 +46,10 @@
                 <p style="overflow-wrap: break-word; font-optical-sizing: auto;"
                    th:text="${group.getDescription()}"></p>
             </div>
+            <form class="mt-3" th:if="${group.getVisibility() == public}" method="post"
+                  th:action="@{/gruppen2/details/{id}/join(id=${group.getId()})}">
+                <button class="btn btn-primary" type="submit">Beitreten!</button>
+            </form>
         </div>
     </div>
 </main>

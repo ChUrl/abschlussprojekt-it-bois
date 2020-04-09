@@ -17,13 +17,13 @@
                 <a th:href="@{/gruppen2}" href="/">Gruppen</a>
             </li>
             <li th:case="${true}">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li class="active">
-                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
+                <a th:href="@{/gruppen2/search}" href="/search">Suche</a>
             </li>
         </ul>
     </nav>
@@ -35,20 +35,15 @@
                 <h1>Gruppensuche</h1>
                 <div class="shadow-sm p-2"
                      style="border: 10px solid aliceblue; border-radius: 5px; background: aliceblue;">
-                    <form method="get" th:action="@{/gruppen2/search}">
+                    <form method="post" th:action="@{/gruppen2/search}">
                         <div class="form-group">
                             <label for="suchleiste">Suchbegriff:</label>
                             <input class="form-control" id="suchleiste"
                                    placeholder="z.B. Programmieren, Lerngruppe, ..."
-                                   th:name="suchbegriff" type="text">
+                                   th:name="string" type="text">
                         </div>
-                        <button class="btn btn-primary"
-                                style="background: #52a1eb; border-style: none;"
-                                type="submit">Suchen
-                        </button>
-                        <button class="btn btn-primary" style="background: deepskyblue; border-style: none;" type="submit">
-                            <a href="/gruppen2/search?suchbegriff=" style="color: white;">Alle
-                                                                                          anzeigen</a>
+                        <button class="btn btn-primary" style="background: #52a1eb; border-style: none;" type="submit">
+                            Suchen
                         </button>
                     </form>
                 </div>

@@ -19,13 +19,13 @@
                 <a href="/" th:href="@{/gruppen2}">Gruppen</a>
             </li>
             <li th:case="${true}">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li class="active">
-                <a href="/searchPage" th:href="@{/gruppen2/searchPage}">Suche</a>
+                <a href="/search" th:href="@{/gruppen2/search}">Suche</a>
             </li>
         </ul>
     </nav>
@@ -44,7 +44,7 @@
             <div class="form-group mt-2" th:if="${group.getMembers().size() < group.getUserLimit()}">
                 <h3>Möchtest du dieser privaten Gruppe beitreten?</h3>
                 <div class="text-right">
-                    <form method="post" th:action="@{/gruppen2/join}">
+                    <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}">
                         <input name="id" th:value="${group.getId()}" type="hidden"/>
                         <button class="btn btn-primary"
                                 style="background: #52a1eb; border-style: none;"

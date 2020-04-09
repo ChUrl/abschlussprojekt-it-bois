@@ -21,13 +21,13 @@
                 <a th:href="@{/gruppen2}" href="/">Gruppen</a>
             </li>
             <li th:case="${true}">
-                <a href="/createOrga" th:href="@{/gruppen2/createOrga}">Erstellen</a>
+                <a href="/create/orga" th:href="@{/gruppen2/create/orga}">Erstellen</a>
             </li>
             <li th:case="${false}">
-                <a href="/createStudent" th:href="@{/gruppen2/createStudent}">Erstellen</a>
+                <a href="/create/student" th:href="@{/gruppen2/create/student}">Erstellen</a>
             </li>
             <li>
-                <a th:href="@{/gruppen2/searchPage}" href="/searchPage">Suche</a>
+                <a th:href="@{/gruppen2/search}" href="/search">Suche</a>
             </li>
         </ul>
     </nav>
@@ -49,9 +49,8 @@
                 </div>
                 <div class="shadow p-2" style="border: 10px solid aliceblue; background: aliceblue;">
                     <div class="form-group pt-4" th:if="${account.getRoles().contains('orga')}">
-                        <form th:action="@{/gruppen2/details/members/addUsersFromCsv}"
-                              enctype="multipart/form-data"
-                              method="post">
+                        <form th:action="@{/gruppen2/details/{id}/members/update/csv(id=${group.getId()})}"
+                              enctype="multipart/form-data" method="post">
                             <div class="input-group mb-3">
                                 <div class="custom-file">
                                     <input class="custom-file-input" id="file" th:name="file"
@@ -63,8 +62,7 @@
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary"
                                             style="background: #52a1eb; border-style: none;"
-                                            th:name="group_id" th:value="${group.getId()}"
-                                            type="submit">
+                                            th:name="group_id" type="submit">
                                         <a style="color: white;">Hinzufügen</a>
                                     </button>
                                 </div>
@@ -72,7 +70,7 @@
                         </form>
                     </div>
                     <div class="form-group pt-4">
-                        <form method="post" th:action="@{/gruppen2/details/members/changeMaximum}">
+                        <form method="post" th:action="@{/gruppen2/details/{id}/members/update/userlimit(id=${group.getId()})}">
                             <div class="input-group mb-3" id="userMaximum">
                                 <label for="teilnehmerzahl"></label>
                                 <input class="form-control"
@@ -84,8 +82,7 @@
                                 <div class="input-group-append">
                                     <button class="btn btn-outline-secondary"
                                             style="background: #52a1eb; border-style: none;"
-                                            th:name="group_id" th:value="${group.getId()}"
-                                            type="submit">
+                                            th:name="group_id" type="submit">
                                         <a style="color: white;">Speichern</a>
                                     </button>
                                 </div>
@@ -111,21 +108,13 @@
                             <td>
                                 <div class="text-right btn-toolbar" style="float: right;" role="toolbar">
                                     <form method="post"
-                                          th:action="@{/gruppen2/details/members/changeRole}">
-                                        <input th:name="group_id" th:value="${group.getId()}"
-                                               type="hidden">
-                                        <input th:name="user_id" th:value="${member.getId()}"
-                                               type="hidden">
+                                          th:action="@{/gruppen2/details/{id}/members/{userid}/update/role(id=${group.getId()}, userid=${member.getId()})}">
                                         <button class="btn btn-warning btn-sm" type="submit"
                                                 style="margin: 5px;">Rolle ändern
                                         </button>
                                     </form>
                                     <form method="post"
-                                          th:action="@{/gruppen2/details/members/deleteUser}">
-                                        <input th:name="group_id" th:value="${group.getId()}"
-                                               type="hidden">
-                                        <input th:name="user_id" th:value="${member.getId()}"
-                                               type="hidden">
+                                          th:action="@{/gruppen2/details/{id}/members/{userid}/delete(id=${group.getId()}, userid=${member.getId()})}">
                                         <button class="btn btn-danger btn-sm" style="margin: 5px;"
                                                 th:if='!${account.getName().equals(member.getId())}'>
                                             Mitglied entfernen

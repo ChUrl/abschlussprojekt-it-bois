@@ -47,8 +47,8 @@ public class APIController {
     @GetMapping("/update/{id}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt veränderte Gruppen zurück")
-    public GroupRequestWrapper update(@ApiParam("Letzte gespeicherte EventId des Anfragestellers")
-                                      @PathVariable("id") long eventId) {
+    public GroupRequestWrapper getApiUpdate(@ApiParam("Letzte gespeicherte EventId des Anfragestellers")
+                                            @PathVariable("id") long eventId) {
 
         return APIService.wrap(eventStoreService.findMaxEventId(),
                                projectionService.projectNewGroups(eventId));
@@ -60,8 +60,8 @@ public class APIController {
     @GetMapping("/usergroups/{id}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt Gruppen zurück, in welchen ein Nutzer teilnimmt")
-    public List<String> usergroups(@ApiParam("Nutzer-Id")
-                                   @PathVariable("id") String userId) {
+    public List<String> getApiUserGroups(@ApiParam("Nutzer-Id")
+                                         @PathVariable("id") String userId) {
 
         return IdService.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
     }
@@ -72,8 +72,8 @@ public class APIController {
     @GetMapping("/group/{id}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt die Gruppe mit der als Parameter mitgegebenden groupId zurück")
-    public Group getGroupById(@ApiParam("Gruppen-Id der gefordeten Gruppe")
-                              @PathVariable("id") String groupId) {
+    public Group getApiGroup(@ApiParam("Gruppen-Id der gefordeten Gruppe")
+                             @PathVariable("id") String groupId) {
 
         return projectionService.projectSingleGroup(UUID.fromString(groupId));
     }
