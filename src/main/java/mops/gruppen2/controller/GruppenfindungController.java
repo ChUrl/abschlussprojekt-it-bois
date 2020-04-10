@@ -39,7 +39,7 @@ public class GruppenfindungController {
 
         User user = new User(token);
 
-        model.addAttribute("gruppen", projectionService.projectUserGroups(user));
+        model.addAttribute("groups", projectionService.projectUserGroups(user));
 
         return "index";
     }

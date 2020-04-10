@@ -1,47 +1,36 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{mopslayout :: html(name='Gruppenbildung', headcontent=~{:: headcontent}, navigation=~{:: navigation}, bodycontent=~{:: bodycontent})}">
-<head>
-    <meta charset="utf-8">
-    <title>Meine Gruppen</title>
-    <th:block th:fragment="headcontent">
-        <!-- Links, Skripts, Styles hier einfügen! -->
-        <link th:href="@{/style.css}" href="../static/style.css" rel="stylesheet"/>
-    </th:block>
-</head>
+<html lang="de" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{mopslayout :: html(
+          name='Gruppenfindung',
+          title='Meine Gruppen',
+          headcontent=~{fragments/general :: headcontent},
+          navigation=~{fragments/general :: nav(current='index')},
+          bodycontent=~{:: bodycontent})}">
+
 <body>
-<header>
-    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation">
-        <ul>
-            <li class="active">
-                <a th:href="@{/gruppen2}">Gruppen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/create}">Erstellen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/search}">Suche</a>
-            </li>
-        </ul>
-    </nav>
-</header>
+
 <main th:fragment="bodycontent">
     <div class="container-fluid">
+
         <h1 class="def-cursor">Meine Gruppen</h1>
-        <div class="mt-3" th:each="gruppe: ${gruppen}">
-            <div class="con-div p-2">
-                <span class="con-h">
-                    <a th:href="@{/gruppen2/details/{id}(id=${gruppe.getId()})}"
-                       th:text="${gruppe.getTitle()}"></a>
-                    <span class="badge badge-pill badge-success badge-ver float-r"
-                          th:if='${gruppe.getType() == lecture}'>Veranstaltung</span>
-                </span>
-                <div class="con-p p-2">
-                    <span th:text="${#strings.abbreviate(gruppe.getDescription(),300)}"></span>
+
+        <!--Gruppenliste belegte Gruppen-->
+        <div class="mt-3" th:each="group: ${groups}">
+            <div class="content p-2">
+                <div class="content-heading">
+                    <a class="link" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+                       th:text="${group.getTitle()}"></a>
+
+                    <span th:replace="~{fragments/gruppen :: badges}"></span>
+                </div>
+                <div class="content-text p-2">
+                    <span th:text="${group.getDescription()}"></span>
                 </div>
             </div>
         </div>
+
     </div>
 </main>
+
 </body>
 </html>
