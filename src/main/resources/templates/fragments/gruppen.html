@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<!--suppress ALL -->
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--Grouptype Badges-->
+<th:block th:fragment="badges">
+    <span class="badge badge-pill private float-right"
+          th:if='${group.getVisibility() == private}'>Privat</span>
+    <span class="badge badge-pill public float-right" th:if="${group.getVisibility() == public}"
+          th:unless="${group.getType() == lecture}">Öffentlich</span>
+    <span class="badge badge-pill lecture float-right"
+          th:if='${group.getType() == lecture}'>Veranstaltung</span>
+
+    <span class="badge badge-pill parent float-right"
+          th:if="${parent != null}" th:text="${parent.getTitle()}">Parent</span>
+
+    <!--Needs completly projected (cached) groups-->
+    <!--<span class="badge badge-success float-right"
+          th:if='${group.getRoles().get(user.getId()) == admin}'>Admin</span>-->
+</th:block>

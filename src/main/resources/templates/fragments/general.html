@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<!--suppress ALL -->
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--Stylesheets, Javascript etc.-->
+<th:block th:fragment="headcontent">
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>-->
+    <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>-->
+    <!--    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>-->
+    <link th:href="@{style.css}" rel="stylesheet"/>
+</th:block>
+
+<!--Left navigation bar-->
+<nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="nav(current)">
+    <ul>
+        <li th:class="${current == 'index'} ? 'active' : ''">
+            <a th:href="@{/gruppen2}">Gruppen</a>
+        </li>
+        <li th:class="${current == 'create'} ? 'active' : ''">
+            <a th:href="@{/gruppen2/create}">Erstellen</a>
+        </li>
+        <li th:class="${current == 'search'} ? 'active' : ''">
+            <a th:href="@{/gruppen2/search}">Suche</a>
+        </li>
+    </ul>
+</nav>
+
+</html>
