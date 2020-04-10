@@ -1,6 +1,6 @@
 INSERT INTO event
 VALUES (1, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '07FEA694', 'CreateGroupEvent',
-        '{"type":"CreateGroupEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"07FEA694","groupVisibility":"PUBLIC","groupParent":null,"groupType":"SIMPLE"}'),
+        '{"type":"CreateGroupEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"07FEA694","groupParent":null,"groupType":"PUBLIC"}'),
        (2, '2d90ae27-1129-4b61-84a5-6c7d585e777e', 'orga', 'AddUserEvent',
         '{"type":"AddUserEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"orga","givenname":"Marcos","familyname":"Glover","email":"Marcos.Glover@mail.de"}'),
 
@@ -29,7 +29,7 @@ VALUES (1, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '07FEA694', 'CreateGroupEvent
         '{"type":"AddUserEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"10","givenname":"Eduardo","familyname":"Lowe","email":"Eduardo.Lowe@mail.de"}'),
 
        (14, '555a531c-8b80-491c-88b4-8fc18170d318', '2D7D9CE0', 'CreateGroupEvent',
-        '{"type":"CreateGroupEvent","groupId":"555a531c-8b80-491c-88b4-8fc18170d318","userId":"2D7D9CE0","groupVisibility":"PUBLIC","groupParent":null,"groupType":"SIMPLE"}'),
+        '{"type":"CreateGroupEvent","groupId":"555a531c-8b80-491c-88b4-8fc18170d318","userId":"2D7D9CE0","groupParent":null,"groupType":"PRIVATE"}'),
        (15, '555a531c-8b80-491c-88b4-8fc18170d318', 'orga', 'AddUserEvent',
         '{"type":"AddUserEvent","groupId":"555a531c-8b80-491c-88b4-8fc18170d318","userId":"orga","givenname":"Jerald","familyname":"Ward","email":"Jerald.Ward@mail.de"}'),
 
@@ -48,7 +48,7 @@ VALUES (1, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '07FEA694', 'CreateGroupEvent
         '{"type":"AddUserEvent","groupId":"555a531c-8b80-491c-88b4-8fc18170d318","userId":"5","givenname":"Dannie","familyname":"Wintheiser","email":"Dannie.Wintheiser@mail.de"}'),
 
        (22, '5e1c2b9a-bf3a-4c9e-9bf0-f5beecb69eb3', 'E7E2EC5F', 'CreateGroupEvent',
-        '{"type":"CreateGroupEvent","groupId":"5e1c2b9a-bf3a-4c9e-9bf0-f5beecb69eb3","userId":"E7E2EC5F","groupVisibility":"PUBLIC","groupParent":null,"groupType":"SIMPLE"}'),
+        '{"type":"CreateGroupEvent","groupId":"5e1c2b9a-bf3a-4c9e-9bf0-f5beecb69eb3","userId":"E7E2EC5F","groupParent":null,"groupType":"LECTURE"}'),
        (23, '5e1c2b9a-bf3a-4c9e-9bf0-f5beecb69eb3', 'orga', 'AddUserEvent',
         '{"type":"AddUserEvent","groupId":"5e1c2b9a-bf3a-4c9e-9bf0-f5beecb69eb3","userId":"orga","givenname":"Hana","familyname":"Connelly","email":"Hana.Connelly@mail.de"}'),
 

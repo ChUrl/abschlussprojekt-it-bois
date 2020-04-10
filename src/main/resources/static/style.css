@@ -10,34 +10,44 @@
 
 /*Content Container*/
 .content {
-    border-radius: 3px;
-    background: #e6f4ff;
-    transition: 100ms;
-    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-}
-
-.content:hover {
+    border-radius: 5px;
     background: #d4ecff;
+    padding: 10px 10px;
+    margin-top: 15px;
     box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
 }
 
 /*Content Heading*/
 .content-heading {
+    margin-bottom: 10px;
     font-weight: bold;
     font-optical-sizing: auto;
     overflow-wrap: break-word;
-    margin-bottom: 5px;
-    transition: 100ms;
 }
 
-.content:hover .content-heading {
-    margin-left: 5px;
-    padding-bottom: 10px;
+.content-text {
+    margin-bottom: 15px;
+    cursor: default;
+}
+
+/*Content Paragraph*/
+.content-text-in {
+    background: whitesmoke;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    cursor: default;
+    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .25);
+}
+
+.content-text-in div {
+    overflow-wrap: break-word;
+    font-optical-sizing: auto;
 }
 
 /*Link*/
 .link {
-    color: dodgerblue;
+    color: var(--primary);
     transition: 100ms;
 }
 
@@ -45,50 +55,29 @@
     color: #4fa4ff;
 }
 
-/*Content Paragraph*/
-.content-text {
-    background: whitesmoke;
-    border-radius: 3px;
-    margin-top: 5px;
-    margin-right: 10px;
-    cursor: default;
-    transition: 100ms;
-    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .075);
-}
-
-.content:hover .content-text {
-    margin-right: 0;
-    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .25);
-}
-
-.content-text div {
-    overflow-wrap: break-word;
-    font-optical-sizing: auto;
-}
-
 /*Badges*/
 .lecture {
     cursor: default;
     color: whitesmoke;
-    background: lightseagreen;
+    background: var(--info);
 }
 
 .public {
     cursor: default;
     color: whitesmoke;
-    background: #52a1eb;
+    background: var(--primary);
 }
 
 .private {
     cursor: default;
     color: whitesmoke;
-    background: darkslategray;
+    background: var(--secondary);
 }
 
 .parent {
     cursor: default;
     color: whitesmoke;
-    background: mediumorchid;
+    background: var(--warning);
 }
 
 /*Positioning*/
