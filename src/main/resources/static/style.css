@@ -1,19 +1,28 @@
+/*Background Light Blue: #e6f4ff*/
+/*              Focused: #d4ecff*/
+/*Background Matt White: whitesmoke*/
+/*Text Heading Blue: dodgerblue*/
+/*          Focused: #4fa4ff*/
+/*Badge Background Private: darkslategray*/
+/*Badge Background Public: #52a1eb*/
+/*Badge Background Veranstaltung: lightseagreen*/
+/*Badge Background Parent: mediumorchid*/
+
 /*Content Container*/
-.con-div {
+.content {
     border-radius: 3px;
     background: #e6f4ff;
     transition: 100ms;
     box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
 }
 
-.con-div:hover {
+.content:hover {
     background: #d4ecff;
-    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .125);
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
 }
 
 /*Content Heading*/
-.con-h {
-    color: dodgerblue;
+.content-heading {
     font-weight: bold;
     font-optical-sizing: auto;
     overflow-wrap: break-word;
@@ -21,21 +30,24 @@
     transition: 100ms;
 }
 
-.con-div:hover .con-h {
+.content:hover .content-heading {
     margin-left: 5px;
+    padding-bottom: 10px;
 }
 
-.con-h a {
+/*Link*/
+.link {
+    color: dodgerblue;
     transition: 100ms;
 }
 
-.con-h a:hover {
+.link:hover {
     color: #4fa4ff;
 }
 
 /*Content Paragraph*/
-.con-p {
-    background: #fbfbfb;
+.content-text {
+    background: whitesmoke;
     border-radius: 3px;
     margin-top: 5px;
     margin-right: 10px;
@@ -44,26 +56,51 @@
     box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .075);
 }
 
-.con-div:hover .con-p {
-    margin-top: 10px;
+.content:hover .content-text {
     margin-right: 0;
-    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .125);
+    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .25);
 }
 
-.con-p span {
-    text-align: center;
+.content-text div {
     overflow-wrap: break-word;
     font-optical-sizing: auto;
 }
 
 /*Badges*/
-.badge-ver {
+.lecture {
+    cursor: default;
+    color: whitesmoke;
     background: lightseagreen;
 }
 
+.public {
+    cursor: default;
+    color: whitesmoke;
+    background: #52a1eb;
+}
+
+.private {
+    cursor: default;
+    color: whitesmoke;
+    background: darkslategray;
+}
+
+.parent {
+    cursor: default;
+    color: whitesmoke;
+    background: mediumorchid;
+}
+
 /*Positioning*/
-.float-r {
+.float-right {
+    margin-right: 10px;
+    margin-left: 10px;
     float: right;
+    transition: 100ms;
+}
+
+.content:hover .float-right {
+    margin-right: 0;
 }
 
 /*Miscellanous*/
