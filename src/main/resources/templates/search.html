@@ -1,80 +1,42 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{mopslayout :: html(name='Gruppenbildung', headcontent=~{:: headcontent}, navigation=~{:: navigation}, bodycontent=~{:: bodycontent})}">
-<head>
-    <meta charset="utf-8">
-    <title>Suche</title>
-    <th:block th:fragment="headcontent">
-        <!-- Links, Skripts, Styles hier einfügen! -->
-    </th:block>
-</head>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    headcontent=~{fragments/general :: headcontent(style='/search.css')},
+    navigation=~{fragments/general :: nav(current='search')},
+    bodycontent=~{:: bodycontent})}">
+
 <body>
-<header>
-    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation">
-        <ul>
-            <li>
-                <a th:href="@{/gruppen2}">Gruppen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/create}">Erstellen</a>
-            </li>
-            <li class="active">
-                <a th:href="@{/gruppen2/search}">Suche</a>
-            </li>
-        </ul>
-    </nav>
-</header>
+
 <main th:fragment="bodycontent">
+
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-10">
-                <h1>Gruppensuche</h1>
-                <div class="shadow-sm p-2"
-                     style="border: 10px solid aliceblue; border-radius: 5px; background: aliceblue;">
-                    <form method="post" th:action="@{/gruppen2/search}">
-                        <div class="form-group">
-                            <label for="suchleiste">Suchbegriff:</label>
-                            <input class="form-control" id="suchleiste"
-                                   placeholder="z.B. Programmieren, Lerngruppe, ..."
-                                   th:name="string" type="text">
-                        </div>
-                        <button class="btn btn-primary" style="background: #52a1eb; border-style: none;" type="submit">
-                            Suchen
-                        </button>
-                    </form>
+
+        <h1>Suche</h1>
+
+        <div class="content top">
+            <form method="post" th:action="@{/gruppen2/search}">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text text-monospace">Suchbegriff:</span>
+                    </div>
+                    <input class="form-control" th:name="string" type="text">
                 </div>
-                <br>
-                <table class="table" th:if='${!gruppen.isEmpty()}'>
-                    <!-- Erscheint dann, wenn man "Suchen" Button klickt und Ergebnisse angezeigt werden, aber so solls aussehen -->
-                    <thead>
-                    <tr>
-                        <th scope="col">Gruppenname</th>
-                        <th scope="col">Beschreibung</th>
-                        <th scope="col">Max. Mitgliederanzahl</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="gruppe : ${gruppen}" th:switch="${gruppe.getUserLimit() != 100000}">
-                        <th scope="row">
-                            <span class="badge badge-pill badge-success"
-                                  style="background: lightseagreen; margin-right: 25px;"
-                                  th:if='${gruppe.getType() == lecture}'>Veranstaltung</span>
-                            <a th:href="@{/gruppen2/details/{id}(id=${gruppe.getId()})}"
-                               th:text="${#strings.abbreviate(gruppe.getTitle(), 50)}">Gruppenname</a>
-                        </th>
-                        <td style="" th:text="${#strings.abbreviate(gruppe.getDescription(), 50)}">
-                            Beschreibung
-                        </td>
-                        <td th:case="${true}">
-                            <a th:text="${gruppe.getUserLimit()}"></a>
-                        </td>
-                        <td th:case="${false}">unbegrenzt</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <button class="btn btn-primary" type="submit">Suchen</button>
+            </form>
+        </div>
+
+        <div class="content" th:each="group: ${groups}">
+            <div class="content-heading">
+                <a class="link" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+                   th:text="${group.getTitle()}"></a>
+            </div>
+            <div class="content-text-in">
+                <span th:text="${group.getDescription()}"></span>
             </div>
         </div>
+
     </div>
 </main>
+
 </body>
 </html>

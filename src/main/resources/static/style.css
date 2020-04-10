@@ -82,14 +82,8 @@
 
 /*Positioning*/
 .float-right {
-    margin-right: 10px;
-    margin-left: 10px;
     float: right;
     transition: 100ms;
-}
-
-.content:hover .float-right {
-    margin-right: 0;
 }
 
 /*Miscellanous*/

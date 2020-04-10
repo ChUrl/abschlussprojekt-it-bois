@@ -57,7 +57,7 @@ public class SearchAndInviteController {
         User user = new User(token);
         List<Group> groups = searchService.searchPublicGroups(search, user);
 
-        model.addAttribute("gruppen", groups);
+        model.addAttribute("groups", groups);
 
         return "search";
     }

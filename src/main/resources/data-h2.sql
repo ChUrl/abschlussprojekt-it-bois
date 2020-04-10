@@ -1,16 +1,16 @@
 INSERT INTO event
 VALUES (1, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '07FEA694', 'CreateGroupEvent',
         '{"type":"CreateGroupEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"07FEA694","groupParent":null,"groupType":"PUBLIC"}'),
-       (2, '2d90ae27-1129-4b61-84a5-6c7d585e777e', 'orga', 'AddUserEvent',
-        '{"type":"AddUserEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"orga","givenname":"Marcos","familyname":"Glover","email":"Marcos.Glover@mail.de"}'),
+       (2, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '2', 'AddUserEvent',
+        '{"type":"AddUserEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"2","givenname":"Marcos","familyname":"Glover","email":"Marcos.Glover@mail.de"}'),
 
        (3, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '2', 'UpdateUserLimitEvent',
         '{"type":"UpdateUserLimitEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"2","userLimit":"1000"}'),
 
        (4, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '5CFBF1AF', 'UpdateGroupTitleEvent',
-        '{"type":"UpdateGroupTitleEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"5CFBF1AF","newGroupTitle":"Zyra"}'),
+        '{"type":"UpdateGroupTitleEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"5CFBF1AF","newGroupTitle":"Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra"}'),
        (5, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '41E11CBC', 'UpdateGroupDescriptionEvent',
-        '{"type":"UpdateGroupDescriptionEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"41E11CBC","newGroupDescription":"Have you seen my Bear Tibbers?"}'),
+        '{"type":"UpdateGroupDescriptionEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"41E11CBC","newGroupDescription":"Have you seen my Bear Tibbers? Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyra Zyrav"}'),
        (6, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '3', 'AddUserEvent',
         '{"type":"AddUserEvent","groupId":"2d90ae27-1129-4b61-84a5-6c7d585e777e","userId":"3","givenname":"Antwan","familyname":"Smitham","email":"Antwan.Smitham@mail.de"}'),
        (7, '2d90ae27-1129-4b61-84a5-6c7d585e777e', '4', 'AddUserEvent',
