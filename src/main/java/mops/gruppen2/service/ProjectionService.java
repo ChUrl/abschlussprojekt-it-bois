@@ -4,7 +4,6 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
@@ -131,7 +130,7 @@ public class ProjectionService {
         List<Group> groups = projectGroups(events);
 
         return groups.stream()
-                     .filter(group -> group.getVisibility() == Visibility.PUBLIC)
+                     .filter(group -> group.getType() == GroupType.PUBLIC)
                      .collect(Collectors.toList());
     }
 

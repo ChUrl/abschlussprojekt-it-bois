@@ -3,8 +3,8 @@ package mops.gruppen2.controller;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.service.InviteService;
 import mops.gruppen2.service.ProjectionService;
 import mops.gruppen2.service.SearchService;
@@ -74,7 +74,7 @@ public class SearchAndInviteController {
         model.addAttribute("group", group);
 
         // Gruppe öffentlich
-        if (group.getVisibility() == Visibility.PUBLIC) {
+        if (group.getType() == GroupType.PUBLIC) {
             return "redirect:/gruppen2/details/" + group.getId();
         }
 

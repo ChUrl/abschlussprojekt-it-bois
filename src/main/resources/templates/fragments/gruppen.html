@@ -5,9 +5,9 @@
 <!--Grouptype Badges-->
 <th:block th:fragment="badges">
     <span class="badge badge-pill private float-right"
-          th:if='${group.getVisibility() == private}'>Privat</span>
-    <span class="badge badge-pill public float-right" th:if="${group.getVisibility() == public}"
-          th:unless="${group.getType() == lecture}">Öffentlich</span>
+          th:if='${group.getType() == private}'>Privat</span>
+    <span class="badge badge-pill public float-right"
+          th:if="${group.getType() == public}">Öffentlich</span>
     <span class="badge badge-pill lecture float-right"
           th:if='${group.getType() == lecture}'>Veranstaltung</span>
 

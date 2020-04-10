@@ -29,7 +29,6 @@ public class DeleteGroupEvent extends Event {
         group.getMembers().clear();
         group.setTitle(null);
         group.setDescription(null);
-        group.setVisibility(null);
         group.setType(null);
         group.setParent(null);
         group.setUserLimit(0L);

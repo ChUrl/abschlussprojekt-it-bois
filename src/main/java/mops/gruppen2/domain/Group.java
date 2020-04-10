@@ -28,7 +28,6 @@ public class Group {
 
     //TODO: Single Type for Public/Private/Lecture?
     private GroupType type;
-    private Visibility visibility;
 
     private String title;
     private String description;

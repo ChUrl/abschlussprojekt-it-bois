@@ -5,7 +5,6 @@ import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DeleteGroupEvent;
@@ -51,7 +50,6 @@ public class GroupService {
     public Group createGroup(User user,
                              String title,
                              String description,
-                             Visibility visibility,
                              GroupType groupType,
                              long userLimit,
                              UUID parent) {
@@ -59,8 +57,7 @@ public class GroupService {
         // Regeln:
         // isPrivate -> !isLecture
         // isLecture -> !isPrivate
-        ValidationService.validateFlags(visibility, groupType);
-        Group group = createGroup(user, parent, groupType, visibility);
+        Group group = createGroup(user, parent, groupType);
 
         // Die Reihenfolge ist wichtig, da der ausführende User Admin sein muss
         addUser(user, group);
@@ -133,12 +130,11 @@ public class GroupService {
     /**
      * Erzeugt eine Gruppe, speichert diese und gibt diese zurück.
      */
-    private Group createGroup(User user, UUID parent, GroupType groupType, Visibility visibility) {
+    private Group createGroup(User user, UUID parent, GroupType groupType) {
         Event event = new CreateGroupEvent(UUID.randomUUID(),
                                            user.getId(),
                                            parent,
-                                           groupType,
-                                           visibility);
+                                           groupType);
         Group group = new Group();
         event.apply(group);
 

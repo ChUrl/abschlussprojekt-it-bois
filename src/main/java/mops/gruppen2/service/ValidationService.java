@@ -4,13 +4,13 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.exception.BadParameterException;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.exception.NoAdminAfterActionException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import static mops.gruppen2.domain.Role.ADMIN;
@@ -127,12 +127,6 @@ public final class ValidationService {
         }
     }
 
-    public static void validateFlags(Visibility visibility, GroupType groupType) {
-        if (visibility == Visibility.PRIVATE && groupType == GroupType.LECTURE) {
-            throw new BadParameterException("Eine Veranstaltung kann nicht privat sein!");
-        }
-    }
-
     public static void validateUserLimit(long userLimit, Group group) {
         if (userLimit < 1) {
             throw new BadParameterException("Das Userlimit muss größer als 1 sein!");
@@ -140,6 +134,13 @@ public final class ValidationService {
 
         if (userLimit < group.getMembers().size()) {
             throw new BadParameterException("Das Userlimit kann nicht unter der momentanen Mitgliederanzahl sein!");
+        }
+    }
+
+    public static void validateGroupType(KeycloakAuthenticationToken token, String type) {
+        if (!token.getAccount().getRoles().contains("orga")
+            && GroupType.valueOf(type) == GroupType.LECTURE) {
+            throw new BadParameterException("Eine Veranstaltung kann nur von ORGA erstellt werden.");
         }
     }
 }
