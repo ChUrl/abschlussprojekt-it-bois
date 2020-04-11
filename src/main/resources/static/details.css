@@ -1,3 +1,25 @@
+/*Content*/
 .content-heading {
     margin-bottom: 15px;
+}
+
+/*Buttons*/
+.edit {
+    font-size: 20px;
+}
+
+.btn-bar {
+    align-self: start;
+    margin-left: 10px;
+}
+
+/*Badges*/
+.badge-pill {
+    align-self: start;
+}
+
+/*Member List*/
+.members {
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
 }

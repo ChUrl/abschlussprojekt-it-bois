@@ -12,7 +12,8 @@
           th:if='${group.getType() == lecture}'>Veranstaltung</span>
 
     <span class="badge badge-pill parent"
-          th:if="${parent != null}" th:text="${parent.getTitle()}">Parent</span>
+          th:unless="${parent == null || parent.getTitle() == null|| parent.getTitle() == ''}"
+          th:text="${parent.getTitle()}">Parent</span>
 
     <!--Needs completly projected (cached) groups-->
     <!--<span class="badge badge-success float-right"

@@ -1,127 +1,98 @@
 <!DOCTYPE html>
-<html lang="en"
-      th:replace="~{mopslayout :: html(name='Gruppenbildung', headcontent=~{:: headcontent}, navigation=~{:: navigation}, bodycontent=~{:: bodycontent})}"
-      xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <title>Gruppendetails</title>
-    <th:block th:fragment="headcontent">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-              rel="stylesheet">
-    </th:block>
-</head>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Details',
+    headcontent=~{fragments/general :: headcontent(style='/details.css')},
+    navigation=~{fragments/general :: nav(current='none')},
+    bodycontent=~{:: bodycontent})}">
+
 <body>
-<header>
-    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation">
-        <ul>
-            <li class="active">
-                <a th:href="@{/gruppen2}">Gruppen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/create}">Erstellen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/search}">Suche</a>
-            </li>
-        </ul>
-    </nav>
-</header>
+
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <div>
-            <div class="shadow-sm p-4 col-8"
-                 style="border: 10px solid aliceblue; display: inline-block; border-radius: 5px; background: aliceblue;">
-                <div class="row">
-                    <div class="col-11">
-                        <h1 style="color: black; font-weight: bold; font-optical-sizing: auto; overflow-wrap: break-word; width: 95%;"
-                            th:text="${group.getTitle()}"></h1>
-                    </div>
-                    <div class="col-1">
-                        <a class="fa fa-pencil"
-                           style="font-size:30px; width: 5%;"
+
+        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+
+        <div class="row">
+            <!--Gruppendetails-->
+            <div class="col-9 px-0">
+
+                <div class="content">
+                    <div class="content-heading row">
+                        <!--Badges-->
+                        <span th:replace="~{fragments/gruppen :: badges}"></span>
+
+                        <!--Spacer-->
+                        <span class="col"></span>
+
+                        <!--Edit-Pen-Button-->
+                        <a class="fas fa-edit edit"
                            th:href="@{/gruppen2/details/{id}/meta(id=${group.getId()})}"
                            th:if="${group.getRoles().get(user.getId()) == admin}"></a>
                     </div>
-                </div>
-                <h3>
-                    <span class="badge badge-pill badge-dark" style="background: darkslategray;"
-                          th:if='${group.getVisibility() == group.getVisibility().PRIVATE }'>Private Gruppe</span>
-                    <span class="badge badge-pill badge-primary" style="background: #52a1eb;"
-                          th:if="${group.getVisibility() == group.getVisibility().PUBLIC}">Öffentliche Gruppe</span>
-                    <span class="badge badge-pill badge-success" style="background: lightseagreen;"
-                          th:if='${group.getType() == group.getType().LECTURE}'>Veranstaltung</span>
-                    <span class="badge badge-pill badge-info" style="background: mediumorchid;"
-                          th:text="${parent?.getTitle()}">Parent</span>
 
-                    <div class="input-group mb-3" style="margin-top: 10px;"
+                    <!--Invite Link-->
+                    <div class="content-text input-group"
                          th:if="${group.getRoles().get(user.getId()) == admin}">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default"
-                                  style="background: #52a1eb;">Einladungslink:</span>
+                            <span class="input-group-text">Einladungslink:</span>
                         </div>
-                        <input aria-describedby="basic-addon2" aria-label="Recipient's username"
-                               class="form-control"
-                               id="groupLink" readonly style="background: white;" th:value="${link}"
-                               type="text">
+                        <input class="form-control" readonly th:value="${link}" type="text">
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" onclick="copyLink()"
-                                    type="button">Link kopieren
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="copyLink()">Link kopieren
                             </button>
                         </div>
                     </div>
-                </h3>
-                <br>
-                <div class="shadow-sm p-4" style="background: white;">
-                    <p style="overflow-wrap: break-word; font-optical-sizing: auto;" th:text="${group.getDescription()}"></p>
+
+                    <!--Description-->
+                    <div class="content-text-in">
+                        <span th:text="${group.getDescription()}"></span>
+                    </div>
+
+                    <!--Button-Bar-->
+                    <div class="row">
+
+                        <!--Spacer-->
+                        <span class="col"></span>
+
+                        <form method="post" th:action="@{/gruppen2/details/{id}/leave(id=${group.getId()})}">
+                            <button class="btn btn-warning btn-bar" type="submit">Gruppe verlassen
+                            </button>
+                        </form>
+                        <form method="post" th:if="${group.getRoles().get(user.getId()) == admin}"
+                              th:action="@{/gruppen2/details/{id}/destroy(id=${group.getId()})}">
+                            <button class="btn btn-danger btn-bar" type="submit">Gruppe löschen
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <br>
-                <div class="text-right btn-toolbar" role="toolbar" style="float: right;">
-                    <button class="btn btn-primary"
-                            style="background: #52a1eb; border: none; margin: 5px;">
-                        <a style="color: white;" th:href="@{/gruppen2}">Zurück</a>
-                    </button>
-                    <form method="post" th:action="@{/gruppen2/details/{id}/leave(id=${group.getId()})}">
-                        <button class="btn btn-danger" style="border-style: none; margin: 5px;"
-                                th:name="group_id"
-                                type="submit">Gruppe verlassen
-                        </button>
-                    </form>
-                    <form method="post" th:action="@{/gruppen2/details/{id}/destroy(id=${group.getId()})}">
-                        <button class="btn btn-danger" style="border-style: none; margin: 5px;" th:name="group_id"
-                                th:if="${group.getRoles().get(user.getId()) == admin}"
-                                type="submit">Gruppe löschen
-                        </button>
-                    </form>
-                </div>
+
             </div>
-            <div class="col-4" style="white-space: nowrap; float: right; background: white; display: inline-block; margin-bottom: 100px; margin-top: -8px;">
-                <h2>Mitglieder</h2>
-                <div th:switch="${group.getUserLimit() != 100000}">
-                    <h4 th:case="${true}">
-                        <a th:text="${group.getMembers().size()}"></a>
-                        <a>von maximal</a>
-                        <a th:text="${group.getUserLimit()}"></a>
-                        <a>Benutzern.</a>
-                    </h4>
-                    <h4 th:case="${false}"> unbegrenzte Teilnehmeranzahl</h4>
+
+            <!--Teilnehmerliste-->
+            <div class="col-3 def-cursor">
+                <!--Anzahl Text-->
+                <div class="mb-2">
+                    <span>Teilnehmer: </span>
+                    <span th:if="${group.getUserLimit() <= 10000}"
+                          th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
+                    <span th:unless="${group.getUserLimit() <= 100000}"
+                          th:text="${group.getMembers().size()}"></span>
                 </div>
-                <div th:if="${group.getRoles().get(user.getId()) == admin}">
+
+                <!--Bearbeiten-Button-->
+                <div class="mb-2" th:if="${group.getRoles().get(user.getId()) == admin}">
                     <form method="get"
                           th:action="@{/gruppen2/details/{id}/members(id=${group.getId()})}">
-                        <button class="btn btn-secondary" style="background: slategrey; float: left;">
-                            Mitglieder bearbeiten
-                        </button>
+                        <button class="btn btn-secondary btn-block">Teilnehmer verwalten</button>
                     </form>
-                    <br>
-                    <br>
                 </div>
-                <div style="overflow-y: scroll;
-                     height:60vh;">
-                    <ul class="list-group-flush" style="background: slategrey;"
-                        th:each="member : ${group.getMembers()}">
-                        <li class="list-group-item" style="background: aliceblue;">
-                            <span th:if='${group.getVisibility() == public}' th:text="${member.getId()}"></span>
-                            <span th:if='${group.getVisibility() == private}' th:text="${#strings.abbreviate(member.getGivenname(), 15)  + ' ' + member.getFamilyname().substring(0, 1) + '.'}"></span>
+
+                <div class="members">
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="member : ${group.getMembers()}"
+                            th:text="${#strings.abbreviate(member.getGivenname(), 15)  + ' ' + member.getFamilyname().substring(0, 1) + '.'}">
                             <span class="badge badge-success"
                                   th:if='${group.getRoles().get(member.getId()) == admin}'>admin</span>
                         </li>
@@ -130,6 +101,7 @@
             </div>
         </div>
     </div>
+
     <script>
         function copyLink() {
             const copyText = document.getElementById("groupLink");
