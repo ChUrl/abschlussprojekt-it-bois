@@ -40,6 +40,7 @@ public class GroupDetailsController {
         this.inviteService = inviteService;
         this.groupService = groupService;
         this.projectionService = projectionService;
+
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})

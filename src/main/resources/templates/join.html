@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"
+<html lang="de"
       th:replace="~{mopslayout :: html(name='Gruppenbildung', headcontent=~{:: headcontent}, navigation=~{:: navigation}, bodycontent=~{:: bodycontent})}"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Gruppe Beitreten</title>
     <th:block th:fragment="headcontent">
         <!-- Links, Skripts, Styles hier einfügen! -->
@@ -20,7 +20,7 @@
             <li>
                 <a th:href="@{/gruppen2/create}">Erstellen</a>
             </li>
-            <li class="active">
+            <li>
                 <a th:href="@{/gruppen2/search}">Suche</a>
             </li>
         </ul>
