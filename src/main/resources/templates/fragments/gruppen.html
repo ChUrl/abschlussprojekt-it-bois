@@ -4,14 +4,14 @@
 
 <!--Grouptype Badges-->
 <th:block th:fragment="badges">
-    <span class="badge badge-pill private float-right"
+    <span class="badge badge-pill private"
           th:if='${group.getType() == private}'>Privat</span>
-    <span class="badge badge-pill public float-right"
+    <span class="badge badge-pill public"
           th:if="${group.getType() == public}">Öffentlich</span>
-    <span class="badge badge-pill lecture float-right"
+    <span class="badge badge-pill lecture"
           th:if='${group.getType() == lecture}'>Veranstaltung</span>
 
-    <span class="badge badge-pill parent float-right"
+    <span class="badge badge-pill parent"
           th:if="${parent != null}" th:text="${parent.getTitle()}">Parent</span>
 
     <!--Needs completly projected (cached) groups-->

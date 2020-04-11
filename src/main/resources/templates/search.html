@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
     name='Gruppenbildung',
+    title='Suchen',
     headcontent=~{fragments/general :: headcontent(style='/search.css')},
     navigation=~{fragments/general :: nav(current='search')},
     bodycontent=~{:: bodycontent})}">
@@ -8,11 +9,11 @@
 <body>
 
 <main th:fragment="bodycontent">
-
     <div class="container-fluid">
 
-        <h1>Suche</h1>
+        <h1>Suchen</h1>
 
+        <!--Suchfilter-->
         <div class="content top">
             <form method="post" th:action="@{/gruppen2/search}">
                 <div class="input-group mb-3">
@@ -25,9 +26,12 @@
             </form>
         </div>
 
+        <!--Ergebnisliste-->
         <div class="content" th:each="group: ${groups}">
-            <div class="content-heading">
-                <a class="link" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+            <div class="content-heading row">
+                <span th:replace="~{fragments/gruppen :: badges}"></span>
+
+                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
                    th:text="${group.getTitle()}"></a>
             </div>
             <div class="content-text-in">
