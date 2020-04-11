@@ -1,53 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{mopslayout :: html(name='Gruppenbildung', headcontent=~{:: headcontent}, navigation=~{:: navigation}, bodycontent=~{:: bodycontent})}">
-<head>
-    <meta charset="utf-8">
-    <title>Gruppendetails</title>
-    <th:block th:fragment="headcontent">
-        <!-- Links, Skripts, Styles hier einfügen! -->
-    </th:block>
-</head>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Details',
+    headcontent=~{fragments/general :: headcontent('/details.css')},
+    navigation=~{fragments/general :: nav('none')},
+    bodycontent=~{:: bodycontent})}">
+
 <body>
-<header>
-    <nav class="navigation navigation-secondary" is="mops-navigation" th:fragment="navigation">
-        <ul>
-            <li>
-                <a th:href="@{/gruppen2}" href="/">Gruppen</a>
-            </li>
-            <li>
-                <a th:href="@{/gruppen2/create}">Erstellen</a>
-            </li>
-            <li class="active">
-                <a th:href="@{/gruppen2/search}">Suche</a>
-            </li>
-        </ul>
-    </nav>
-</header>
+
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <div class="shadow-sm p-4" style="border: 1px solid aliceblue; border-radius: 5px; background: aliceblue;">
-            <h1 style="color: black; font-weight: bold; font-optical-sizing: auto; overflow-wrap: break-word;" th:text="${group.getTitle()}"></h1>
-            <h3>
-                        <span class="badge badge-pill badge-dark" style="background: darkslategray;"
-                              th:if='${group.getVisibility() == group.getVisibility().PRIVATE }'>Private Gruppe</span>
-                <span class="badge badge-pill badge-primary" style="background: #52a1eb;"
-                      th:if="${group.getVisibility() == group.getVisibility().PUBLIC}">Öffentliche Gruppe</span>
-                <span class="badge badge-pill badge-success"
-                      style="background: lightseagreen;"
-                      th:if='${group.getType() == lecture}'> Veranstaltung</span>
-                <span class="badge badge-pill badge-info" style="background: mediumorchid;"
-                      th:text="${parent?.getTitle()}">Parent</span>
-            </h3>
-            <div class="shadow-sm p-4" style="background: white;">
-                <p style="overflow-wrap: break-word; font-optical-sizing: auto;"
-                   th:text="${group.getDescription()}"></p>
+
+        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+
+        <div class="content">
+            <div class="content-heading">
+                <div th:replace="~{fragments/gruppen :: badges}"></div>
             </div>
-            <form class="mt-3" th:if="${group.getVisibility() == public}" method="post"
+
+            <div class="content-text-in">
+                <span th:text="${group.getDescription()}"></span>
+            </div>
+
+            <form th:if="${group.getType() == public}" method="post"
                   th:action="@{/gruppen2/details/{id}/join(id=${group.getId()})}">
                 <button class="btn btn-primary" type="submit">Beitreten!</button>
             </form>
         </div>
+
     </div>
 </main>
 </body>
