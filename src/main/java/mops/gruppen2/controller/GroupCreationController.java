@@ -23,7 +23,6 @@ import javax.annotation.security.RolesAllowed;
 
 import static mops.gruppen2.service.ControllerService.getGroupType;
 import static mops.gruppen2.service.ControllerService.getParent;
-import static mops.gruppen2.service.ControllerService.getUserLimit;
 
 @SuppressWarnings("SameReturnValue")
 @Log4j2
@@ -58,7 +57,6 @@ public class GroupCreationController {
                                  @RequestParam("description") String description,
                                  @RequestParam("type") String type,
                                  @RequestParam(value = "parent", defaultValue = "") String parent,
-                                 @RequestParam("limit") String limit,
                                  @RequestParam("userlimit") long userLimit,
                                  @RequestParam(value = "file", required = false) MultipartFile file) {
 
@@ -69,7 +67,7 @@ public class GroupCreationController {
                                                title,
                                                description,
                                                getGroupType(type),
-                                               getUserLimit(limit, userLimit),
+                                               userLimit,
                                                getParent(parent, type));
 
         // ROLE_studentin kann kein CSV importieren

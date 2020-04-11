@@ -2,7 +2,6 @@ package mops.gruppen2.service;
 
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Limit;
 import net.bytebuddy.description.modifier.Visibility;
 import org.springframework.stereotype.Service;
 
@@ -21,19 +20,6 @@ public final class ControllerService {
 
     public static GroupType getGroupType(String type) {
         return GroupType.valueOf(type);
-    }
-
-    /**
-     * Wenn die maximale Useranzahl unendlich ist, wird das Maximum auf 100000 gesetzt.
-     * Praktisch gibt es also maximal 100000 Nutzer pro Gruppe.
-     *
-     * @param limit     Gibt an, ob es unendlich viele User geben soll
-     * @param userLimit Das Maximum an Usern, falls es eins gibt
-     *
-     * @return Maximum an Usern
-     */
-    public static long getUserLimit(String limit, long userLimit) {
-        return Limit.valueOf(limit) == Limit.INFINITE ? Long.MAX_VALUE : userLimit;
     }
 
     /**
