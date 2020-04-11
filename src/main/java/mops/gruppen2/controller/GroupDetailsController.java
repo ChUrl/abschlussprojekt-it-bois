@@ -139,7 +139,7 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsMembersUpdateUserLimit(KeycloakAuthenticationToken token,
                                                     @PathVariable("id") String groupId,
-                                                    @RequestParam("maximum") long userLimit) {
+                                                    @RequestParam("userlimit") long userLimit) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));

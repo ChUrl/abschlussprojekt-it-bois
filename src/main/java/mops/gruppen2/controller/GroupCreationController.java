@@ -41,8 +41,7 @@ public class GroupCreationController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/create")
-    public String getCreate(KeycloakAuthenticationToken token,
-                            Model model) {
+    public String getCreate(Model model) {
 
         model.addAttribute("lectures", projectionService.projectLectures());
 

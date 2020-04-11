@@ -55,7 +55,7 @@
                 <!--Anzahl Text-->
                 <div class="mb-2">
                     <span>Teilnehmer: </span>
-                    <span th:if="${group.getUserLimit() <= 10000}"
+                    <span th:if="${group.getUserLimit() <= 100000}"
                           th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
                     <span th:unless="${group.getUserLimit() <= 100000}"
                           th:text="${group.getMembers().size()}"></span>

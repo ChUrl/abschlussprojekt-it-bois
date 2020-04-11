@@ -2,7 +2,6 @@ package mops.gruppen2.service;
 
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.GroupType;
-import net.bytebuddy.description.modifier.Visibility;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,10 +12,6 @@ import java.util.UUID;
 public final class ControllerService {
 
     private ControllerService() {}
-
-    public static Visibility getVisibility(boolean isPrivate) {
-        return isPrivate ? Visibility.PRIVATE : Visibility.PUBLIC;
-    }
 
     public static GroupType getGroupType(String type) {
         return GroupType.valueOf(type);
