@@ -18,8 +18,19 @@
     align-self: start;
 }
 
+.members .badge {
+    align-self: start;
+    margin-top: 2px;
+}
+
 /*Member List*/
 .members {
     overflow-y: auto;
     max-height: calc(100vh - 250px);
+}
+
+.members li span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
