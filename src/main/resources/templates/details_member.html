@@ -31,20 +31,6 @@
                            th:if="${group.getRoles().get(user.getId()) == admin}"></a>
                     </div>
 
-                    <!--Invite Link-->
-                    <div class="content-text input-group"
-                         th:if="${group.getRoles().get(user.getId()) == admin}">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Einladungslink:</span>
-                        </div>
-                        <input class="form-control" readonly th:value="${link}" type="text">
-                        <div class="input-group-append">
-                            <button type="button" class="btn btn-outline-secondary"
-                                    onclick="copyLink()">Link kopieren
-                            </button>
-                        </div>
-                    </div>
-
                     <!--Description-->
                     <div class="content-text-in">
                         <span th:text="${group.getDescription()}"></span>
@@ -57,12 +43,7 @@
                         <span class="col"></span>
 
                         <form method="post" th:action="@{/gruppen2/details/{id}/leave(id=${group.getId()})}">
-                            <button class="btn btn-warning btn-bar" type="submit">Gruppe verlassen
-                            </button>
-                        </form>
-                        <form method="post" th:if="${group.getRoles().get(user.getId()) == admin}"
-                              th:action="@{/gruppen2/details/{id}/destroy(id=${group.getId()})}">
-                            <button class="btn btn-danger btn-bar" type="submit">Gruppe löschen
+                            <button class="btn btn-danger btn-bar" type="submit">Gruppe verlassen
                             </button>
                         </form>
                     </div>
@@ -83,8 +64,8 @@
                 <!--Bearbeiten-Button-->
                 <div class="mb-2" th:if="${group.getRoles().get(user.getId()) == admin}">
                     <form method="get"
-                          th:action="@{/gruppen2/details/{id}/members(id=${group.getId()})}">
-                        <button class="btn btn-secondary btn-block">Teilnehmer verwalten</button>
+                          th:action="@{/gruppen2/details/{id}/edit(id=${group.getId()})}">
+                        <button class="btn btn-secondary btn-block">Gruppe verwalten</button>
                     </form>
                 </div>
 
@@ -101,17 +82,6 @@
 
         </div>
     </div>
-
-    <script>
-        function copyLink() {
-            const copyText = document.getElementById("groupLink");
-
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-
-            document.execCommand("copy");
-        }
-    </script>
 </main>
 </body>
 </html>

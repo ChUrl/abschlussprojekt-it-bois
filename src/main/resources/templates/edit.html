@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Gruppe verwalten',
+    headcontent=~{fragments/general :: headcontent(style='none')},
+    navigation=~{fragments/general :: nav(current='none')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <div class="container-fluid">
+        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+
+        <!--Fertig oder löschen-->
+        <div class="content">
+            <div class="row">
+                <form method="get" th:action="@{/gruppen2/details/{id}(id=${group.getId()})}">
+                    <button class="btn btn-primary">Fertig</button>
+                </form>
+
+                <!--Spacer-->
+                <span class="col"></span>
+
+                <form method="post" th:action="@{/gruppen2/details/{id}/destroy(id=${group.getId()})}">
+                    <button class="btn btn-danger btn-bar" type="submit">Gruppe löschen
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!--Invite Link-->
+        <div class="content input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Einladungslink:</span>
+            </div>
+            <input class="form-control" readonly th:value="${link}" type="text">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-secondary"
+                        onclick="copyLink()">Link kopieren
+                </button>
+            </div>
+        </div>
+
+        <!--Meta-->
+        <div class="content">
+            <div class="content-heading">
+                <span>Eigenschaften</span>
+            </div>
+
+            <!--Beschreibung + Titel-->
+            <div class="content-text">
+                <form th:action="@{/gruppen2/details/{id}/edit/meta(id=${group.getId()})}"
+                      method="post">
+
+                    <div th:replace="~{fragments/gruppen :: meta}"></div>
+                    <div class="row">
+                        <span class="col"></span>
+                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!--Userlimit-->
+            <div class="content-text-in">
+                <form th:action="@{/gruppen2/details/{id}/edit/userlimit(id=${group.getId()})}"
+                      method="post">
+
+                    <div th:replace="~{fragments/gruppen :: userlimit}"></div>
+                    <div class="row">
+                        <span class="col"></span>
+                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+                    </div>
+                </form>
+            </div>
+
+            <!--CSV Import-->
+            <div class="content-text mb-0">
+                <form th:action="@{/gruppen2/details/{id}/edit/csv(id=${group.getId()})}"
+                      th:if="${account.getRoles().contains('orga')}"
+                      enctype="multipart/form-data" method="post">
+
+                    <div th:replace="~{fragments/gruppen :: csvimport}"></div>
+                    <div class="row">
+                        <span class="col"></span>
+                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!--Teilnehmerliste-->
+        <div class="content members">
+            <div class="content-heading">
+                <span>Teilnehmer</span>
+            </div>
+
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between" th:each="member : ${group.getMembers()}">
+                    <div>
+                        <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
+                        <span class="badge badge-success align-self-start ml-2"
+                              th:if="${group.getRoles().get(member.getId()) == admin}">Admin</span>
+                    </div>
+
+                    <div class="d-flex">
+                        <form th:action="@{/gruppen2/details/{id}/edit/delete/{userid}(id=${group.getId()}, userid=${member.getId()})}"
+                              th:unless="${member.getId() == account.getName()}"
+                              method="post">
+                            <button type="submit" class="btn btn-danger mr-2">Entfernen</button>
+                        </form>
+
+                        <form th:action="@{/gruppen2/details/{id}/edit/role/{userid}(id=${group.getId()}, userid=${member.getId()})}"
+                              method="post">
+                            <button type="submit" class="btn btn-warning">Rolle ändern</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>

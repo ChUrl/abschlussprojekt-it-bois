@@ -18,93 +18,21 @@
 
             <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
 
-                <div class="content-text">
-                    <!--Gruppentitel-->
-                    <div class="input-group mb-2">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text text-monospace">Gruppentitel:</span>
-                        </div>
-                        <input type="text" class="form-control" th:name="title" required>
-                    </div>
-
-                    <!--Gruppenbeschreibung-->
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text text-monospace">Beschreibung:</span>
-                        </div>
-                        <textarea class="form-control" th:name="description" required></textarea>
-                    </div>
-                </div>
+                <!--Titel + Beschreibung-->
+                <div class="content-text" th:insert="~{fragments/gruppen :: meta}"></div>
 
                 <!--TODO: Enter AsciiDoc Description-->
 
                 <div class="content-text-in">
                     <!--Gruppentyp-->
-                    <label for="grouptype">Gruppentyp:</label>
-                    <div class="btn-toolbar row mb-2" id="grouptype">
-                        <div class="btn-group btn-group-toggle col-sm-4" data-toggle="buttons">
-                            <label class="btn btn-secondary active" onclick="enableParent()">
-                                <input type="radio" name="type" value="PRIVATE" checked> Privat
-                            </label>
-                            <label class="btn btn-secondary" onclick="enableParent()">
-                                <input type="radio" name="type" value="PUBLIC"> Öffentlich
-                            </label>
-                            <label class="btn btn-secondary" onclick="disableParent()"
-                                   th:if="${account.getRoles().contains('orga')}">
-                                <input type="radio" name="type" value="LECTURE"> Veranstaltung
-                            </label>
-                        </div>
-
-                        <div class="input-group col-sm-8">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text text-monospace">Gehört zu:</span>
-                            </div>
-                            <select class="custom-select" id="parentselect" name="parent">
-                                <option value="" selected>Keiner</option>
-                                <option th:each="lecture : ${lectures}" th:value="${lecture.getId()}"
-                                        th:text="${lecture.getTitle()}"></option>
-                            </select>
-                        </div>
-                    </div>
+                    <div th:replace="~{fragments/gruppen :: grouptype}"></div>
 
                     <!--Benutzerlimit-->
-                    <label for="userlimit">Teilnehmeranzahl:</label>
-                    <div class="btn-toolbar row" id="userlimit">
-                        <div class="btn-group btn-group-toggle col-sm-4" data-toggle="buttons">
-                            <label class="btn btn-secondary active">
-                                <input type="radio" name="limit" value="INFINITE" checked>
-                                Unbegrenzt
-                            </label>
-                            <label class="btn btn-secondary">
-                                <input type="radio" name="limit" value="LOCKED"> Begrenzt
-                            </label>
-                        </div>
-
-                        <div class="input-group col-sm-8">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text text-monospace">Limit:</span>
-                            </div>
-                            <input type="number" class="form-control" th:name="userlimit" value="1"
-                                   min="1" max="100000" required>
-                            <div class="input-group-append">
-                                <span class="input-group-text text-monospace">Teilnehmer</span>
-                            </div>
-                        </div>
-                    </div>
+                    <div th:replace="~{fragments/gruppen :: userlimit}"></div>
                 </div>
 
-                <div class="content-text" th:if="${account.getRoles().contains('orga')}">
-                    <!--CSV-->
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text text-monospace">CSV:</span>
-                        </div>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="file" th:name="file">
-                            <label class="custom-file-label" for="file">Datei auswählen</label>
-                        </div>
-                    </div>
-                </div>
+                <!--CSV Import-->
+                <div class="content-text" th:insert="~{fragments/gruppen :: csvimport}"></div>
 
                 <!--Submit-->
                 <button class="btn btn-primary btn-block" type="submit">Gruppe Erstellen</button>
@@ -112,23 +40,6 @@
             </form>
         </div>
     </div>
-
-    <script>
-        // Add the following code if you want the name of the file appear on select
-        $(".custom-file-input").on("change", function () {
-            const fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
-
-        function disableParent() {
-            $('#parentselect').prop('disabled', true);
-        }
-
-        function enableParent() {
-            $('#parentselect').prop('disabled', false);
-        }
-    </script>
-
 </main>
 
 </body>

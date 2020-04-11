@@ -19,3 +19,89 @@
     <!--<span class="badge badge-success float-right"
           th:if='${group.getRoles().get(user.getId()) == admin}'>Admin</span>-->
 </th:block>
+
+<!--CSV-->
+<div th:fragment="csvimport" class="input-group" th:if="${account.getRoles().contains('orga')}">
+    <div class="input-group-prepend">
+        <span class="input-group-text text-monospace">CSV:</span>
+    </div>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input" id="file" th:name="file">
+        <label class="custom-file-label" for="file">Datei auswählen</label>
+    </div>
+</div>
+
+<!--Gruppentyp-->
+<th:block th:fragment="grouptype">
+    <label for="grouptype">Gruppentyp:</label>
+    <div class="btn-toolbar row mb-2 mx-0" id="grouptype">
+        <div class="btn-group btn-group-toggle col-sm-4 px-0" data-toggle="buttons">
+            <label class="btn btn-secondary active" onclick="enable('#parentselect')">
+                <input type="radio" name="type" value="PRIVATE" checked> Privat
+            </label>
+            <label class="btn btn-secondary" onclick="enable('#parentselect')">
+                <input type="radio" name="type" value="PUBLIC"> Öffentlich
+            </label>
+            <label class="btn btn-secondary" onclick="disable('#parentselect')"
+                   th:if="${account.getRoles().contains('orga')}">
+                <input type="radio" name="type" value="LECTURE"> Veranstaltung
+            </label>
+        </div>
+
+        <div class="input-group col-sm-8 pr-0">
+            <div class="input-group-prepend">
+                <span class="input-group-text text-monospace">Gehört zu:</span>
+            </div>
+            <select class="custom-select" id="parentselect" name="parent">
+                <option value="" selected>Keiner</option>
+                <option th:each="lecture : ${lectures}" th:value="${lecture.getId()}"
+                        th:text="${lecture.getTitle()}"></option>
+            </select>
+        </div>
+    </div>
+</th:block>
+
+<!--Userlimit-->
+<th:block th:fragment="userlimit">
+    <label for="userlimit">Teilnehmeranzahl:</label>
+    <div class="btn-toolbar row mx-0" id="userlimit">
+        <div class="btn-group btn-group-toggle col-sm-4 px-0" data-toggle="buttons">
+            <label class="btn btn-secondary active" onclick="disable('#limitselect')">
+                <input type="radio" name="userlimit" value="9223372036854775807" checked>
+                Unbegrenzt
+            </label>
+            <label class="btn btn-secondary" onclick="enable('#limitselect')">
+                <input type="radio"> Begrenzt
+            </label>
+        </div>
+
+        <div class="input-group col-sm-8 pr-0">
+            <div class="input-group-prepend">
+                <span class="input-group-text text-monospace">Limit:</span>
+            </div>
+            <input type="number" class="form-control" name="userlimit" value="1"
+                   min="1" max="100000" id="limitselect" required disabled>
+            <div class="input-group-append">
+                <span class="input-group-text text-monospace">Teilnehmer</span>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="meta">
+    <!--Gruppentitel-->
+    <div class="input-group mb-2">
+        <div class="input-group-prepend">
+            <span class="input-group-text text-monospace">Gruppentitel:</span>
+        </div>
+        <input type="text" class="form-control" th:name="title" required>
+    </div>
+
+    <!--Gruppenbeschreibung-->
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text text-monospace">Beschreibung:</span>
+        </div>
+        <textarea class="form-control" th:name="description" required></textarea>
+    </div>
+</th:block>

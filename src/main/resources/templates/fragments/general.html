@@ -8,6 +8,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/22c0caaa8a.js" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" th:src="@{/script.js}"></script>
+
     <link th:href="@{/style.css}" rel="stylesheet"/>
     <link th:unless="${style == 'none'}" th:href="@{${style}}" rel="stylesheet"/>
 </th:block>
