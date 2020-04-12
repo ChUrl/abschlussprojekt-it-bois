@@ -4,11 +4,11 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.service.CsvService;
+import mops.gruppen2.domain.helper.CsvHelper;
+import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.ProjectionService;
-import mops.gruppen2.domain.service.ValidationService;
 import mops.gruppen2.web.form.CreateForm;
 import mops.gruppen2.web.form.MetaForm;
 import mops.gruppen2.web.form.UserLimitForm;
@@ -56,7 +56,7 @@ public class GroupCreationController {
                                  @Valid UserLimitForm limit) {
 
         // Zusätzlicher check: studentin kann keine lecture erstellen
-        ValidationService.validateCreateForm(token, create);
+        ValidationHelper.validateCreateForm(token, create);
 
         User user = new User(token);
         Group group = groupService.createGroup(user,
@@ -68,9 +68,9 @@ public class GroupCreationController {
 
         // ROLE_studentin kann kein CSV importieren
         if (token.getAccount().getRoles().contains("orga")) {
-            groupService.addUsersToGroup(CsvService.readCsvFile(create.getFile()), group, user);
+            groupService.addUsersToGroup(CsvHelper.readCsvFile(create.getFile()), group, user);
         }
 
-        return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());
+        return "redirect:/gruppen2/details/" + IdHelper.uuidToString(group.getId());
     }
 }

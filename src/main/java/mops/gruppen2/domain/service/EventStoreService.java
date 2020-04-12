@@ -7,6 +7,8 @@ import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.BadPayloadException;
+import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.helper.JsonHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
@@ -80,7 +82,7 @@ public class EventStoreService {
      */
     static EventDTO getDTOFromEvent(Event event) {
         try {
-            String payload = JsonService.serializeEvent(event);
+            String payload = JsonHelper.serializeEvent(event);
             return new EventDTO(null,
                                 event.getGroupId().toString(),
                                 event.getUserId(),
@@ -107,7 +109,7 @@ public class EventStoreService {
 
     private static Event getEventFromDTO(EventDTO dto) {
         try {
-            return JsonService.deserializeEvent(dto.getEvent_payload());
+            return JsonHelper.deserializeEvent(dto.getEvent_payload());
         } catch (JsonProcessingException e) {
             log.error("Payload {} konnte nicht deserialisiert werden!", dto.getEvent_payload(), e);
             throw new BadPayloadException(EventStoreService.class.toString());
@@ -231,7 +233,7 @@ public class EventStoreService {
 
     List<Event> findEventsByGroupAndType(List<UUID> groupIds, String... types) {
         return getEventsFromDTOs(eventStore.findEventDTOsByGroupAndType(Arrays.asList(types),
-                                                                        IdService.uuidsToString(groupIds)));
+                                                                        IdHelper.uuidsToString(groupIds)));
     }
 
     /**

@@ -1,19 +1,17 @@
-package mops.gruppen2.domain.service;
+package mops.gruppen2.domain.helper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
-import org.springframework.stereotype.Service;
 
 /**
  * Übersetzt JSON-Event-Payloads zu Java-Event-Repräsentationen und zurück.
  */
-@Service
 @Log4j2
-public final class JsonService {
+public final class JsonHelper {
 
-    private JsonService() {}
+    private JsonHelper() {}
 
     /**
      * Übersetzt eine Java-Event-Repräsentation zu einem JSON-Event-Payload.
@@ -25,7 +23,7 @@ public final class JsonService {
      * @throws JsonProcessingException Bei JSON Fehler
      */
 
-    static String serializeEvent(Event event) throws JsonProcessingException {
+    public static String serializeEvent(Event event) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(event);
     }
@@ -39,7 +37,7 @@ public final class JsonService {
      *
      * @throws JsonProcessingException Bei JSON Fehler
      */
-    static Event deserializeEvent(String json) throws JsonProcessingException {
+    public static Event deserializeEvent(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, Event.class);
     }

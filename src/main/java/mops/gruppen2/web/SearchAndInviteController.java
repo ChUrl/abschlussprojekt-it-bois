@@ -5,10 +5,10 @@ import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
+import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.SearchService;
-import mops.gruppen2.domain.service.ValidationService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,7 +79,7 @@ public class SearchAndInviteController {
         }
 
         // Bereits Mitglied
-        if (ValidationService.checkIfMember(group, user)) {
+        if (ValidationHelper.checkIfMember(group, user)) {
             return "redirect:/gruppen2/details/" + group.getId();
         }
 

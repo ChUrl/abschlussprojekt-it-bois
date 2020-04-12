@@ -1,17 +1,15 @@
-package mops.gruppen2.domain.service;
+package mops.gruppen2.domain.helper;
 
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.web.api.GroupRequestWrapper;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 @Log4j2
-public class APIService {
+public final class APIHelper {
 
-    private APIService() {}
+    private APIHelper() {}
 
     public static GroupRequestWrapper wrap(long status, List<Group> groupList) {
         return new GroupRequestWrapper(status, groupList);

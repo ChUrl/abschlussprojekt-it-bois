@@ -53,8 +53,6 @@ class GroupServiceTest {
     @Autowired
     private EventStoreService eventStoreService;
     @Autowired
-    private ValidationService validationService;
-    @Autowired
     private InviteService inviteService;
 
     @SuppressWarnings("SyntaxError")

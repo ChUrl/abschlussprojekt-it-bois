@@ -2,7 +2,7 @@ package mops.gruppen2.web.form;
 
 import lombok.Data;
 import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.service.IdService;
+import mops.gruppen2.domain.helper.IdHelper;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -24,6 +24,6 @@ public class CreateForm {
     }
 
     public UUID getParent() {
-        return getType() == GroupType.LECTURE ? IdService.emptyUUID() : IdService.stringToUUID(parent);
+        return getType() == GroupType.LECTURE ? IdHelper.emptyUUID() : IdHelper.stringToUUID(parent);
     }
 }

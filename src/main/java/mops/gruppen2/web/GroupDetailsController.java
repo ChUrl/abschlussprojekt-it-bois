@@ -4,12 +4,12 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.service.CsvService;
+import mops.gruppen2.domain.helper.CsvHelper;
+import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
-import mops.gruppen2.domain.service.ValidationService;
 import mops.gruppen2.web.form.MetaForm;
 import mops.gruppen2.web.form.UserLimitForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -63,7 +63,7 @@ public class GroupDetailsController {
         model.addAttribute("parent", parent);
 
         // Detailseite für nicht-Mitglieder
-        if (!ValidationService.checkIfMember(group, user)) {
+        if (!ValidationHelper.checkIfMember(group, user)) {
             return "preview";
         }
 
@@ -79,7 +79,7 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        if (ValidationService.checkIfMember(group, user)) {
+        if (ValidationHelper.checkIfMember(group, user)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
@@ -97,7 +97,7 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationService.throwIfNoMember(group, user);
+        ValidationHelper.throwIfNoMember(group, user);
 
         groupService.deleteUser(user, group);
 
@@ -119,7 +119,7 @@ public class GroupDetailsController {
         String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
         String link = serverURL + "gruppen2/join/" + inviteService.getLinkByGroup(group);
 
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         model.addAttribute("group", group);
         model.addAttribute("link", link);
@@ -165,9 +165,9 @@ public class GroupDetailsController {
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
 
         User user = new User(token);
-        Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
+        Group group = projectionService.projectSingleGroup(IdHelper.stringToUUID(groupId));
 
-        groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
+        groupService.addUsersToGroup(CsvHelper.readCsvFile(file), group, user);
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -182,12 +182,12 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         groupService.toggleMemberRole(new User(userId), group);
 
         // Falls sich der User selbst die Rechte genommen hat
-        if (!ValidationService.checkIfAdmin(group, user)) {
+        if (!ValidationHelper.checkIfAdmin(group, user)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
@@ -204,7 +204,7 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         // Der eingeloggte User kann sich nicht selbst entfernen (er kann aber verlassen)
         if (!userId.equals(user.getId())) {

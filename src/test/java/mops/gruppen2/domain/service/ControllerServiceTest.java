@@ -2,6 +2,7 @@ package mops.gruppen2.domain.service;
 
 import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.domain.Account;
+import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.persistance.EventRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ class ControllerServiceTest {
     @Autowired
     EventStoreService eventStoreService;
     @Autowired
-    ValidationService validationService;
+    ValidationHelper validationHelper;
     @Autowired
     EventRepository eventRepository;
     @Autowired

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Schreibt eine Nachricht bei Methodenausführung in den Trace-Stream
+ * Schreibt eine Nachricht bei Methodenausführung in den Trace-Stream.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
