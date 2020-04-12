@@ -15,9 +15,9 @@
           th:if='${group.getType() == lecture}'>Veranstaltung</span>
 
     <span class="badge badge-pill parent"
-          th:unless="${parent == null || parent.getTitle() == null|| parent.getTitle() == ''}"
-          th:title="${'Die Gruppe gehört zur Veranstaltung ' + parent.getTitle() + '.'}"
-          th:text="${parent.getTitle()}">Parent</span>
+          th:unless="${parent == null || parent?.getTitle()?.getGroupTitle() == null|| parent?.getTitle()?.getGroupTitle() == ''}"
+          th:title="${'Die Gruppe gehört zur Veranstaltung ' + parent.getTitle().getGroupTitle() + '.'}"
+          th:text="${parent.getTitle().getGroupTitle()}">Parent</span>
 
     <!--Needs completly projected (cached) groups-->
     <!--<span class="badge badge-success float-right"
@@ -39,7 +39,7 @@
 
     <!--Description-->
     <div class="content-text-in">
-        <span th:text="${group.getDescription()}"></span>
+        <span th:text="${group.getDescription().getGroupDescription()}"></span>
     </div>
 
     <!--<div class="content-text-in" th:if="${group.getMembers().contains(user.getId())}"></div>-->
@@ -48,21 +48,21 @@
 <!--Buttonbar zum Gruppe beitreten-->
 <th:block th:fragment="joingroup">
     <div class="content-heading">
-        <span th:if="${group.getMembers().size() < group.getUserLimit()}">
+        <span th:if="${group.getMembers().size() < group.getUserLimit().getUserLimit()}">
             Möchtest du dieser Gruppe beitreten?
         </span>
-        <span th:unless="${group.getMembers().size() < group.getUserLimit()}">
+        <span th:unless="${group.getMembers().size() < group.getUserLimit().getUserLimit()}">
             Diese Gruppe hat ihre maximale Teilnehmeranzahl erreicht.
         </span>
     </div>
 
     <div class="row">
         <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}"
-              th:if="${group.getMembers().size() < group.getUserLimit()}">
+              th:if="${group.getMembers().size() < group.getUserLimit().getUserLimit()}">
             <button class="btn btn-success" type="submit">Gruppe beitreten.</button>
         </form>
 
-        <div class="col" th:if="${group.getMembers().size() < group.getUserLimit()}"></div>
+        <div class="col" th:if="${group.getMembers().size() < group.getUserLimit().getUserLimit()}"></div>
 
         <a class="btn btn-primary" href="/gruppen2"
            type="submit">Startseite.</a>

@@ -1,43 +1,32 @@
 package mops.gruppen2.domain.event;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.exception.BadParameterException;
-
-import java.util.UUID;
+import mops.gruppen2.domain.model.Description;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.User;
 
 /**
  * Ändert nur die Gruppenbeschreibung.
  */
 @Getter
-@NoArgsConstructor // For Jackson
 @ToString
 @Log4j2
 public class UpdateGroupDescriptionEvent extends Event {
 
-    private String newGroupDescription;
+    private Description groupDescription;
 
-    public UpdateGroupDescriptionEvent(UUID groupId, String userId, String newGroupDescription) {
-        super(groupId, userId);
-        this.newGroupDescription = newGroupDescription;
-    }
+    private UpdateGroupDescriptionEvent() {}
 
-    public UpdateGroupDescriptionEvent(Group group, User user, String newGroupDescription) {
+    public UpdateGroupDescriptionEvent(Group group, User user, Description groupDescription) {
         super(group.getId(), user.getId());
-        this.newGroupDescription = newGroupDescription;
+        this.groupDescription = groupDescription;
     }
 
     @Override
     protected void applyEvent(Group group) {
-        if (newGroupDescription.isEmpty()) {
-            throw new BadParameterException("Die Beschreibung ist leer.");
-        }
-
-        group.setDescription(newGroupDescription);
+        group.setDescription(groupDescription);
 
         log.trace("\t\t\t\t\tNeue Beschreibung: {}", group.getDescription());
     }

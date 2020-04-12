@@ -2,10 +2,10 @@ package mops.gruppen2.domain.service;
 
 import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.TestBuilder;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.Event;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.persistance.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -83,7 +83,7 @@ class GroupServiceTest {
 
         assertThat(groups).hasSize(1);
         assertThat(groups.get(0).getMembers()).hasSize(5);
-        assertThat(groups.get(0).getType()).isEqualTo(GroupType.PRIVATE);
+        assertThat(groups.get(0).getType()).isEqualTo(Type.PRIVATE);
     }
 
     //TODO: ProjectionServiceTest

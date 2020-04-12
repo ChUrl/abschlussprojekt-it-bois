@@ -1,13 +1,11 @@
-package mops.gruppen2.domain;
+package mops.gruppen2.domain.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,19 +24,16 @@ public class Group {
     @ToString.Exclude
     private UUID parent;
 
-    //TODO: Single Type for Public/Private/Lecture?
-    private GroupType type;
+    private Type type;
 
-    private String title;
-    private String description;
+    private Title title;
+    private Description description;
 
-    // Default + Minimum: 1
     @ToString.Exclude
-    private long userLimit = 1;
+    private Limit userLimit = new Limit(1); // Add initial user
 
-    //TODO: List to Hashmap
     @ToString.Exclude
-    private final List<User> members = new ArrayList<>();
+    private final Map<String, User> members = new HashMap<>();
     @ToString.Exclude
     private final Map<String, Role> roles = new HashMap<>();
 }

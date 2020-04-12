@@ -10,8 +10,8 @@
         <div class="input-group-prepend">
             <span class="input-group-text text-monospace">Gruppentitel:</span>
         </div>
-        <input type="text" class="form-control" th:name="title" th:value="${group?.getTitle()}"
-               required minlength="4" maxlength="128">
+        <input type="text" class="form-control" name="groupTitle" minlength="4" maxlength="128"
+               th:value="${group?.getTitle()?.getGroupTitle()}" required>
     </div>
 
     <!--Gruppenbeschreibung-->
@@ -20,8 +20,8 @@
         <div class="input-group-prepend">
             <span class="input-group-text text-monospace">Beschreibung:</span>
         </div>
-        <textarea class="form-control" th:name="description" th:text="${group?.getDescription()}"
-                  required minlength="4" maxlength="512"></textarea>
+        <textarea class="form-control" name="groupDescription" minlength="4" maxlength="512"
+                  th:text="${group?.getDescription()?.getGroupDescription()}" required></textarea>
     </div>
 </th:block>
 
@@ -47,11 +47,11 @@
             <div class="input-group-prepend">
                 <span class="input-group-text text-monospace">Gehört zu:</span>
             </div>
-            <input type="hidden" id="parentdummy" value="00000000-0000-0000-0000-000000000000" disabled>
+            <input type="hidden" id="parentdummy" name="parent" value="00000000-0000-0000-0000-000000000000" disabled>
             <select class="custom-select" id="parentselect" name="parent">
                 <option value="00000000-0000-0000-0000-000000000000" selected>Keiner</option>
                 <option th:each="lecture : ${lectures}" th:value="${lecture.getId()}"
-                        th:text="${lecture.getTitle()}"></option>
+                        th:text="${lecture.getTitle().getGroupTitle()}"></option>
             </select>
         </div>
     </div>
@@ -61,17 +61,17 @@
 <th:block th:fragment="userlimit">
     <label for="userlimit">Teilnehmeranzahl:</label>
     <div class="btn-toolbar row mx-0" id="userlimit">
-        <input type="hidden" name="userlimit" id="limit" value="999999"
-               th:disabled="${group != null && group.getUserLimit() < 999999} ? 'disabled' : 'false'">
+        <input type="hidden" name="userLimit" id="limit" value="999999"
+               th:disabled="${group != null && group.getUserLimit().getUserLimit() < 999999} ? 'disabled' : 'false'">
         <div class="btn-group btn-group-toggle col-sm-4 px-0" data-toggle="buttons">
             <label class="btn btn-secondary active" onclick="disable('#limitselect'); enable('#limit')">
                 <input type="radio"
-                       th:checked="${group != null && group.getUserLimit() < 999999} ? 'false' : 'checked'">
+                       th:checked="${group != null && group.getUserLimit().getUserLimit() < 999999} ? 'false' : 'checked'">
                 Unbegrenzt
             </label>
             <label class="btn btn-secondary" onclick="enable('#limitselect'); disable('#limit')">
                 <input type="radio"
-                       th:checked="${group != null && group.getUserLimit() < 999999} ? 'checked' : 'false'">
+                       th:checked="${group != null && group.getUserLimit().getUserLimit() < 999999} ? 'checked' : 'false'">
                 Begrenzt
             </label>
         </div>
@@ -81,10 +81,10 @@
             <div class="input-group-prepend">
                 <span class="input-group-text text-monospace">Limit:</span>
             </div>
-            <input type="number" class="form-control" name="userlimit"
-                   th:value="${group != null} ? ${group.getUserLimit()} : '999999'"
+            <input type="number" class="form-control" name="userLimit"
+                   th:value="${group != null} ? ${group.getUserLimit().getUserLimit()} : '999999'"
                    min="1" max="999999" id="limitselect" required
-                   th:disabled="${group != null && group.getUserLimit() < 999999} ? 'false' : 'disabled'">
+                   th:disabled="${group != null && group.getUserLimit().getUserLimit() < 999999} ? 'false' : 'disabled'">
             <div class="input-group-append">
                 <span class="input-group-text text-monospace">Teilnehmer</span>
             </div>

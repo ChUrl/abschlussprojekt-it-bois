@@ -1,10 +1,6 @@
 package mops.gruppen2.domain.service;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Role;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DeleteGroupEvent;
@@ -16,6 +12,13 @@ import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.helper.ValidationHelper;
+import mops.gruppen2.domain.model.Description;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Limit;
+import mops.gruppen2.domain.model.Role;
+import mops.gruppen2.domain.model.Title;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,16 +52,16 @@ public class GroupService {
      * @param description Gruppenbeschreibung
      */
     public Group createGroup(User user,
-                             String title,
-                             String description,
-                             GroupType groupType,
-                             long userLimit,
+                             Title title,
+                             Description description,
+                             Type type,
+                             Limit userLimit,
                              UUID parent) {
 
         // Regeln:
         // isPrivate -> !isLecture
         // isLecture -> !isPrivate
-        Group group = createGroup(user, parent, groupType);
+        Group group = createGroup(user, parent, type);
 
         // Die Reihenfolge ist wichtig, da der ausführende User Admin sein muss
         addUser(user, group);
@@ -102,8 +105,8 @@ public class GroupService {
      *
      * @return Das neue Teilnehmermaximum
      */
-    private static long getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return Math.max((long) group.getMembers().size() + newUsers.size(), group.getUserLimit());
+    private static Limit getAdjustedUserLimit(List<User> newUsers, Group group) {
+        return new Limit(Math.max((long) group.getMembers().size() + newUsers.size(), group.getUserLimit().getUserLimit()));
     }
 
     /**
@@ -131,11 +134,11 @@ public class GroupService {
     /**
      * Erzeugt eine Gruppe, speichert diese und gibt diese zurück.
      */
-    private Group createGroup(User user, UUID parent, GroupType groupType) {
+    private Group createGroup(User user, UUID parent, Type type) {
         Event event = new CreateGroupEvent(UUID.randomUUID(),
                                            user.getId(),
                                            parent,
-                                           groupType);
+                                           type);
         Group group = new Group();
         event.apply(group);
 
@@ -206,14 +209,14 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob der Titel valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateTitle(User user, Group group, String title) {
+    public void updateTitle(User user, Group group, Title title) {
         ValidationHelper.throwIfNoAdmin(group, user);
 
-        if (title.trim().equals(group.getTitle())) {
+        if (title.equals(group.getTitle())) {
             return;
         }
 
-        Event event = new UpdateGroupTitleEvent(group, user, title.trim());
+        Event event = new UpdateGroupTitleEvent(group, user, title);
         event.apply(group);
 
         eventStoreService.saveEvent(event);
@@ -224,14 +227,14 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob die Beschreibung valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateDescription(User user, Group group, String description) {
+    public void updateDescription(User user, Group group, Description description) {
         ValidationHelper.throwIfNoAdmin(group, user);
 
-        if (description.trim().equals(group.getDescription())) {
+        if (description.equals(group.getDescription())) {
             return;
         }
 
-        Event event = new UpdateGroupDescriptionEvent(group, user, description.trim());
+        Event event = new UpdateGroupDescriptionEvent(group, user, description);
         event.apply(group);
 
         eventStoreService.saveEvent(event);
@@ -260,7 +263,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob das Limit valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateUserLimit(User user, Group group, long userLimit) {
+    public void updateUserLimit(User user, Group group, Limit userLimit) {
         ValidationHelper.throwIfNoAdmin(group, user);
 
         if (userLimit == group.getUserLimit()) {
@@ -268,8 +271,8 @@ public class GroupService {
         }
 
         Event event;
-        if (userLimit < group.getMembers().size()) {
-            event = new UpdateUserLimitEvent(group, user, group.getMembers().size());
+        if (userLimit.getUserLimit() < group.getMembers().size()) {
+            event = new UpdateUserLimitEvent(group, user, new Limit(group.getMembers().size()));
         } else {
             event = new UpdateUserLimitEvent(group, user, userLimit);
         }

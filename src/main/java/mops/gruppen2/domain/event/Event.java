@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupIdMismatchException;
+import mops.gruppen2.domain.model.Group;
 
 import java.util.UUID;
 

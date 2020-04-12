@@ -1,9 +1,9 @@
 package mops.gruppen2.domain.service;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.exception.InvalidInviteException;
 import mops.gruppen2.domain.exception.NoInviteExistException;
+import mops.gruppen2.domain.model.Group;
 import mops.gruppen2.persistance.InviteRepository;
 import mops.gruppen2.persistance.dto.InviteLinkDTO;
 import org.springframework.stereotype.Service;

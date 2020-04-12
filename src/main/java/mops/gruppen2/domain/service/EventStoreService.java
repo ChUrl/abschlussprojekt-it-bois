@@ -2,13 +2,13 @@ package mops.gruppen2.domain.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.BadPayloadException;
 import mops.gruppen2.domain.helper.IdHelper;
 import mops.gruppen2.domain.helper.JsonHelper;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;

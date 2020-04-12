@@ -1,13 +1,13 @@
 package mops.gruppen2.domain.service;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
 import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -131,7 +131,7 @@ public class ProjectionService {
         List<Group> groups = projectGroups(events);
 
         return groups.stream()
-                     .filter(group -> group.getType() == GroupType.PUBLIC)
+                     .filter(group -> group.getType() != Type.PRIVATE)
                      .collect(Collectors.toList());
     }
 
@@ -151,7 +151,7 @@ public class ProjectionService {
         List<Group> lectures = projectGroups(events);
 
         return lectures.stream()
-                       .filter(group -> group.getType() == GroupType.LECTURE)
+                       .filter(group -> group.getType() == Type.LECTURE)
                        .collect(Collectors.toList());
     }
 

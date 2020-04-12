@@ -1,23 +1,17 @@
 package mops.gruppen2.domain.event;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
-
-import java.util.UUID;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.User;
 
 @Getter
-@NoArgsConstructor // For Jackson
 @ToString
 @Log4j2
 public class DeleteGroupEvent extends Event {
 
-    public DeleteGroupEvent(UUID groupId, String userId) {
-        super(groupId, userId);
-    }
+    private DeleteGroupEvent() {}
 
     public DeleteGroupEvent(Group group, User user) {
         super(group.getId(), user.getId());
@@ -31,7 +25,7 @@ public class DeleteGroupEvent extends Event {
         group.setDescription(null);
         group.setType(null);
         group.setParent(null);
-        group.setUserLimit(0L);
+        group.setUserLimit(null);
 
         log.trace("\t\t\t\t\tGelöschte Gruppe: {}", group);
     }

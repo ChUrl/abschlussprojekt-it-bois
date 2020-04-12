@@ -1,19 +1,19 @@
 package mops.gruppen2.domain.helper;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.BadParameterException;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.exception.NoAdminAfterActionException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.web.form.CreateForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
-import static mops.gruppen2.domain.Role.ADMIN;
+import static mops.gruppen2.domain.model.Role.ADMIN;
 
 @Log4j2
 public final class ValidationHelper {
@@ -28,7 +28,7 @@ public final class ValidationHelper {
      * Überprüft, ob ein User in einer Gruppe teilnimmt.
      */
     public static boolean checkIfMember(Group group, User user) {
-        return group.getMembers().contains(user);
+        return group.getMembers().containsKey(user.getId());
     }
 
     public static boolean checkIfLastMember(User user, Group group) {
@@ -39,7 +39,7 @@ public final class ValidationHelper {
      * Überprüft, ob eine Gruppe voll ist.
      */
     public static boolean checkIfGroupFull(Group group) {
-        return group.getMembers().size() >= group.getUserLimit();
+        return group.getMembers().size() >= group.getUserLimit().getUserLimit();
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ValidationHelper {
 
     public static void validateCreateForm(KeycloakAuthenticationToken token, CreateForm form) {
         if (!token.getAccount().getRoles().contains("orga")
-            && form.getType() == GroupType.LECTURE) {
+            && form.getType() == Type.LECTURE) {
             throw new BadParameterException("Eine Veranstaltung kann nur von ORGA erstellt werden.");
         }
     }

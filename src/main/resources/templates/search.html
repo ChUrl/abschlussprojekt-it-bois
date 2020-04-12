@@ -20,7 +20,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text text-monospace">Suchbegriff:</span>
                     </div>
-                    <input class="form-control" th:name="string" type="text">
+                    <input class="form-control" name="string" type="text">
                 </div>
                 <button class="btn btn-primary" type="submit">Suchen</button>
             </form>
@@ -32,10 +32,10 @@
                 <span th:replace="~{fragments/groups :: badges}"></span>
 
                 <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                   th:text="${group.getTitle()}"></a>
+                   th:text="${group.getTitle().getGroupTitle()}"></a>
             </div>
             <div class="content-text-in">
-                <span th:text="${group.getDescription()}"></span>
+                <span th:text="${group.getDescription().getGroupDescription()}"></span>
             </div>
         </div>
 

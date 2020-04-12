@@ -1,17 +1,19 @@
 package mops.gruppen2.web;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.helper.CsvHelper;
 import mops.gruppen2.domain.helper.IdHelper;
 import mops.gruppen2.domain.helper.ValidationHelper;
+import mops.gruppen2.domain.model.Description;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Limit;
+import mops.gruppen2.domain.model.Title;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
-import mops.gruppen2.web.form.MetaForm;
-import mops.gruppen2.web.form.UserLimitForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -31,6 +33,7 @@ import java.util.UUID;
 @SuppressWarnings("SameReturnValue")
 @Log4j2
 @TraceMethodCalls
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/gruppen2")
 public class GroupDetailsController {
@@ -38,13 +41,6 @@ public class GroupDetailsController {
     private final InviteService inviteService;
     private final GroupService groupService;
     private final ProjectionService projectionService;
-
-    public GroupDetailsController(InviteService inviteService, GroupService groupService, ProjectionService projectionService) {
-        this.inviteService = inviteService;
-        this.groupService = groupService;
-        this.projectionService = projectionService;
-
-    }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}")
@@ -132,13 +128,14 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditMeta(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
-                                      @Valid MetaForm form) {
+                                      @Valid Title title,
+                                      @Valid Description description) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateTitle(user, group, form.getTitle());
-        groupService.updateDescription(user, group, form.getDescription());
+        groupService.updateTitle(user, group, title);
+        groupService.updateDescription(user, group, description);
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -148,11 +145,11 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditUserLimit(KeycloakAuthenticationToken token,
                                            @PathVariable("id") String groupId,
-                                           @Valid UserLimitForm form) {
+                                           @Valid Limit limit) {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateUserLimit(user, group, form.getUserlimit());
+        groupService.updateUserLimit(user, group, limit);
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }

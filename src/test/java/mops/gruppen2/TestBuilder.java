@@ -2,9 +2,6 @@ package mops.gruppen2;
 
 import com.github.javafaker.Faker;
 import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DeleteGroupEvent;
@@ -14,6 +11,9 @@ import mops.gruppen2.domain.event.UpdateGroupDescriptionEvent;
 import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.event.UpdateUserLimitEvent;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Role;
+import mops.gruppen2.domain.model.Type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -151,7 +151,7 @@ public class TestBuilder {
     }
 
     public static Event createPrivateGroupEvent(UUID groupId) {
-        return createGroupEvent(groupId, GroupType.PRIVATE);
+        return createGroupEvent(groupId, Type.PRIVATE);
     }
 
     public static Event createPrivateGroupEvent() {
@@ -159,14 +159,14 @@ public class TestBuilder {
     }
 
     public static Event createPublicGroupEvent(UUID groupId) {
-        return createGroupEvent(groupId, GroupType.PUBLIC);
+        return createGroupEvent(groupId, Type.PUBLIC);
     }
 
     public static Event createPublicGroupEvent() {
         return createPublicGroupEvent(UUID.randomUUID());
     }
 
-    public static Event createGroupEvent(UUID groupId, GroupType type) {
+    public static Event createGroupEvent(UUID groupId, Type type) {
         return new CreateGroupEvent(
                 groupId,
                 faker.random().hex(),
@@ -184,7 +184,7 @@ public class TestBuilder {
                 groupId,
                 faker.random().hex(),
                 null,
-                GroupType.LECTURE
+                Type.LECTURE
         );
     }
 

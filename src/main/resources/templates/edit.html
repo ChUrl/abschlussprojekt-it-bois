@@ -10,7 +10,7 @@
 
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+        <h1 class="def-cursor" th:text="${group.getTitle().getGroupTitle()}"></h1>
 
         <!--Fertig oder löschen-->
         <div class="content">
@@ -96,7 +96,7 @@
             </div>
 
             <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between" th:each="member : ${group.getMembers()}">
+                <li class="list-group-item d-flex justify-content-between" th:each="member : ${group.getMembers().values()}">
                     <div>
                         <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
                         <span th:replace="~{fragments/groups :: userbadges}"></span>

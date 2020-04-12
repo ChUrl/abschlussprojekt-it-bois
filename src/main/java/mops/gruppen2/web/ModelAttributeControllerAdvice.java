@@ -1,9 +1,9 @@
 package mops.gruppen2.web;
 
 import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Role;
-import mops.gruppen2.domain.User;
+import mops.gruppen2.domain.model.Role;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,9 +26,9 @@ public class ModelAttributeControllerAdvice {
         // Add enums
         model.addAttribute("member", Role.MEMBER);
         model.addAttribute("admin", Role.ADMIN);
-        model.addAttribute("public", GroupType.PUBLIC);
-        model.addAttribute("private", GroupType.PRIVATE);
-        model.addAttribute("lecture", GroupType.LECTURE);
+        model.addAttribute("public", Type.PUBLIC);
+        model.addAttribute("private", Type.PRIVATE);
+        model.addAttribute("lecture", Type.LECTURE);
     }
 
 }

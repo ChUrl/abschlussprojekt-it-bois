@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.event;
 
 import mops.gruppen2.TestBuilder;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
 import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.uuidMock;
@@ -15,12 +15,12 @@ class CreateGroupEventTest {
         Event createEvent = new CreateGroupEvent(uuidMock(0),
                                                  "A",
                                                  uuidMock(1),
-                                                 GroupType.PUBLIC);
+                                                 Type.PUBLIC);
 
         Group group = TestBuilder.apply(createEvent);
 
         assertThat(group.getMembers()).hasSize(0);
-        assertThat(group.getType()).isEqualTo(GroupType.PUBLIC);
+        assertThat(group.getType()).isEqualTo(Type.PUBLIC);
         assertThat(group.getId()).isEqualTo(uuidMock(0));
         assertThat(group.getParent()).isEqualTo(uuidMock(1));
     }

@@ -1,8 +1,8 @@
 package mops.gruppen2.web.form;
 
 import lombok.Data;
-import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.model.Type;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -19,11 +19,11 @@ public class CreateForm {
 
     MultipartFile file;
 
-    public GroupType getType() {
-        return GroupType.valueOf(type);
+    public Type getType() {
+        return Type.valueOf(type);
     }
 
     public UUID getParent() {
-        return getType() == GroupType.LECTURE ? IdHelper.emptyUUID() : IdHelper.stringToUUID(parent);
+        return getType() == Type.LECTURE ? IdHelper.emptyUUID() : IdHelper.stringToUUID(parent);
     }
 }

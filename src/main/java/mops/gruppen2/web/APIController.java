@@ -3,12 +3,13 @@ package mops.gruppen2.web;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.helper.APIHelper;
 import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.web.api.GroupRequestWrapper;
@@ -26,17 +27,13 @@ import java.util.UUID;
  */
 @Log4j2
 @TraceMethodCalls
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/gruppen2/api")
 public class APIController {
 
     private final EventStoreService eventStoreService;
     private final ProjectionService projectionService;
-
-    public APIController(EventStoreService eventStoreService, ProjectionService projectionService) {
-        this.eventStoreService = eventStoreService;
-        this.projectionService = projectionService;
-    }
 
     /**
      * Erzeugt eine Liste aus Gruppen, welche sich seit einer übergebenen Event-Id geändert haben.

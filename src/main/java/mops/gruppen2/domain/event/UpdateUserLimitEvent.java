@@ -1,38 +1,32 @@
 package mops.gruppen2.domain.event;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.BadParameterException;
 import mops.gruppen2.domain.exception.EventException;
-
-import java.util.UUID;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Limit;
+import mops.gruppen2.domain.model.User;
 
 @Getter
-@NoArgsConstructor
 @ToString
 @Log4j2
 public class UpdateUserLimitEvent extends Event {
 
-    private long userLimit;
+    private Limit userLimit;
 
-    public UpdateUserLimitEvent(UUID groupId, String userId, long userLimit) {
-        super(groupId, userId);
-        this.userLimit = userLimit;
-    }
+    private UpdateUserLimitEvent() {}
 
-    public UpdateUserLimitEvent(Group group, User user, long userLimit) {
+    public UpdateUserLimitEvent(Group group, User user, Limit userLimit) {
         super(group.getId(), user.getId());
         this.userLimit = userLimit;
     }
 
     @Override
     protected void applyEvent(Group group) throws EventException {
-        if (userLimit <= 0 || userLimit < group.getMembers().size()) {
-            throw new BadParameterException("Usermaximum zu klein.");
+        if (userLimit.getUserLimit() < group.getMembers().size()) {
+            throw new BadParameterException("Teilnehmerlimit zu klein.");
         }
 
         group.setUserLimit(userLimit);

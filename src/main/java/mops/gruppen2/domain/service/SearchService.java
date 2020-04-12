@@ -1,10 +1,10 @@
 package mops.gruppen2.domain.service;
 
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.EventException;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -56,10 +56,10 @@ public class SearchService {
      */
     private static void sortByGroupType(List<Group> groups) {
         groups.sort((Group g1, Group g2) -> {
-            if (g1.getType() == GroupType.LECTURE) {
+            if (g1.getType() == Type.LECTURE) {
                 return -1;
             }
-            if (g2.getType() == GroupType.LECTURE) {
+            if (g2.getType() == Type.LECTURE) {
                 return 0;
             }
 

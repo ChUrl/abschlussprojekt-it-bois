@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.event;
 
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.Role;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Role;
 import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.addUserEvent;

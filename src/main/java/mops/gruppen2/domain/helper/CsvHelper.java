@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.WrongFileException;
+import mops.gruppen2.domain.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

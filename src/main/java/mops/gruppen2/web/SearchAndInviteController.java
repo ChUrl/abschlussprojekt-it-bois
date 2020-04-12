@@ -1,11 +1,12 @@
 package mops.gruppen2.web;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.helper.ValidationHelper;
+import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.SearchService;
@@ -25,6 +26,7 @@ import java.util.List;
 @SuppressWarnings("SameReturnValue")
 @Log4j2
 @TraceMethodCalls
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/gruppen2")
 public class SearchAndInviteController {
@@ -32,12 +34,6 @@ public class SearchAndInviteController {
     private final InviteService inviteService;
     private final ProjectionService projectionService;
     private final SearchService searchService;
-
-    public SearchAndInviteController(InviteService inviteService, ProjectionService projectionService, SearchService searchService) {
-        this.inviteService = inviteService;
-        this.projectionService = projectionService;
-        this.searchService = searchService;
-    }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/search")
@@ -74,7 +70,7 @@ public class SearchAndInviteController {
         model.addAttribute("group", group);
 
         // Gruppe öffentlich
-        if (group.getType() == GroupType.PUBLIC) {
+        if (group.getType() == Type.PUBLIC) {
             return "redirect:/gruppen2/details/" + group.getId();
         }
 

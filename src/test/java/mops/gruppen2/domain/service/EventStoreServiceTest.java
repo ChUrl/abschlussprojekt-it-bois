@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.service;
 
 import mops.gruppen2.Gruppen2Application;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.Event;
+import mops.gruppen2.domain.model.User;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.junit.jupiter.api.BeforeEach;

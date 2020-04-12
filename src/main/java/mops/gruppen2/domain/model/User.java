@@ -1,4 +1,4 @@
-package mops.gruppen2.domain;
+package mops.gruppen2.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

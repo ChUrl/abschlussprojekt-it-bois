@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.event;
 
-import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.model.Group;
 import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.addUserEvent;

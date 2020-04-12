@@ -11,7 +11,7 @@
 <main th:fragment="bodycontent">
     <div class="container-fluid">
 
-        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+        <h1 class="def-cursor" th:text="${group.getTitle().getGroupTitle()}"></h1>
 
         <div class="row">
             <!--Gruppendetails-->
@@ -40,7 +40,7 @@
                 <!--Anzahl Text-->
                 <div class="mb-2">
                     <span>Teilnehmer: </span>
-                    <span th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
+                    <span th:text="${group.getMembers().size() + ' von ' + group.getUserLimit().getUserLimit()}"></span>
                 </div>
 
                 <!--Bearbeiten-Button-->
@@ -55,7 +55,7 @@
                 <div class="members">
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between"
-                            th:each="member : ${group.getMembers()}">
+                            th:each="member : ${group.getMembers().values()}">
                             <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
                             <span th:replace="~{fragments/groups :: userbadges}"></span>
                         </li>
