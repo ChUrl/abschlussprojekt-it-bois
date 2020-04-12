@@ -25,7 +25,9 @@ public final class JsonHelper {
 
     public static String serializeEvent(Event event) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(event);
+        String payload = mapper.writeValueAsString(event);
+        log.trace(payload);
+        return payload;
     }
 
     /**

@@ -20,7 +20,7 @@ class UpdateUserLimitEventTest {
 
         Group group = apply(createEvent, updateEvent);
 
-        assertThat(group.getUserLimit()).isEqualTo(5);
+        assertThat(group.getLimit()).isEqualTo(5);
     }
 
     @Test

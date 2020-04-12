@@ -10,19 +10,19 @@
 
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <h1 class="def-cursor" th:text="${group.getTitle().getGroupTitle()}"></h1>
+        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
 
         <!--Fertig oder löschen-->
         <div class="content">
             <div class="row">
-                <form method="get" th:action="@{/gruppen2/details/{id}(id=${group.getId()})}">
+                <form method="get" th:action="@{/gruppen2/details/{id}(id=${group.getGroupid()})}">
                     <button class="btn btn-primary">Fertig</button>
                 </form>
 
                 <!--Spacer-->
                 <span class="col"></span>
 
-                <form method="post" th:action="@{/gruppen2/details/{id}/edit/destroy(id=${group.getId()})}">
+                <form method="post" th:action="@{/gruppen2/details/{id}/edit/destroy(id=${group.getGroupid()})}">
                     <button class="btn btn-danger btn-bar" type="submit">Gruppe löschen
                     </button>
                 </form>
@@ -50,7 +50,7 @@
 
             <!--Beschreibung + Titel-->
             <div class="content-text">
-                <form th:action="@{/gruppen2/details/{id}/edit/meta(id=${group.getId()})}"
+                <form th:action="@{/gruppen2/details/{id}/edit/meta(id=${group.getGroupid()})}"
                       method="post">
 
                     <div th:replace="~{fragments/forms :: meta}"></div>
@@ -63,7 +63,7 @@
 
             <!--Userlimit-->
             <div class="content-text-in">
-                <form th:action="@{/gruppen2/details/{id}/edit/userlimit(id=${group.getId()})}"
+                <form th:action="@{/gruppen2/details/{id}/edit/userlimit(id=${group.getGroupid()})}"
                       method="post">
 
                     <div th:replace="~{fragments/forms :: userlimit}"></div>
@@ -76,7 +76,7 @@
 
             <!--CSV Import-->
             <div class="content-text mb-0">
-                <form th:action="@{/gruppen2/details/{id}/edit/csv(id=${group.getId()})}"
+                <form th:action="@{/gruppen2/details/{id}/edit/csv(id=${group.getGroupid()})}"
                       th:if="${account.getRoles().contains('orga')}"
                       enctype="multipart/form-data" method="post">
 
@@ -103,13 +103,13 @@
                     </div>
 
                     <div class="d-flex">
-                        <form th:action="@{/gruppen2/details/{id}/edit/delete/{userid}(id=${group.getId()}, userid=${member.getId()})}"
-                              th:unless="${member.getId() == account.getName()}"
+                        <form th:action="@{/gruppen2/details/{id}/edit/delete/{userid}(id=${group.getGroupid()}, userid=${member.getUserid()})}"
+                              th:unless="${member.getUserid() == account.getName()}"
                               method="post">
                             <button type="submit" class="btn btn-danger mr-2">Entfernen</button>
                         </form>
 
-                        <form th:action="@{/gruppen2/details/{id}/edit/role/{userid}(id=${group.getId()}, userid=${member.getId()})}"
+                        <form th:action="@{/gruppen2/details/{id}/edit/role/{userid}(id=${group.getGroupid()}, userid=${member.getUserid()})}"
                               method="post">
                             <button type="submit" class="btn btn-warning">Rolle ändern</button>
                         </form>

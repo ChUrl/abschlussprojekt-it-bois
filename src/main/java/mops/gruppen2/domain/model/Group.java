@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Group {
 
     @EqualsAndHashCode.Include
-    private UUID id;
+    private UUID groupid;
 
     @ToString.Exclude
     private UUID parent;
@@ -30,7 +30,7 @@ public class Group {
     private Description description;
 
     @ToString.Exclude
-    private Limit userLimit = new Limit(1); // Add initial user
+    private Limit limit = new Limit(1); // Add initial user
 
     @ToString.Exclude
     private final Map<String, User> members = new HashMap<>();

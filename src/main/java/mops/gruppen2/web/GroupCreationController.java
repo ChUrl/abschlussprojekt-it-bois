@@ -70,6 +70,6 @@ public class GroupCreationController {
             groupService.addUsersToGroup(CsvHelper.readCsvFile(create.getFile()), group, user);
         }
 
-        return "redirect:/gruppen2/details/" + IdHelper.uuidToString(group.getId());
+        return "redirect:/gruppen2/details/" + IdHelper.uuidToString(group.getGroupid());
     }
 }

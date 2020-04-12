@@ -106,7 +106,7 @@ public class GroupService {
      * @return Das neue Teilnehmermaximum
      */
     private static Limit getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return new Limit(Math.max((long) group.getMembers().size() + newUsers.size(), group.getUserLimit().getUserLimit()));
+        return new Limit(Math.max((long) group.getMembers().size() + newUsers.size(), group.getLimit().getUserLimit()));
     }
 
     /**
@@ -122,7 +122,7 @@ public class GroupService {
         ValidationHelper.throwIfNoMember(group, user);
         ValidationHelper.throwIfLastAdmin(user, group);
 
-        Role role = group.getRoles().get(user.getId());
+        Role role = group.getRoles().get(user.getUserid());
         updateRole(user, group, role.toggle());
     }
 
@@ -136,7 +136,7 @@ public class GroupService {
      */
     private Group createGroup(User user, UUID parent, Type type) {
         Event event = new CreateGroupEvent(UUID.randomUUID(),
-                                           user.getId(),
+                                           user,
                                            parent,
                                            type);
         Group group = new Group();
@@ -248,7 +248,7 @@ public class GroupService {
     private void updateRole(User user, Group group, Role role) {
         ValidationHelper.throwIfNoMember(group, user);
 
-        if (role == group.getRoles().get(user.getId())) {
+        if (role == group.getRoles().get(user.getUserid())) {
             return;
         }
 
@@ -266,7 +266,7 @@ public class GroupService {
     public void updateUserLimit(User user, Group group, Limit userLimit) {
         ValidationHelper.throwIfNoAdmin(group, user);
 
-        if (userLimit == group.getUserLimit()) {
+        if (userLimit == group.getLimit()) {
             return;
         }
 

@@ -230,7 +230,7 @@ public class TestBuilder {
         Collections.shuffle(shuffle);
 
         for (Event event : shuffle) {
-            removeEvents.add(new DeleteUserEvent(event.getGroupId(), event.getUserId()));
+            removeEvents.add(new DeleteUserEvent(event.getGroupid(), event.getUserid()));
 
             if (removeEvents.size() >= count) {
                 break;
@@ -249,7 +249,7 @@ public class TestBuilder {
      */
     public static List<Event> deleteUserEvents(Group group) {
         return group.getMembers().parallelStream()
-                    .map(user -> deleteUserEvent(group.getId(), user.getId()))
+                    .map(user -> deleteUserEvent(group.getGroupid(), user.getUserId()))
                     .collect(Collectors.toList());
     }
 

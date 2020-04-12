@@ -28,7 +28,7 @@ public final class ValidationHelper {
      * Überprüft, ob ein User in einer Gruppe teilnimmt.
      */
     public static boolean checkIfMember(Group group, User user) {
-        return group.getMembers().containsKey(user.getId());
+        return group.getMembers().containsKey(user.getUserid());
     }
 
     public static boolean checkIfLastMember(User user, Group group) {
@@ -39,7 +39,7 @@ public final class ValidationHelper {
      * Überprüft, ob eine Gruppe voll ist.
      */
     public static boolean checkIfGroupFull(Group group) {
-        return group.getMembers().size() >= group.getUserLimit().getUserLimit();
+        return group.getMembers().size() >= group.getLimit().getUserLimit();
     }
 
     /**
@@ -54,7 +54,7 @@ public final class ValidationHelper {
      */
     public static boolean checkIfAdmin(Group group, User user) {
         if (checkIfMember(group, user)) {
-            return group.getRoles().get(user.getId()) == ADMIN;
+            return group.getRoles().get(user.getUserid()) == ADMIN;
         }
         return false;
     }

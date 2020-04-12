@@ -22,16 +22,16 @@ public class InviteService {
 
     void createLink(Group group) {
         inviteRepository.save(new InviteLinkDTO(null,
-                                                group.getId().toString(),
+                                                group.getGroupid().toString(),
                                                 UUID.randomUUID().toString()));
 
-        log.debug("Link wurde erzeugt! (Gruppe: {})", group.getId());
+        log.debug("Link wurde erzeugt! (Gruppe: {})", group.getGroupid());
     }
 
     void destroyLink(Group group) {
-        inviteRepository.deleteLinkOfGroup(group.getId().toString());
+        inviteRepository.deleteLinkOfGroup(group.getGroupid().toString());
 
-        log.debug("Link wurde zerstört! (Gruppe: {})", group.getId());
+        log.debug("Link wurde zerstört! (Gruppe: {})", group.getGroupid());
     }
 
     public UUID getGroupIdFromLink(String link) {
@@ -45,10 +45,10 @@ public class InviteService {
 
     public String getLinkByGroup(Group group) {
         try {
-            return inviteRepository.findLinkByGroupId(group.getId().toString());
+            return inviteRepository.findLinkByGroupId(group.getGroupid().toString());
         } catch (Exception e) {
-            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", group.getId(), e);
-            throw new NoInviteExistException(group.getId().toString());
+            log.error("Link zu Gruppe ({}) konnte nicht gefunden werden!", group.getGroupid(), e);
+            throw new NoInviteExistException(group.getGroupid().toString());
         }
     }
 }

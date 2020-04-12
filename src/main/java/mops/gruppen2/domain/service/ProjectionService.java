@@ -48,7 +48,7 @@ public class ProjectionService {
     static List<Group> projectGroups(List<Event> events) throws EventException {
         Map<UUID, Group> groupMap = new HashMap<>();
 
-        events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupId())));
+        events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupid())));
 
         return new ArrayList<>(groupMap.values());
     }
@@ -119,7 +119,6 @@ public class ProjectionService {
      * @throws EventException Projektionsfehler
      */
     @Cacheable("groups")
-    //TODO: remove userID param
     public List<Group> projectPublicGroups() throws EventException {
         List<UUID> groupIds = eventStoreService.findExistingGroupIds();
         List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
@@ -219,7 +218,7 @@ public class ProjectionService {
     void removeUserGroups(List<Group> groups, User user) {
         List<UUID> userGroups = eventStoreService.findExistingUserGroups(user);
 
-        groups.removeIf(group -> userGroups.contains(group.getId()));
+        groups.removeIf(group -> userGroups.contains(group.getGroupid()));
     }
 }
 

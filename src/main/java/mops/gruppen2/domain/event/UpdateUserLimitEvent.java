@@ -1,5 +1,7 @@
 package mops.gruppen2.domain.event;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.BadParameterException;
@@ -10,23 +12,25 @@ import mops.gruppen2.domain.model.User;
 
 @Log4j2
 @Value
+@AllArgsConstructor
 public class UpdateUserLimitEvent extends Event {
 
-    Limit userLimit;
+    @JsonProperty("limit")
+    Limit limit;
 
-    public UpdateUserLimitEvent(Group group, User user, Limit userLimit) {
-        super(group.getId(), user.getId());
-        this.userLimit = userLimit;
+    public UpdateUserLimitEvent(Group group, User user, Limit limit) {
+        super(group.getGroupid(), user.getUserid());
+        this.limit = limit;
     }
 
     @Override
     protected void applyEvent(Group group) throws EventException {
-        if (userLimit.getUserLimit() < group.getMembers().size()) {
+        if (limit.getUserLimit() < group.getMembers().size()) {
             throw new BadParameterException("Teilnehmerlimit zu klein.");
         }
 
-        group.setUserLimit(userLimit);
+        group.setLimit(limit);
 
-        log.trace("\t\t\t\t\tNeues UserLimit: {}", group.getUserLimit());
+        log.trace("\t\t\t\t\tNeues UserLimit: {}", group.getLimit());
     }
 }

@@ -71,12 +71,12 @@ public class SearchAndInviteController {
 
         // Gruppe öffentlich
         if (group.getType() == Type.PUBLIC) {
-            return "redirect:/gruppen2/details/" + group.getId();
+            return "redirect:/gruppen2/details/" + group.getGroupid();
         }
 
         // Bereits Mitglied
         if (ValidationHelper.checkIfMember(group, user)) {
-            return "redirect:/gruppen2/details/" + group.getId();
+            return "redirect:/gruppen2/details/" + group.getGroupid();
         }
 
         return "link";

@@ -31,8 +31,8 @@
             <div class="content-heading row">
                 <span th:replace="~{fragments/groups :: badges}"></span>
 
-                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                   th:text="${group.getTitle().getGroupTitle()}"></a>
+                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getGroupid()})}"
+                   th:text="${group.getTitle()}"></a>
             </div>
             <div class="content-text-in">
                 <span th:text="${group.getDescription().getGroupDescription()}"></span>

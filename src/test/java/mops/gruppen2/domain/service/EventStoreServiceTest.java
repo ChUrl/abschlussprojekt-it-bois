@@ -72,8 +72,8 @@ class EventStoreServiceTest {
 
         EventDTO dto = EventStoreService.getDTOFromEvent(event);
 
-        assertThat(dto.getGroup_id()).isEqualTo(event.getGroupId().toString());
-        assertThat(dto.getUser_id()).isEqualTo(event.getUserId());
+        assertThat(dto.getGroup_id()).isEqualTo(event.getGroupid().toString());
+        assertThat(dto.getUser_id()).isEqualTo(event.getUserid());
         assertThat(dto.getEvent_id()).isEqualTo(null);
         assertThat(dto.getEvent_type()).isEqualTo("CreateGroupEvent");
     }

@@ -10,7 +10,7 @@
 
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <h1 class="def-cursor" th:text="${group.getTitle().getGroupTitle()}"></h1>
+        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
 
         <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
 

@@ -161,7 +161,7 @@ class APIControllerTest {
     void getGroupFromId_singleGroup() {
         eventStoreService.saveAll(createPrivateGroupEvent(uuidMock(0)));
 
-        assertThat(apiController.getApiGroup(uuidMock(0).toString()).getId()).isEqualTo(uuidMock(0));
+        assertThat(apiController.getApiGroup(uuidMock(0).toString()).getGroupid()).isEqualTo(uuidMock(0));
     }
 
     @Test

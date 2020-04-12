@@ -108,8 +108,8 @@ class GroupServiceTest {
         List<UUID> groupIds = Arrays.asList(uuidMock(0), uuidMock(1));
 
         assertThat(eventStoreService.findGroupEvents(groupIds)).hasSize(2);
-        assertThat(eventStoreService.findGroupEvents(groupIds).get(0).getGroupId()).isEqualTo(uuidMock(0));
-        assertThat(eventStoreService.findGroupEvents(groupIds).get(1).getGroupId()).isEqualTo(uuidMock(1));
+        assertThat(eventStoreService.findGroupEvents(groupIds).get(0).getGroupid()).isEqualTo(uuidMock(0));
+        assertThat(eventStoreService.findGroupEvents(groupIds).get(1).getGroupid()).isEqualTo(uuidMock(1));
     }
 
     //TODO: ProjectionServiceTest

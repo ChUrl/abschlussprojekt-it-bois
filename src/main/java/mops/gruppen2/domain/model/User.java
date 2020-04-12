@@ -2,31 +2,30 @@ package mops.gruppen2.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.Value;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
-@Getter
+@Value
 @AllArgsConstructor
-@NoArgsConstructor // Für Jackson: CSV-Import
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 public class User {
 
     @EqualsAndHashCode.Include
-    private String id;
+    String userid;
 
-    private String givenname;
+    String givenname;
+
     @ToString.Exclude
-    private String familyname;
+    String familyname;
+
     @ToString.Exclude
-    private String email;
+    String email;
 
     public User(KeycloakAuthenticationToken token) {
         KeycloakPrincipal principal = (KeycloakPrincipal) token.getPrincipal();
-        id = principal.getName();
+        userid = principal.getName();
         givenname = principal.getKeycloakSecurityContext().getIdToken().getGivenName();
         familyname = principal.getKeycloakSecurityContext().getIdToken().getFamilyName();
         email = principal.getKeycloakSecurityContext().getIdToken().getEmail();
@@ -35,10 +34,10 @@ public class User {
     /**
      * User identifizieren sich über die Id, mehr wird also manchmal nicht benötigt.
      *
-     * @param userId Die User Id
+     * @param userid Die User Id
      */
-    public User(String userId) {
-        id = userId;
+    public User(String userid) {
+        this.userid = userid;
         givenname = "";
         familyname = "";
         email = "";

@@ -204,7 +204,7 @@ public class GroupDetailsController {
         ValidationHelper.throwIfNoAdmin(group, user);
 
         // Der eingeloggte User kann sich nicht selbst entfernen (er kann aber verlassen)
-        if (!userId.equals(user.getId())) {
+        if (!userId.equals(user.getUserid())) {
             groupService.deleteUser(new User(userId), group);
         }
 

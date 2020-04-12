@@ -84,8 +84,8 @@ public class EventStoreService {
         try {
             String payload = JsonHelper.serializeEvent(event);
             return new EventDTO(null,
-                                event.getGroupId().toString(),
-                                event.getUserId(),
+                                event.getGroupid().toString(),
+                                event.getUserid(),
                                 getEventType(event),
                                 payload);
         } catch (JsonProcessingException e) {
@@ -181,7 +181,7 @@ public class EventStoreService {
 
         return createEvents.stream()
                            .filter(event -> event instanceof CreateGroupEvent)
-                           .map(Event::getGroupId)
+                           .map(Event::getGroupid)
                            .collect(Collectors.toList());
     }
 
@@ -194,14 +194,14 @@ public class EventStoreService {
         List<Event> userEvents = findLatestEventsFromGroupsByUser(user);
         List<UUID> deletedIds = findLatestEventsFromGroupsByType("DeleteGroupEvent")
                 .stream()
-                .map(Event::getGroupId)
+                .map(Event::getGroupid)
                 .collect(Collectors.toList());
 
-        userEvents.removeIf(event -> deletedIds.contains(event.getGroupId()));
+        userEvents.removeIf(event -> deletedIds.contains(event.getGroupid()));
 
         return userEvents.stream()
                          .filter(event -> event instanceof AddUserEvent)
-                         .map(Event::getGroupId)
+                         .map(Event::getGroupid)
                          .collect(Collectors.toList());
     }
 
@@ -244,7 +244,7 @@ public class EventStoreService {
      * @return Eine Liste von einem Add- oder DeleteUserEvent pro Gruppe
      */
     private List<Event> findLatestEventsFromGroupsByUser(User user) {
-        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByUser(user.getId()));
+        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByUser(user.getUserid()));
     }
 
 
