@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Schreibt die Methodenausführdauer in den Trace-Stream
+ * Schreibt die Methodenausführdauer in den Trace-Stream.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

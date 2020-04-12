@@ -1,21 +1,19 @@
-package mops.gruppen2.domain.service;
+package mops.gruppen2.domain.helper;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service
 @Log4j2
-public final class IdService {
+public final class IdHelper {
 
-    private IdService() {}
+    private IdHelper() {}
 
     public static List<UUID> stringsToUUID(List<String> groupIds) {
         return groupIds.stream()
-                       .map(IdService::stringToUUID)
+                       .map(IdHelper::stringToUUID)
                        .collect(Collectors.toList());
     }
 

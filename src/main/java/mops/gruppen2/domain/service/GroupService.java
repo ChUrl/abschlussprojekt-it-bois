@@ -15,6 +15,7 @@ import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 import mops.gruppen2.domain.exception.EventException;
+import mops.gruppen2.domain.helper.ValidationHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -115,8 +116,8 @@ public class GroupService {
      * @throws EventException Falls der User nicht gefunden wird
      */
     public void toggleMemberRole(User user, Group group) throws EventException {
-        ValidationService.throwIfNoMember(group, user);
-        ValidationService.throwIfLastAdmin(user, group);
+        ValidationHelper.throwIfNoMember(group, user);
+        ValidationHelper.throwIfLastAdmin(user, group);
 
         Role role = group.getRoles().get(user.getId());
         updateRole(user, group, role.toggle());
@@ -148,8 +149,8 @@ public class GroupService {
      * Prüft, ob der Nutzer schon Mitglied ist und ob Gruppe voll ist.
      */
     public void addUser(User user, Group group) {
-        ValidationService.throwIfMember(group, user);
-        ValidationService.throwIfGroupFull(group);
+        ValidationHelper.throwIfMember(group, user);
+        ValidationHelper.throwIfGroupFull(group);
 
         Event event = new AddUserEvent(group, user);
         event.apply(group);
@@ -173,10 +174,10 @@ public class GroupService {
      * Prüft, ob der Nutzer Mitglied ist und ob er der letzte Admin ist.
      */
     public void deleteUser(User user, Group group) throws EventException {
-        ValidationService.throwIfNoMember(group, user);
-        ValidationService.throwIfLastAdmin(user, group);
+        ValidationHelper.throwIfNoMember(group, user);
+        ValidationHelper.throwIfLastAdmin(user, group);
 
-        if (ValidationService.checkIfGroupEmpty(group)) {
+        if (ValidationHelper.checkIfGroupEmpty(group)) {
             deleteGroup(user, group);
         } else {
             Event event = new DeleteUserEvent(group, user);
@@ -191,7 +192,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist.
      */
     public void deleteGroup(User user, Group group) {
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         Event event = new DeleteGroupEvent(group, user);
         event.apply(group);
@@ -206,7 +207,7 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void updateTitle(User user, Group group, String title) {
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         if (title.trim().equals(group.getTitle())) {
             return;
@@ -224,7 +225,7 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void updateDescription(User user, Group group, String description) {
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         if (description.trim().equals(group.getDescription())) {
             return;
@@ -242,7 +243,7 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     private void updateRole(User user, Group group, Role role) {
-        ValidationService.throwIfNoMember(group, user);
+        ValidationHelper.throwIfNoMember(group, user);
 
         if (role == group.getRoles().get(user.getId())) {
             return;
@@ -260,7 +261,7 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void updateUserLimit(User user, Group group, long userLimit) {
-        ValidationService.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, user);
 
         if (userLimit == group.getUserLimit()) {
             return;

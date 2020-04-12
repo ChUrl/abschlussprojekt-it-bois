@@ -1,11 +1,9 @@
-import com.github.spotbugs.SpotBugsTask
-
 plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 
-    id 'com.github.spotbugs' version '3.0.0'
+    id 'com.github.spotbugs' version '4.0.1'
     id 'checkstyle'
     id 'pmd'
 }
@@ -14,30 +12,39 @@ group = 'mops'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+repositories {
+    maven {
+        url = 'https://s3.cs.hhu.de/public/mops/'
+        metadataSources {
+            artifact()
+        }
+    }
+    mavenCentral()
+}
+
 spotbugs {
+    toolVersion = '4.0.1'
     ignoreFailures = false
     reportLevel = "high"
     effort = "max"
-    toolVersion = '4.0.0-RC1'
+    showProgress = true
 }
 
-tasks.withType(SpotBugsTask) {
+spotbugsMain {
     reports {
-        xml.enabled = false
-        html.enabled = true
+        html {
+            enabled = true
+        }
     }
 }
 
 pmd {
     consoleOutput = true
     ignoreFailures = true
-    toolVersion = "6.21.0"
+    toolVersion = "6.22.0"
     rulePriority = 5
-    ruleSets = ["category/java/errorprone.xml",
-                "category/java/bestpractices.xml",
-                "category/java/security.xml",
-                "category/java/performance.xml",
-                "category/java/design.xml"]
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    ruleSets = []
 }
 
 checkstyle {
@@ -54,16 +61,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-}
-
-repositories {
-    maven {
-        url = 'https://s3.cs.hhu.de/public/mops/'
-        metadataSources {
-            artifact()
-        }
-    }
-    mavenCentral()
 }
 
 dependencies {

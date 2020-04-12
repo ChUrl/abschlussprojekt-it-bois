@@ -7,6 +7,7 @@ import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
+import mops.gruppen2.domain.helper.IdHelper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -185,7 +186,7 @@ public class ProjectionService {
      * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
      */
     public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
-        if (IdService.isEmpty(groupId)) {
+        if (IdHelper.isEmpty(groupId)) {
             throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
         }
 
@@ -202,7 +203,7 @@ public class ProjectionService {
      * Projiziert eine einzelne Gruppe, welche leer sein darf.
      */
     public Group projectParent(UUID parentId) {
-        if (IdService.isEmpty(parentId)) {
+        if (IdHelper.isEmpty(parentId)) {
             return new Group();
         }
 

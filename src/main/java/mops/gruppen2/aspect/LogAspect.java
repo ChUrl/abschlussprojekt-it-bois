@@ -55,7 +55,7 @@ public class LogAspect {
         joinPoint.proceed();
         long stop = System.currentTimeMillis();
 
-        log.trace("Ausführungsdauer: {} Millis", (stop - start));
+        log.trace("Ausführungsdauer: {} Millis", stop - start);
 
         return joinPoint.proceed();
     }

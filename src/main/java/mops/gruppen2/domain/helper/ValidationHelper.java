@@ -1,4 +1,4 @@
-package mops.gruppen2.domain.service;
+package mops.gruppen2.domain.helper;
 
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.Group;
@@ -12,15 +12,13 @@ import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.web.form.CreateForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.springframework.stereotype.Service;
 
 import static mops.gruppen2.domain.Role.ADMIN;
 
-@Service
 @Log4j2
-public final class ValidationService {
+public final class ValidationHelper {
 
-    private ValidationService() {}
+    private ValidationHelper() {}
 
 
     // ######################################## CHECK ############################################

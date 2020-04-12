@@ -7,9 +7,9 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.service.APIService;
+import mops.gruppen2.domain.helper.APIHelper;
+import mops.gruppen2.domain.helper.IdHelper;
 import mops.gruppen2.domain.service.EventStoreService;
-import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.web.api.GroupRequestWrapper;
 import org.springframework.security.access.annotation.Secured;
@@ -50,8 +50,8 @@ public class APIController {
     public GroupRequestWrapper getApiUpdate(@ApiParam("Letzte gespeicherte EventId des Anfragestellers")
                                             @PathVariable("id") long eventId) {
 
-        return APIService.wrap(eventStoreService.findMaxEventId(),
-                               projectionService.projectNewGroups(eventId));
+        return APIHelper.wrap(eventStoreService.findMaxEventId(),
+                              projectionService.projectNewGroups(eventId));
     }
 
     /**
@@ -63,7 +63,7 @@ public class APIController {
     public List<String> getApiUserGroups(@ApiParam("Nutzer-Id")
                                          @PathVariable("id") String userId) {
 
-        return IdService.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
+        return IdHelper.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
     }
 
     /**

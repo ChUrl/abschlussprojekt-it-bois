@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Schreibt eine benutzerdefinierte Nachricht in den Trace-Stream bei Methodenaufruf
+ * Schreibt eine benutzerdefinierte Nachricht in den Trace-Stream bei Methodenaufruf.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
