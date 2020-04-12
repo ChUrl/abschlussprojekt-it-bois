@@ -6,7 +6,6 @@ import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.persistance.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -53,8 +52,6 @@ class GroupServiceTest {
     ProjectionService projectionService;
     @Autowired
     private EventStoreService eventStoreService;
-    @Autowired
-    private ValidationHelper validationHelper;
     @Autowired
     private InviteService inviteService;
 
