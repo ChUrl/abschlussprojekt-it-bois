@@ -10,6 +10,8 @@ import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.ValidationService;
+import mops.gruppen2.web.form.MetaForm;
+import mops.gruppen2.web.form.UserLimitForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -23,9 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import java.util.UUID;
 
 @SuppressWarnings("SameReturnValue")
@@ -126,14 +126,13 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsMetaUpdate(KeycloakAuthenticationToken token,
                                         @PathVariable("id") String groupId,
-                                        @NotBlank @RequestParam("title") String title,
-                                        @NotBlank @RequestParam("description") String description) {
+                                        @Valid MetaForm form) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateTitle(user, group, title);
-        groupService.updateDescription(user, group, description);
+        groupService.updateTitle(user, group, form.getTitle());
+        groupService.updateDescription(user, group, form.getDescription());
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -143,12 +142,11 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsMembersUpdateUserLimit(KeycloakAuthenticationToken token,
                                                     @PathVariable("id") String groupId,
-                                                    @Min(1) @Max(999_999) @RequestParam("userlimit") long userLimit) {
-
+                                                    @Valid UserLimitForm form) {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateUserLimit(user, group, userLimit);
+        groupService.updateUserLimit(user, group, form.getUserlimit());
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }

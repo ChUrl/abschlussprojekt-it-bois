@@ -10,6 +10,8 @@ import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.ValidationService;
 import mops.gruppen2.web.form.CreateForm;
+import mops.gruppen2.web.form.MetaForm;
+import mops.gruppen2.web.form.UserLimitForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -49,22 +51,24 @@ public class GroupCreationController {
     @PostMapping("/create")
     @CacheEvict(value = "groups", allEntries = true)
     public String postCreateOrga(KeycloakAuthenticationToken token,
-                                 @Valid CreateForm form) {
+                                 @Valid CreateForm create,
+                                 @Valid MetaForm meta,
+                                 @Valid UserLimitForm limit) {
 
         // Zusätzlicher check: studentin kann keine lecture erstellen
-        ValidationService.validateCreateForm(token, form);
+        ValidationService.validateCreateForm(token, create);
 
         User user = new User(token);
         Group group = groupService.createGroup(user,
-                                               form.getTitle(),
-                                               form.getDescription(),
-                                               form.getType(),
-                                               form.getUserlimit(),
-                                               form.getParent());
+                                               meta.getTitle(),
+                                               meta.getDescription(),
+                                               create.getType(),
+                                               limit.getUserlimit(),
+                                               create.getParent());
 
         // ROLE_studentin kann kein CSV importieren
         if (token.getAccount().getRoles().contains("orga")) {
-            groupService.addUsersToGroup(CsvService.readCsvFile(form.getFile()), group, user);
+            groupService.addUsersToGroup(CsvService.readCsvFile(create.getFile()), group, user);
         }
 
         return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());

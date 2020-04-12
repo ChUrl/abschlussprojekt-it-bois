@@ -15,6 +15,7 @@
 /*Badges*/
 .badge-pill {
     align-self: start;
+    margin-right: 10px;
 }
 
 .members .badge {
