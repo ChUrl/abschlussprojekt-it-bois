@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Neue Gruppe',
+    headcontent=~{fragments/general :: headcontent('none')},
+    navigation=~{fragments/general :: nav('create')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <div class="container">
+
+        <h1 class="def-cursor">Neue Gruppe</h1>
+
+        <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
+            <div class="content">
+                <h3 class="def-cursor">Eigenschaften:</h3>
+
+                <!--Titel + Beschreibung-->
+                <div class="content-text" th:insert="~{fragments/forms :: meta}"></div>
+
+                <!--TODO: Enter AsciiDoc Description-->
+
+                <div class="content-text-in">
+                    <!--Gruppentyp-->
+                    <div th:replace="~{fragments/forms :: grouptype}"></div>
+
+                    <!--Benutzerlimit-->
+                    <div th:replace="~{fragments/forms :: userlimit}"></div>
+                </div>
+
+                <!--CSV Import-->
+                <div class="content-text mb-0" th:insert="~{fragments/forms :: csvimport}"></div>
+            </div>
+
+            <div class="content">
+                <!--Submit-->
+                <button class="btn btn-primary btn-block" type="submit">Gruppe Erstellen</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+</body>
+
+</html>

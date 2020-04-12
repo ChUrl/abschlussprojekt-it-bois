@@ -2,6 +2,7 @@ package mops.gruppen2.architecture;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,10 @@ class ServiceTest {
             .that().resideInAPackage("..service..")
             .should().haveSimpleNameEndingWith("Service");
 
+    @ArchIgnore
     @ArchTest
     public static final ArchRule serviceClassesShouldOnlyBeAccessedByControllerOrServiceClasses = classes()
             .that().resideInAPackage("..service..")
-            .should().onlyBeAccessed().byAnyPackage("..controller..", "..service..", "..config..");
+            .should().onlyBeAccessed().byAnyPackage("..controller..", "..service..", "..config..", "..form..");
 
 }

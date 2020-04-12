@@ -5,7 +5,6 @@ import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.Group;
 import mops.gruppen2.domain.GroupType;
 import mops.gruppen2.domain.Role;
-import mops.gruppen2.domain.Visibility;
 import mops.gruppen2.domain.event.AddUserEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DeleteGroupEvent;
@@ -152,7 +151,7 @@ public class TestBuilder {
     }
 
     public static Event createPrivateGroupEvent(UUID groupId) {
-        return createGroupEvent(groupId, Visibility.PRIVATE);
+        return createGroupEvent(groupId, GroupType.PRIVATE);
     }
 
     public static Event createPrivateGroupEvent() {
@@ -160,20 +159,19 @@ public class TestBuilder {
     }
 
     public static Event createPublicGroupEvent(UUID groupId) {
-        return createGroupEvent(groupId, Visibility.PUBLIC);
+        return createGroupEvent(groupId, GroupType.PUBLIC);
     }
 
     public static Event createPublicGroupEvent() {
         return createPublicGroupEvent(UUID.randomUUID());
     }
 
-    public static Event createGroupEvent(UUID groupId, Visibility visibility) {
+    public static Event createGroupEvent(UUID groupId, GroupType type) {
         return new CreateGroupEvent(
                 groupId,
                 faker.random().hex(),
                 null,
-                GroupType.SIMPLE,
-                visibility
+                type
         );
     }
 
@@ -186,8 +184,7 @@ public class TestBuilder {
                 groupId,
                 faker.random().hex(),
                 null,
-                GroupType.LECTURE,
-                Visibility.PUBLIC
+                GroupType.LECTURE
         );
     }
 

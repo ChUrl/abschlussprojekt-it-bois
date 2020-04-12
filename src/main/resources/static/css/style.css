@@ -1,0 +1,104 @@
+/*Background Light Blue: #e6f4ff*/
+/*              Focused: #d4ecff*/
+/*Background Matt White: whitesmoke*/
+/*Text Heading Blue: dodgerblue*/
+/*          Focused: #4fa4ff*/
+/*Badge Background Private: darkslategray*/
+/*Badge Background Public: #52a1eb*/
+/*Badge Background Veranstaltung: lightseagreen*/
+/*Badge Background Parent: mediumorchid*/
+
+/*Content Container*/
+.content {
+    border-radius: 5px;
+    background: #d4ecff;
+    padding: 10px 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
+    transition: 100ms;
+}
+
+/*Content Heading*/
+.content-heading {
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-optical-sizing: auto;
+    overflow-wrap: break-word;
+    transition: 100ms;
+}
+
+.content-heading .link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*Content Paragraph*/
+.content-text {
+    margin-bottom: 15px;
+    cursor: default;
+    transition: 100ms;
+}
+
+.content-text-in {
+    background: whitesmoke;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+    cursor: default;
+    box-shadow: inset 0 .125rem .25rem rgba(0, 0, 0, .25);
+    transition: 100ms;
+}
+
+.content-text-in div {
+    overflow-wrap: break-word;
+    font-optical-sizing: auto;
+}
+
+/*Link*/
+.link {
+    color: var(--primary);
+    transition: 100ms;
+}
+
+.link:hover {
+    color: #4fa4ff;
+}
+
+/*Badges*/
+.badge-pill {
+    cursor: default;
+    color: whitesmoke;
+}
+
+.lecture {
+    background: var(--info);
+}
+
+.public {
+    background: var(--primary);
+}
+
+.private {
+    background: var(--secondary);
+}
+
+.parent {
+    background: var(--warning);
+}
+
+/*Grid System*/
+.row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.col {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/*Miscellanous*/
+.def-cursor {
+    cursor: default;
+}

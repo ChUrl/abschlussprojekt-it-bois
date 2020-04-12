@@ -1,0 +1,36 @@
+/*Content*/
+.content-heading {
+    margin-bottom: 15px;
+}
+
+/*Buttons*/
+.edit {
+    font-size: 20px;
+}
+
+.btn-bar {
+    align-self: start;
+}
+
+/*Badges*/
+.badge-pill {
+    align-self: start;
+    margin-right: 10px;
+}
+
+.members .badge {
+    align-self: start;
+    margin-top: 2px;
+}
+
+/*Member List*/
+.members {
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+.members li span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

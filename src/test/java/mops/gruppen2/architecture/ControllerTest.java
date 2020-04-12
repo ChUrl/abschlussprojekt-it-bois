@@ -30,11 +30,11 @@ class ControllerTest {
     public static final ArchRule controllerClassesShouldBeInControllerPackage = classes()
             .that().areAnnotatedWith(Controller.class)
             .or().areAnnotatedWith(RestController.class)
-            .should().resideInAPackage("..controller..");
+            .should().resideInAPackage("..web");
 
     @ArchTest
     public static final ArchRule classesInControllerPackageShouldHaveControllerInName = classes()
-            .that().resideInAPackage("..controller..")
+            .that().resideInAPackage("..web")
             .should().haveSimpleNameEndingWith("Controller")
             .orShould().haveSimpleNameEndingWith("ControllerAdvice");
 

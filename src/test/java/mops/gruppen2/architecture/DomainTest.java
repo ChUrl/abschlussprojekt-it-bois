@@ -2,6 +2,7 @@ package mops.gruppen2.architecture;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import mops.gruppen2.domain.exception.EventException;
@@ -12,6 +13,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
 class DomainTest {
 
+    @ArchIgnore
     @ArchTest
     public static final ArchRule domainClassesShouldNotAccessClassesFromOtherPackagesExceptDomainItself = noClasses()
             .that().resideInAPackage("..domain..")
@@ -51,10 +53,5 @@ class DomainTest {
     public static final ArchRule classesInDtoPackageShouldHaveDtoInName = classes()
             .that().resideInAPackage("..domain.dto..")
             .should().haveSimpleNameEndingWith("DTO");
-
-    @ArchTest
-    public static final ArchRule dtoClassesShouldBeInDtoPackage = classes()
-            .that().haveSimpleNameEndingWith("DTO")
-            .should().resideInAPackage("..domain.dto..");
 
 }
