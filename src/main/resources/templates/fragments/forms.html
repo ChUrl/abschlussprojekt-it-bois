@@ -5,7 +5,8 @@
 <!--Meta-->
 <th:block th:fragment="meta">
     <!--Gruppentitel-->
-    <div class="input-group mb-2">
+    <div class="input-group mb-2"
+         title="Ein Gruppentitel zwischen 4 und 128 Zeichen. Der Titel ist öffentlich.">
         <div class="input-group-prepend">
             <span class="input-group-text text-monospace">Gruppentitel:</span>
         </div>
@@ -14,7 +15,8 @@
     </div>
 
     <!--Gruppenbeschreibung-->
-    <div class="input-group">
+    <div class="input-group"
+         title="Eine kurze Gruppenbeschreibung zwischen 4 und 512 Zeichen. Die Beschreibung ist öffentlich.">
         <div class="input-group-prepend">
             <span class="input-group-text text-monospace">Beschreibung:</span>
         </div>
@@ -40,7 +42,8 @@
             </label>
         </div>
 
-        <div class="input-group col-sm-8 pr-0">
+        <div class="input-group col-sm-8 pr-0"
+             title="Optional kann eine Veranstaltungszugehörigkeit festgelegt werden.">
             <div class="input-group-prepend">
                 <span class="input-group-text text-monospace">Gehört zu:</span>
             </div>
@@ -73,7 +76,8 @@
             </label>
         </div>
 
-        <div class="input-group col-sm-8 pr-0">
+        <div class="input-group col-sm-8 pr-0"
+             title="999999 ist die maximal zulässige Teilnehmerzahl. Ist diese Obergrenze erreicht, gilt die Gruppe als unbegrenzt.">
             <div class="input-group-prepend">
                 <span class="input-group-text text-monospace">Limit:</span>
             </div>
@@ -89,7 +93,8 @@
 </th:block>
 
 <!--CSV-->
-<div th:fragment="csvimport" class="input-group" th:if="${account.getRoles().contains('orga')}">
+<div th:fragment="csvimport" class="input-group" th:if="${account.getRoles().contains('orga')}"
+     title="Das CSV folgt dem Format id,givenname,familyname,email.">
     <div class="input-group-prepend">
         <span class="input-group-text text-monospace">CSV:</span>
     </div>
