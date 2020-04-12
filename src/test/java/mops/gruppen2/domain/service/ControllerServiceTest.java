@@ -21,8 +21,6 @@ class ControllerServiceTest {
     Account account2;
     Account account3;
     @Autowired
-    ControllerService controllerService;
-    @Autowired
     EventStoreService eventStoreService;
     @Autowired
     ValidationService validationService;
