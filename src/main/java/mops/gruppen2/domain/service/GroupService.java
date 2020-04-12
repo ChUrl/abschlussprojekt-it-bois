@@ -207,7 +207,6 @@ public class GroupService {
      */
     public void updateTitle(User user, Group group, String title) {
         ValidationService.throwIfNoAdmin(group, user);
-        ValidationService.validateTitle(title.trim());
 
         if (title.trim().equals(group.getTitle())) {
             return;
@@ -226,7 +225,6 @@ public class GroupService {
      */
     public void updateDescription(User user, Group group, String description) {
         ValidationService.throwIfNoAdmin(group, user);
-        ValidationService.validateDescription(description.trim());
 
         if (description.trim().equals(group.getDescription())) {
             return;
@@ -263,13 +261,18 @@ public class GroupService {
      */
     public void updateUserLimit(User user, Group group, long userLimit) {
         ValidationService.throwIfNoAdmin(group, user);
-        ValidationService.validateUserLimit(userLimit, group);
 
         if (userLimit == group.getUserLimit()) {
             return;
         }
 
-        Event event = new UpdateUserLimitEvent(group, user, userLimit);
+        Event event;
+        if (userLimit < group.getMembers().size()) {
+            event = new UpdateUserLimitEvent(group, user, group.getMembers().size());
+        } else {
+            event = new UpdateUserLimitEvent(group, user, userLimit);
+        }
+
         event.apply(group);
 
         eventStoreService.saveEvent(event);

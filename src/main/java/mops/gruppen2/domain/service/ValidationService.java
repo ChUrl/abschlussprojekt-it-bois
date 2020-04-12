@@ -111,33 +111,6 @@ public final class ValidationService {
 
     // ##################################### VALIDATE FIELDS #####################################
 
-
-    //TODO: max title length?
-    public static void validateTitle(String title) {
-        if (title == null || title.trim().isEmpty()) {
-            log.error("Der Titel {} ist fehlerhaft!", title);
-            throw new BadParameterException("Der Titel darf nicht leer sein!");
-        }
-    }
-
-    //TODO: max description length?
-    public static void validateDescription(String description) {
-        if (description == null || description.trim().isEmpty()) {
-            log.error("Die Beschreibung {} ist fehlerhaft!", description);
-            throw new BadParameterException("Die Beschreibung darf nicht leer sein!");
-        }
-    }
-
-    public static void validateUserLimit(long userLimit, Group group) {
-        if (userLimit < 1) {
-            throw new BadParameterException("Das Userlimit muss größer als 1 sein!");
-        }
-
-        if (userLimit < group.getMembers().size()) {
-            throw new BadParameterException("Das Userlimit kann nicht unter der momentanen Mitgliederanzahl sein!");
-        }
-    }
-
     public static void validateCreateForm(KeycloakAuthenticationToken token, CreateForm form) {
         if (!token.getAccount().getRoles().contains("orga")
             && form.getType() == GroupType.LECTURE) {
