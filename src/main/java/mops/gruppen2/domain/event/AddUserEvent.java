@@ -1,7 +1,6 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.helper.ValidationHelper;
@@ -12,16 +11,14 @@ import mops.gruppen2.domain.model.User;
 /**
  * Fügt einen einzelnen Nutzer einer Gruppe hinzu.
  */
-@Getter
-@ToString
+
 @Log4j2
+@Value
 public class AddUserEvent extends Event {
 
-    private String givenname;
-    private String familyname;
-    private String email;
-
-    private AddUserEvent() {}
+    String givenname;
+    String familyname;
+    String email;
 
     public AddUserEvent(Group group, User user) {
         super(group.getId(), user.getId());

@@ -1,22 +1,18 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.model.Group;
 import mops.gruppen2.domain.model.Type;
 
 import java.util.UUID;
 
-@Getter
-@ToString
 @Log4j2
+@Value
 public class CreateGroupEvent extends Event {
 
-    private UUID groupParent;
-    private Type type;
-
-    private CreateGroupEvent() {}
+    UUID groupParent;
+    Type type;
 
     public CreateGroupEvent(UUID groupId, String userId, UUID parent, Type type) {
         super(groupId, userId);

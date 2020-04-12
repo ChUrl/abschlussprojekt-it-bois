@@ -1,7 +1,6 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.model.Group;
 import mops.gruppen2.domain.model.Title;
@@ -10,14 +9,11 @@ import mops.gruppen2.domain.model.User;
 /**
  * Ändert nur den Gruppentitel.
  */
-@Getter
-@ToString
 @Log4j2
+@Value
 public class UpdateGroupTitleEvent extends Event {
 
-    private Title newGroupTitle;
-
-    private UpdateGroupTitleEvent() {}
+    Title newGroupTitle;
 
     public UpdateGroupTitleEvent(Group group, User user, Title newGroupTitle) {
         super(group.getId(), user.getId());

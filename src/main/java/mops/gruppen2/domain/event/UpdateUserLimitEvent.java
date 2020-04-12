@@ -1,7 +1,6 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.BadParameterException;
 import mops.gruppen2.domain.exception.EventException;
@@ -9,14 +8,11 @@ import mops.gruppen2.domain.model.Group;
 import mops.gruppen2.domain.model.Limit;
 import mops.gruppen2.domain.model.User;
 
-@Getter
-@ToString
 @Log4j2
+@Value
 public class UpdateUserLimitEvent extends Event {
 
-    private Limit userLimit;
-
-    private UpdateUserLimitEvent() {}
+    Limit userLimit;
 
     public UpdateUserLimitEvent(Group group, User user, Limit userLimit) {
         super(group.getId(), user.getId());

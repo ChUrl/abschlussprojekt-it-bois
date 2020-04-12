@@ -1,7 +1,6 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.helper.ValidationHelper;
@@ -14,14 +13,11 @@ import java.util.UUID;
 /**
  * Aktualisiert die Gruppenrolle eines Teilnehmers.
  */
-@Getter
-@ToString
 @Log4j2
+@Value
 public class UpdateRoleEvent extends Event {
 
-    private Role newRole;
-
-    private UpdateRoleEvent() {}
+    Role newRole;
 
     public UpdateRoleEvent(UUID groupId, String userId, Role newRole) {
         super(groupId, userId);
