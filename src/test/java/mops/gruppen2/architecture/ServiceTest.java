@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-@ArchIgnore
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
 class ServiceTest {
 
@@ -33,6 +32,7 @@ class ServiceTest {
             .that().resideInAPackage("..service..")
             .should().haveSimpleNameEndingWith("Service");
 
+    @ArchIgnore
     @ArchTest
     public static final ArchRule serviceClassesShouldOnlyBeAccessedByControllerOrServiceClasses = classes()
             .that().resideInAPackage("..service..")
