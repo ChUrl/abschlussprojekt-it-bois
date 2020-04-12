@@ -2,6 +2,7 @@ package mops.gruppen2.architecture;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import org.springframework.data.repository.CrudRepository;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
+@ArchIgnore
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
 class RepositoryTest {
 
