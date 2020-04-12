@@ -83,6 +83,6 @@ public class SearchAndInviteController {
             return "redirect:/gruppen2/details/" + group.getId();
         }
 
-        return "join";
+        return "link";
     }
 }

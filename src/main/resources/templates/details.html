@@ -16,28 +16,13 @@
         <div class="row">
             <!--Gruppendetails-->
             <div class="col-9 px-0">
+
+                <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
+
                 <div class="content">
-
-                    <div class="content-heading row">
-                        <!--Badges-->
-                        <span th:replace="~{fragments/gruppen :: badges}"></span>
-
-                        <!--Spacer-->
-                        <span class="col"></span>
-
-                        <!--Edit-Pen-Button-->
-                        <a class="fas fa-edit edit"
-                           th:href="@{/gruppen2/details/{id}/meta(id=${group.getId()})}"
-                           th:if="${group.getRoles().get(user.getId()) == admin}"></a>
-                    </div>
-
-                    <!--Description-->
-                    <div class="content-text-in">
-                        <span th:text="${group.getDescription()}"></span>
-                    </div>
-
                     <!--Button-Bar-->
                     <div class="row">
+                        <a class="btn btn-primary" href="/gruppen2">Fertig</a>
 
                         <!--Spacer-->
                         <span class="col"></span>
@@ -72,7 +57,7 @@
                         <li class="list-group-item d-flex justify-content-between"
                             th:each="member : ${group.getMembers()}">
                             <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
-                            <span th:replace="~{fragments/gruppen :: userbadges}"></span>
+                            <span th:replace="~{fragments/groups :: userbadges}"></span>
                         </li>
                     </ul>
                 </div>

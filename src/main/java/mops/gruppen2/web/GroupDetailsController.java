@@ -79,6 +79,10 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
+        if (ValidationService.checkIfMember(group, user)) {
+            return "redirect:/gruppen2/details/" + groupId;
+        }
+
         groupService.addUser(user, group);
 
         return "redirect:/gruppen2/details/" + groupId;
@@ -93,6 +97,8 @@ public class GroupDetailsController {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
+        ValidationService.throwIfNoMember(group, user);
+
         groupService.deleteUser(user, group);
 
         return "redirect:/gruppen2";
@@ -100,10 +106,10 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}/edit")
-    public String getDetailsMembers(KeycloakAuthenticationToken token,
-                                    Model model,
-                                    HttpServletRequest request,
-                                    @PathVariable("id") String groupId) {
+    public String getDetailsEdit(KeycloakAuthenticationToken token,
+                                 Model model,
+                                 HttpServletRequest request,
+                                 @PathVariable("id") String groupId) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
@@ -124,9 +130,9 @@ public class GroupDetailsController {
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/meta")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsMetaUpdate(KeycloakAuthenticationToken token,
-                                        @PathVariable("id") String groupId,
-                                        @Valid MetaForm form) {
+    public String postDetailsEditMeta(KeycloakAuthenticationToken token,
+                                      @PathVariable("id") String groupId,
+                                      @Valid MetaForm form) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
@@ -140,9 +146,9 @@ public class GroupDetailsController {
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/userlimit")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsMembersUpdateUserLimit(KeycloakAuthenticationToken token,
-                                                    @PathVariable("id") String groupId,
-                                                    @Valid UserLimitForm form) {
+    public String postDetailsEditUserLimit(KeycloakAuthenticationToken token,
+                                           @PathVariable("id") String groupId,
+                                           @Valid UserLimitForm form) {
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
@@ -154,9 +160,9 @@ public class GroupDetailsController {
     @RolesAllowed("ROLE_orga")
     @PostMapping("/details/{id}/edit/csv")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsMembersUpdateCsv(KeycloakAuthenticationToken token,
-                                              @PathVariable("id") String groupId,
-                                              @RequestParam(value = "file", required = false) MultipartFile file) {
+    public String postDetailsEditCsv(KeycloakAuthenticationToken token,
+                                     @PathVariable("id") String groupId,
+                                     @RequestParam(value = "file", required = false) MultipartFile file) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(IdService.stringToUUID(groupId));
@@ -169,9 +175,9 @@ public class GroupDetailsController {
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/role/{userid}")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsMembersUpdateRole(KeycloakAuthenticationToken token,
-                                               @PathVariable("id") String groupId,
-                                               @PathVariable("userid") String userId) {
+    public String postDetailsEditRole(KeycloakAuthenticationToken token,
+                                      @PathVariable("id") String groupId,
+                                      @PathVariable("userid") String userId) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
@@ -191,9 +197,9 @@ public class GroupDetailsController {
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/delete/{userid}")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsMembersDelete(KeycloakAuthenticationToken token,
-                                           @PathVariable("id") String groupId,
-                                           @PathVariable("userid") String userId) {
+    public String postDetailsEditDelete(KeycloakAuthenticationToken token,
+                                        @PathVariable("id") String groupId,
+                                        @PathVariable("userid") String userId) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
@@ -211,8 +217,8 @@ public class GroupDetailsController {
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/destroy")
     @CacheEvict(value = "groups", allEntries = true)
-    public String postDetailsDestroy(KeycloakAuthenticationToken token,
-                                     @PathVariable("id") String groupId) {
+    public String postDetailsEditDestroy(KeycloakAuthenticationToken token,
+                                         @PathVariable("id") String groupId) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));

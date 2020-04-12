@@ -13,10 +13,9 @@
 
         <h1 class="def-cursor">Neue Gruppe</h1>
 
-        <div class="content">
-            <h3 class="def-cursor">Eigenschaften:</h3>
-
-            <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
+        <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
+            <div class="content">
+                <h3 class="def-cursor">Eigenschaften:</h3>
 
                 <!--Titel + Beschreibung-->
                 <div class="content-text" th:insert="~{fragments/forms :: meta}"></div>
@@ -32,13 +31,14 @@
                 </div>
 
                 <!--CSV Import-->
-                <div class="content-text" th:insert="~{fragments/forms :: csvimport}"></div>
+                <div class="content-text mb-0" th:insert="~{fragments/forms :: csvimport}"></div>
+            </div>
 
+            <div class="content">
                 <!--Submit-->
                 <button class="btn btn-primary btn-block" type="submit">Gruppe Erstellen</button>
-
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </main>
 

@@ -29,7 +29,7 @@
         <!--Ergebnisliste-->
         <div class="content" th:each="group: ${groups}">
             <div class="content-heading row">
-                <span th:replace="~{fragments/gruppen :: badges}"></span>
+                <span th:replace="~{fragments/groups :: badges}"></span>
 
                 <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
                    th:text="${group.getTitle()}"></a>

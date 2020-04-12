@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<!--suppress ALL -->
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--Grouptype Badges-->
+<th:block th:fragment="badges">
+    <span class="badge badge-pill private"
+          th:if='${group.getType() == private}'>Privat</span>
+    <span class="badge badge-pill public"
+          th:if="${group.getType() == public}">Öffentlich</span>
+    <span class="badge badge-pill lecture"
+          th:if='${group.getType() == lecture}'>Veranstaltung</span>
+
+    <span class="badge badge-pill parent"
+          th:unless="${parent == null || parent.getTitle() == null|| parent.getTitle() == ''}"
+          th:text="${parent.getTitle()}">Parent</span>
+
+    <!--Needs completly projected (cached) groups-->
+    <!--<span class="badge badge-success float-right"
+          th:if='${group.getRoles().get(user.getId()) == admin}'>Admin</span>-->
+</th:block>
+
+
+<!--User Badges-->
+<th:block th:fragment="userbadges">
+    <span class="badge badge-success align-self-start ml-2"
+          th:if="${group.getRoles().get(member.getId()) == admin}">Admin</span>
+</th:block>
+
+<th:block th:fragment="groupcontent">
+    <!--Badges-->
+    <div class="content-heading">
+        <span th:replace="~{fragments/groups :: badges}"></span>
+    </div>
+
+    <!--Description-->
+    <div class="content-text-in">
+        <span th:text="${group.getDescription()}"></span>
+    </div>
+
+    <!--<div class="content-text-in" th:if="${group.getMembers().contains(user.getId())}"></div>-->
+</th:block>
+
+<th:block th:fragment="joingroup">
+    <div class="content-heading" th:if="${group.getMembers().size() < group.getUserLimit()}">
+        <span>Möchtest du dieser Gruppe beitreten?</span>
+    </div>
+    <div class="row" th:if="${group.getMembers().size() < group.getUserLimit()}">
+        <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}">
+            <button class="btn btn-success" type="submit">Gruppe beitreten.</button>
+        </form>
+
+        <div class="col"></div>
+
+        <a class="btn btn-warning" href="/gruppen2"
+           type="submit">Nicht beitreten.</a>
+    </div>
+
+    <div class="content-heading" th:unless="${group.getMembers().size() < group.getUserLimit()}">
+        <span>Diese Gruppe hat ihre maximale Teilnehmeranzahl erreicht.</span>
+    </div>
+    <div class="row" th:unless="${group.getMembers().size() < group.getUserLimit()}">
+        <div class="col"></div>
+
+        <a class="btn btn-primary" href="/gruppen2"
+           type="submit">Startseite.</a>
+    </div>
+</th:block>

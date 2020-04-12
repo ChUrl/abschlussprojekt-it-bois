@@ -10,7 +10,7 @@
             <span class="input-group-text text-monospace">Gruppentitel:</span>
         </div>
         <input type="text" class="form-control" th:name="title" th:value="${group?.getTitle()}"
-               required>
+               required minlength="4" maxlength="128">
     </div>
 
     <!--Gruppenbeschreibung-->
@@ -19,7 +19,7 @@
             <span class="input-group-text text-monospace">Beschreibung:</span>
         </div>
         <textarea class="form-control" th:name="description" th:text="${group?.getDescription()}"
-                  required></textarea>
+                  required minlength="4" maxlength="512"></textarea>
     </div>
 </th:block>
 

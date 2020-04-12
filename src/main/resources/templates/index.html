@@ -19,7 +19,7 @@
                 <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
                    th:text="${group.getTitle()}"></a>
 
-                <span th:replace="~{fragments/gruppen :: badges}"></span>
+                <span th:replace="~{fragments/groups :: badges}"></span>
             </div>
             <div class="content-text-in">
                 <span th:text="${group.getDescription()}"></span>
