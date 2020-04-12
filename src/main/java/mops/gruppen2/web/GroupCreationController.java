@@ -9,6 +9,7 @@ import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.IdService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.ValidationService;
+import mops.gruppen2.web.form.CreateForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -16,16 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-
-import static mops.gruppen2.domain.service.ControllerService.getGroupType;
-import static mops.gruppen2.domain.service.ControllerService.getParent;
+import javax.validation.Valid;
 
 @SuppressWarnings("SameReturnValue")
 @Log4j2
@@ -55,26 +49,22 @@ public class GroupCreationController {
     @PostMapping("/create")
     @CacheEvict(value = "groups", allEntries = true)
     public String postCreateOrga(KeycloakAuthenticationToken token,
-                                 @NotBlank @RequestParam("title") String title,
-                                 @NotBlank @RequestParam("description") String description,
-                                 @NotBlank @RequestParam("type") String type,
-                                 @Min(1) @Max(100_000) @RequestParam("userlimit") long userLimit,
-                                 @RequestParam(value = "parent", defaultValue = "") String parent,
-                                 @RequestParam(value = "file", required = false) MultipartFile file) {
+                                 @Valid CreateForm form) {
 
-        ValidationService.validateGroupType(token, type);
+        // Zusätzlicher check: studentin kann keine lecture erstellen
+        ValidationService.validateCreateForm(token, form);
 
         User user = new User(token);
         Group group = groupService.createGroup(user,
-                                               title,
-                                               description,
-                                               getGroupType(type),
-                                               userLimit,
-                                               getParent(parent, type));
+                                               form.getTitle(),
+                                               form.getDescription(),
+                                               form.getType(),
+                                               form.getUserlimit(),
+                                               form.getParent());
 
         // ROLE_studentin kann kein CSV importieren
         if (token.getAccount().getRoles().contains("orga")) {
-            groupService.addUsersToGroup(CsvService.readCsvFile(file), group, user);
+            groupService.addUsersToGroup(CsvService.readCsvFile(form.getFile()), group, user);
         }
 
         return "redirect:/gruppen2/details/" + IdService.uuidToString(group.getId());

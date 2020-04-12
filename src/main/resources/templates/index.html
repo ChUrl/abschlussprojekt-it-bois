@@ -2,8 +2,8 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
     name='Gruppenfindung',
     title='Meine Gruppen',
-    headcontent=~{fragments/general :: headcontent(style='/index.css')},
-    navigation=~{fragments/general :: nav(current='index')},
+    headcontent=~{fragments/general :: headcontent('index')},
+    navigation=~{fragments/general :: nav('index')},
     bodycontent=~{:: bodycontent})}">
 
 <body>

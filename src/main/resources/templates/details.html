@@ -2,8 +2,8 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
     name='Gruppenbildung',
     title='Details',
-    headcontent=~{fragments/general :: headcontent(style='/details.css')},
-    navigation=~{fragments/general :: nav(current='none')},
+    headcontent=~{fragments/general :: headcontent('details')},
+    navigation=~{fragments/general :: nav('none')},
     bodycontent=~{:: bodycontent})}">
 
 <body>
@@ -55,10 +55,7 @@
                 <!--Anzahl Text-->
                 <div class="mb-2">
                     <span>Teilnehmer: </span>
-                    <span th:if="${group.getUserLimit() <= 100000}"
-                          th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
-                    <span th:unless="${group.getUserLimit() <= 100000}"
-                          th:text="${group.getMembers().size()}"></span>
+                    <span th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
                 </div>
 
                 <!--Bearbeiten-Button-->
@@ -72,9 +69,10 @@
                 <!--Liste-->
                 <div class="members">
                     <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between" th:each="member : ${group.getMembers()}">
+                        <li class="list-group-item d-flex justify-content-between"
+                            th:each="member : ${group.getMembers()}">
                             <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
-                            <span class="badge badge-success" th:if="${group.getRoles().get(member.getId()) == admin}">Admin</span>
+                            <span th:replace="~{fragments/gruppen :: userbadges}"></span>
                         </li>
                     </ul>
                 </div>

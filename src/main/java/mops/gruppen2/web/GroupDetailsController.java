@@ -64,10 +64,10 @@ public class GroupDetailsController {
 
         // Detailseite für nicht-Mitglieder
         if (!ValidationService.checkIfMember(group, user)) {
-            return "details_nomember";
+            return "preview";
         }
 
-        return "details_member";
+        return "details";
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
@@ -143,7 +143,7 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsMembersUpdateUserLimit(KeycloakAuthenticationToken token,
                                                     @PathVariable("id") String groupId,
-                                                    @Min(1) @Max(100_000) @RequestParam("userlimit") long userLimit) {
+                                                    @Min(1) @Max(999_999) @RequestParam("userlimit") long userLimit) {
 
         User user = new User(token);
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));

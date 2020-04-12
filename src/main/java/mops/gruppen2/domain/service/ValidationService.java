@@ -10,6 +10,7 @@ import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.exception.NoAdminAfterActionException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import mops.gruppen2.web.form.CreateForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -137,9 +138,9 @@ public final class ValidationService {
         }
     }
 
-    public static void validateGroupType(KeycloakAuthenticationToken token, String type) {
+    public static void validateCreateForm(KeycloakAuthenticationToken token, CreateForm form) {
         if (!token.getAccount().getRoles().contains("orga")
-            && GroupType.valueOf(type) == GroupType.LECTURE) {
+            && form.getType() == GroupType.LECTURE) {
             throw new BadParameterException("Eine Veranstaltung kann nur von ORGA erstellt werden.");
         }
     }
