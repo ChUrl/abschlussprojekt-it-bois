@@ -22,10 +22,10 @@ public class KeycloakConfig {
     @Value("${keycloak.resource}")
     private String clientId;
 
-    @Value("1a13cd9e-5242-4c29-8c50-45ee53464010")
+    @Value("f73354fd-614e-4e24-b801-a8d0f4abf531")
     private String clientSecret;
 
-    @Value("${hhu_keycloak.token-uri}")
+    @Value("https://gruppenkeycloak.herokuapp.com/auth/realms/master/protocol/openid-connect/token")
     private String tokenUri;
 
     @Bean
