@@ -1,23 +1,34 @@
 package mops.gruppen2.domain.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Role;
-import mops.gruppen2.domain.User;
-import mops.gruppen2.domain.event.AddUserEvent;
+import mops.gruppen2.aspect.annotation.TraceMethodCalls;
+import mops.gruppen2.domain.event.AddMemberEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
-import mops.gruppen2.domain.event.DeleteGroupEvent;
-import mops.gruppen2.domain.event.DeleteUserEvent;
+import mops.gruppen2.domain.event.DestroyGroupEvent;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.event.UpdateGroupDescriptionEvent;
-import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
+import mops.gruppen2.domain.event.KickMemberEvent;
+import mops.gruppen2.domain.event.SetDescriptionEvent;
+import mops.gruppen2.domain.event.SetInviteLinkEvent;
+import mops.gruppen2.domain.event.SetLimitEvent;
+import mops.gruppen2.domain.event.SetParentEvent;
+import mops.gruppen2.domain.event.SetTitleEvent;
+import mops.gruppen2.domain.event.SetTypeEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
-import mops.gruppen2.domain.event.UpdateUserLimitEvent;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.helper.ValidationHelper;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Role;
+import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.domain.model.group.User;
+import mops.gruppen2.domain.model.group.wrapper.Description;
+import mops.gruppen2.domain.model.group.wrapper.Limit;
+import mops.gruppen2.domain.model.group.wrapper.Link;
+import mops.gruppen2.domain.model.group.wrapper.Parent;
+import mops.gruppen2.domain.model.group.wrapper.Title;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,51 +36,48 @@ import java.util.UUID;
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen.
  * Es werden übergebene Gruppen bearbeitet und dementsprechend Events erzeugt und gespeichert.
  */
-@Service
 @Log4j2
+@TraceMethodCalls
+@RequiredArgsConstructor
+@Service
 public class GroupService {
 
     private final EventStoreService eventStoreService;
-    private final InviteService inviteService;
-
-    public GroupService(EventStoreService eventStoreService, InviteService inviteService) {
-        this.eventStoreService = eventStoreService;
-        this.inviteService = inviteService;
-    }
-
 
     // ################################# GRUPPE ERSTELLEN ########################################
 
 
-    /**
-     * Erzeugt eine neue Gruppe und erzeugt nötige Events für die Initiale Setzung der Attribute.
-     *
-     * @param user        Keycloak-Account
-     * @param title       Gruppentitel
-     * @param description Gruppenbeschreibung
-     */
-    public Group createGroup(User user,
-                             String title,
-                             String description,
-                             GroupType groupType,
-                             long userLimit,
-                             UUID parent) {
+    public Group createGroup(String exec) {
+        return createGroup(UUID.randomUUID(), exec, LocalDateTime.now());
+    }
 
-        // Regeln:
-        // isPrivate -> !isLecture
-        // isLecture -> !isPrivate
-        Group group = createGroup(user, parent, groupType);
+    public void initGroupMembers(Group group,
+                                 String exec,
+                                 String target,
+                                 User user,
+                                 Limit limit) {
 
-        // Die Reihenfolge ist wichtig, da der ausführende User Admin sein muss
-        addUser(user, group);
-        updateRole(user, group, Role.ADMIN);
-        updateTitle(user, group, title);
-        updateDescription(user, group, description);
-        updateUserLimit(user, group, userLimit);
+        addMember(group, exec, target, user);
+        updateRole(group, exec, target, Role.ADMIN);
+        setLimit(group, exec, limit);
+    }
 
-        inviteService.createLink(group);
+    public void initGroupMeta(Group group,
+                              String exec,
+                              Type type,
+                              Parent parent) {
 
-        return group;
+        setType(group, exec, type);
+        setParent(group, exec, parent);
+    }
+
+    public void initGroupText(Group group,
+                              String exec,
+                              Title title,
+                              Description description) {
+
+        setTitle(group, exec, title);
+        setDescription(group, exec, description);
     }
 
 
@@ -84,12 +92,12 @@ public class GroupService {
      *
      * @param newUsers Userliste
      * @param group    Gruppe
-     * @param user     Ausführender User
+     * @param exec     Ausführender User
      */
-    public void addUsersToGroup(List<User> newUsers, Group group, User user) {
-        updateUserLimit(user, group, getAdjustedUserLimit(newUsers, group));
+    public void addUsersToGroup(Group group, String exec, List<User> newUsers) {
+        setLimit(group, exec, getAdjustedUserLimit(newUsers, group));
 
-        newUsers.forEach(newUser -> addUserSilent(newUser, group));
+        newUsers.forEach(newUser -> addUserSilent(group, exec, newUser.getId(), newUser));
     }
 
     /**
@@ -102,25 +110,21 @@ public class GroupService {
      *
      * @return Das neue Teilnehmermaximum
      */
-    private static long getAdjustedUserLimit(List<User> newUsers, Group group) {
-        return Math.max((long) group.getMembers().size() + newUsers.size(), group.getUserLimit());
+    private static Limit getAdjustedUserLimit(List<User> newUsers, Group group) {
+        return new Limit(Math.max((long) group.size() + newUsers.size(), group.getLimit()));
     }
 
     /**
      * Wechselt die Rolle eines Teilnehmers von Admin zu Member oder andersherum.
      * Überprüft, ob der User Mitglied ist und ob er der letzte Admin ist.
      *
-     * @param user  Teilnehmer, welcher geändert wird
-     * @param group Gruppe, in welcher sih der Teilnehmer befindet
+     * @param target Teilnehmer, welcher geändert wird
+     * @param group  Gruppe, in welcher sih der Teilnehmer befindet
      *
      * @throws EventException Falls der User nicht gefunden wird
      */
-    public void toggleMemberRole(User user, Group group) throws EventException {
-        ValidationHelper.throwIfNoMember(group, user);
-        ValidationHelper.throwIfLastAdmin(user, group);
-
-        Role role = group.getRoles().get(user.getId());
-        updateRole(user, group, role.toggle());
+    public void toggleMemberRole(Group group, String exec, String target) {
+        updateRole(group, exec, target, group.getRole(target).toggle());
     }
 
 
@@ -131,59 +135,44 @@ public class GroupService {
     /**
      * Erzeugt eine Gruppe, speichert diese und gibt diese zurück.
      */
-    private Group createGroup(User user, UUID parent, GroupType groupType) {
-        Event event = new CreateGroupEvent(UUID.randomUUID(),
-                                           user.getId(),
-                                           parent,
-                                           groupType);
+    private Group createGroup(UUID groupid, String exec, LocalDateTime date) {
+        Event event = new CreateGroupEvent(groupid,
+                                           exec,
+                                           date);
         Group group = new Group();
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
+        applyAndSave(group, event);
 
         return group;
     }
 
     /**
-     * Erzeugt, speichert ein AddUserEvent und wendet es auf eine Gruppe an.
-     * Prüft, ob der Nutzer schon Mitglied ist und ob Gruppe voll ist.
-     */
-    public void addUser(User user, Group group) {
-        ValidationHelper.throwIfMember(group, user);
-        ValidationHelper.throwIfGroupFull(group);
-
-        Event event = new AddUserEvent(group, user);
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
-    }
-
-    /**
      * Dasselbe wie addUser(), aber exceptions werden abgefangen und nicht geworfen.
      */
-    private void addUserSilent(User user, Group group) {
+    private void addUserSilent(Group group, String exec, String target, User user) {
         try {
-            addUser(user, group);
+            addMember(group, exec, target, user);
         } catch (Exception e) {
             log.debug("Doppelter User {} wurde nicht zu Gruppe {} hinzugefügt!", user, group);
         }
     }
 
     /**
+     * Erzeugt, speichert ein AddUserEvent und wendet es auf eine Gruppe an.
+     * Prüft, ob der Nutzer schon Mitglied ist und ob Gruppe voll ist.
+     */
+    public void addMember(Group group, String exec, String target, User user) {
+        applyAndSave(group, new AddMemberEvent(group.getId(), exec, target, user));
+    }
+
+    /**
      * Erzeugt, speichert ein DeleteUserEvent und wendet es auf eine Gruppe an.
      * Prüft, ob der Nutzer Mitglied ist und ob er der letzte Admin ist.
      */
-    public void deleteUser(User user, Group group) throws EventException {
-        ValidationHelper.throwIfNoMember(group, user);
-        ValidationHelper.throwIfLastAdmin(user, group);
+    public void kickMember(Group group, String exec, String target) {
+        applyAndSave(group, new KickMemberEvent(group.getId(), exec, target));
 
         if (ValidationHelper.checkIfGroupEmpty(group)) {
-            deleteGroup(user, group);
-        } else {
-            Event event = new DeleteUserEvent(group, user);
-            event.apply(group);
-
-            eventStoreService.saveEvent(event);
+            deleteGroup(group, exec);
         }
     }
 
@@ -191,14 +180,12 @@ public class GroupService {
      * Erzeugt, speichert ein DeleteGroupEvent und wendet es auf eine Gruppe an.
      * Prüft, ob der Nutzer Admin ist.
      */
-    public void deleteGroup(User user, Group group) {
-        ValidationHelper.throwIfNoAdmin(group, user);
+    public void deleteGroup(Group group, String exec) {
+        if (!group.exists()) {
+            return;
+        }
 
-        Event event = new DeleteGroupEvent(group, user);
-        event.apply(group);
-        inviteService.destroyLink(group);
-
-        eventStoreService.saveEvent(event);
+        applyAndSave(group, new DestroyGroupEvent(group.getId(), exec));
     }
 
     /**
@@ -206,17 +193,12 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob der Titel valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateTitle(User user, Group group, String title) {
-        ValidationHelper.throwIfNoAdmin(group, user);
-
-        if (title.trim().equals(group.getTitle())) {
+    public void setTitle(Group group, String exec, Title title) {
+        if (group.getTitle().equals(title.getValue())) {
             return;
         }
 
-        Event event = new UpdateGroupTitleEvent(group, user, title.trim());
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
+        applyAndSave(group, new SetTitleEvent(group.getId(), exec, title));
     }
 
     /**
@@ -224,17 +206,12 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob die Beschreibung valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateDescription(User user, Group group, String description) {
-        ValidationHelper.throwIfNoAdmin(group, user);
-
-        if (description.trim().equals(group.getDescription())) {
+    public void setDescription(Group group, String exec, Description description) {
+        if (group.getDescription().equals(description.getValue())) {
             return;
         }
 
-        Event event = new UpdateGroupDescriptionEvent(group, user, description.trim());
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
+        applyAndSave(group, new SetDescriptionEvent(group.getId(), exec, description));
     }
 
     /**
@@ -242,17 +219,12 @@ public class GroupService {
      * Prüft, ob der Nutzer Mitglied ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    private void updateRole(User user, Group group, Role role) {
-        ValidationHelper.throwIfNoMember(group, user);
-
-        if (role == group.getRoles().get(user.getId())) {
+    private void updateRole(Group group, String exec, String target, Role role) {
+        if (group.memberHasRole(target, role)) {
             return;
         }
 
-        Event event = new UpdateRoleEvent(group, user, role);
-        event.apply(group);
-
-        eventStoreService.saveEvent(event);
+        applyAndSave(group, new UpdateRoleEvent(group.getId(), exec, target, role));
     }
 
     /**
@@ -260,20 +232,40 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob das Limit valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void updateUserLimit(User user, Group group, long userLimit) {
-        ValidationHelper.throwIfNoAdmin(group, user);
-
-        if (userLimit == group.getUserLimit()) {
+    public void setLimit(Group group, String exec, Limit userLimit) {
+        if (userLimit.getValue() == group.getLimit()) {
             return;
         }
 
-        Event event;
-        if (userLimit < group.getMembers().size()) {
-            event = new UpdateUserLimitEvent(group, user, group.getMembers().size());
-        } else {
-            event = new UpdateUserLimitEvent(group, user, userLimit);
+        applyAndSave(group, new SetLimitEvent(group.getId(), exec, userLimit));
+    }
+
+    public void setParent(Group group, String exec, Parent parent) {
+        if (parent.getValue() == group.getParent()) {
+            return;
         }
 
+        applyAndSave(group, new SetParentEvent(group.getId(), exec, parent));
+    }
+
+    public void setLink(Group group, String exec, Link link) {
+        if (group.getLink().equals(link.getValue())) {
+            return;
+        }
+
+        applyAndSave(group, new SetInviteLinkEvent(group.getId(), exec, link));
+    }
+
+    private void setType(Group group, String exec, Type type) {
+        if (group.getType() == type) {
+            return;
+        }
+
+        applyAndSave(group, new SetTypeEvent(group.getId(), exec, type));
+    }
+
+    private void applyAndSave(Group group, Event event) throws EventException {
+        event.init(group.version() + 1);
         event.apply(group);
 
         eventStoreService.saveEvent(event);

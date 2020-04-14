@@ -40,11 +40,11 @@
                 <!--Anzahl Text-->
                 <div class="mb-2">
                     <span>Teilnehmer: </span>
-                    <span th:text="${group.getMembers().size() + ' von ' + group.getUserLimit()}"></span>
+                    <span th:text="${group.size() + ' von ' + group.getLimit()}"></span>
                 </div>
 
                 <!--Bearbeiten-Button-->
-                <div class="mb-2" th:if="${group.getRoles().get(user.getId()) == admin}">
+                <div class="mb-2" th:if="${group.isAdmin(principal.getId())}">
                     <form method="get"
                           th:action="@{/gruppen2/details/{id}/edit(id=${group.getId()})}">
                         <button class="btn btn-secondary btn-block">Gruppe verwalten</button>
@@ -56,7 +56,7 @@
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between"
                             th:each="member : ${group.getMembers()}">
-                            <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
+                            <span th:text="${member.format()}"></span>
                             <span th:replace="~{fragments/groups :: userbadges}"></span>
                         </li>
                     </ul>

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Log4j2
-@Profile("dev")
+@Profile({"dev", "docker"})
 @Aspect
 @Component
 public class LogAspect {
@@ -36,12 +36,12 @@ public class LogAspect {
 
 
     @Before("@annotation(mops.gruppen2.aspect.annotation.Trace)")
-    public void logCustom(JoinPoint joinPoint) {
+    public static void logCustom(JoinPoint joinPoint) {
         log.trace(((MethodSignature) joinPoint.getSignature()).getMethod().getAnnotation(Trace.class).value());
     }
 
     @Before("@annotation(mops.gruppen2.aspect.annotation.TraceMethodCall) || logMethodCalls()")
-    public void logMethodCall(JoinPoint joinPoint) {
+    public static void logMethodCall(JoinPoint joinPoint) {
         log.trace("Methodenaufruf: {} ({})",
                   joinPoint.getSignature().getName(),
                   joinPoint.getSourceLocation().getWithinType().getName().replace("mops.gruppen2.", ""));
@@ -50,7 +50,7 @@ public class LogAspect {
     }
 
     @Around("@annotation(mops.gruppen2.aspect.annotation.TraceExecutionTime)")
-    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+    public static Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         joinPoint.proceed();
         long stop = System.currentTimeMillis();

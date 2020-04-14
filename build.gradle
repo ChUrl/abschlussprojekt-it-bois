@@ -82,6 +82,7 @@ dependencies {
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'com.github.javafaker:javafaker:1.0.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.10.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

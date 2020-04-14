@@ -98,7 +98,7 @@
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between" th:each="member : ${group.getMembers()}">
                     <div>
-                        <span th:text="${member.getGivenname()  + ' ' + member.getFamilyname().charAt(0) + '.'}"></span>
+                        <span th:text="${member.format()}"></span>
                         <span th:replace="~{fragments/groups :: userbadges}"></span>
                     </div>
 

@@ -2,7 +2,7 @@ package mops.gruppen2.web.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.model.group.Group;
 
 import java.util.List;
 

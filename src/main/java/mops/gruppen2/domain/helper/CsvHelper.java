@@ -3,10 +3,12 @@ package mops.gruppen2.domain.helper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.WrongFileException;
+import mops.gruppen2.domain.model.group.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,9 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CsvHelper {
-
-    private CsvHelper() {}
 
     public static List<User> readCsvFile(MultipartFile file) throws EventException {
         if (file == null || file.isEmpty()) {

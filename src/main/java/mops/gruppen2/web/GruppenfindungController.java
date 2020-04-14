@@ -1,8 +1,8 @@
 package mops.gruppen2.web;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCall;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.exception.PageNotFoundException;
 import mops.gruppen2.domain.service.ProjectionService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -16,14 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 
 @SuppressWarnings("SameReturnValue")
 @Log4j2
+@RequiredArgsConstructor
 @Controller
 public class GruppenfindungController {
 
     private final ProjectionService projectionService;
-
-    public GruppenfindungController(ProjectionService projectionService) {
-        this.projectionService = projectionService;
-    }
 
     // For convenience
     //@GetMapping("")
@@ -37,9 +34,8 @@ public class GruppenfindungController {
     public String getIndexPage(KeycloakAuthenticationToken token,
                                Model model) {
 
-        User user = new User(token);
-
-        model.addAttribute("groups", projectionService.projectUserGroups(user));
+        String principal = token.getName();
+        model.addAttribute("groups", projectionService.projectUserGroups(principal));
 
         return "index";
     }

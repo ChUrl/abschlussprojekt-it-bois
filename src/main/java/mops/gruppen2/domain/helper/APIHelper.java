@@ -1,15 +1,17 @@
 package mops.gruppen2.domain.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.domain.Group;
+import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.web.api.GroupRequestWrapper;
 
 import java.util.List;
 
+//TODO: sinnvolles format
 @Log4j2
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class APIHelper {
-
-    private APIHelper() {}
 
     public static GroupRequestWrapper wrap(long status, List<Group> groupList) {
         return new GroupRequestWrapper(status, groupList);

@@ -1,17 +1,19 @@
 package mops.gruppen2.web;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.helper.CsvHelper;
-import mops.gruppen2.domain.helper.IdHelper;
 import mops.gruppen2.domain.helper.ValidationHelper;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.domain.model.group.User;
+import mops.gruppen2.domain.model.group.wrapper.Description;
+import mops.gruppen2.domain.model.group.wrapper.Limit;
+import mops.gruppen2.domain.model.group.wrapper.Parent;
+import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.ProjectionService;
-import mops.gruppen2.web.form.CreateForm;
-import mops.gruppen2.web.form.MetaForm;
-import mops.gruppen2.web.form.UserLimitForm;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -19,6 +21,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
@@ -26,17 +30,13 @@ import javax.validation.Valid;
 @SuppressWarnings("SameReturnValue")
 @Log4j2
 @TraceMethodCalls
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/gruppen2")
 public class GroupCreationController {
 
     private final GroupService groupService;
     private final ProjectionService projectionService;
-
-    public GroupCreationController(GroupService groupService, ProjectionService projectionService) {
-        this.groupService = groupService;
-        this.projectionService = projectionService;
-    }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/create")
@@ -51,26 +51,27 @@ public class GroupCreationController {
     @PostMapping("/create")
     @CacheEvict(value = "groups", allEntries = true)
     public String postCreateOrga(KeycloakAuthenticationToken token,
-                                 @Valid CreateForm create,
-                                 @Valid MetaForm meta,
-                                 @Valid UserLimitForm limit) {
+                                 @RequestParam("type") Type type,
+                                 @RequestParam("parent") @Valid Parent parent,
+                                 @RequestParam("title") @Valid Title title,
+                                 @RequestParam("description") @Valid Description description,
+                                 @RequestParam("limit") @Valid Limit limit,
+                                 @RequestParam(value = "file", required = false) MultipartFile file) {
 
         // Zusätzlicher check: studentin kann keine lecture erstellen
-        ValidationHelper.validateCreateForm(token, create);
+        ValidationHelper.validateCreateForm(token, type);
 
-        User user = new User(token);
-        Group group = groupService.createGroup(user,
-                                               meta.getTitle(),
-                                               meta.getDescription(),
-                                               create.getType(),
-                                               limit.getUserlimit(),
-                                               create.getParent());
+        String principal = token.getName();
+        Group group = groupService.createGroup(principal);
+        groupService.initGroupMembers(group, principal, principal, new User(token), limit);
+        groupService.initGroupMeta(group, principal, type, parent);
+        groupService.initGroupText(group, principal, title, description);
 
         // ROLE_studentin kann kein CSV importieren
         if (token.getAccount().getRoles().contains("orga")) {
-            groupService.addUsersToGroup(CsvHelper.readCsvFile(create.getFile()), group, user);
+            groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
         }
 
-        return "redirect:/gruppen2/details/" + IdHelper.uuidToString(group.getId());
+        return "redirect:/gruppen2/details/" + group.getId();
     }
 }

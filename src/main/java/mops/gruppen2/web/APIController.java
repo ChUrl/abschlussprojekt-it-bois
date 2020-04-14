@@ -3,12 +3,12 @@ package mops.gruppen2.web;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.User;
 import mops.gruppen2.domain.helper.APIHelper;
-import mops.gruppen2.domain.helper.IdHelper;
+import mops.gruppen2.domain.helper.CommonHelper;
+import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.web.api.GroupRequestWrapper;
@@ -26,17 +26,13 @@ import java.util.UUID;
  */
 @Log4j2
 @TraceMethodCalls
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/gruppen2/api")
 public class APIController {
 
     private final EventStoreService eventStoreService;
     private final ProjectionService projectionService;
-
-    public APIController(EventStoreService eventStoreService, ProjectionService projectionService) {
-        this.eventStoreService = eventStoreService;
-        this.projectionService = projectionService;
-    }
 
     /**
      * Erzeugt eine Liste aus Gruppen, welche sich seit einer übergebenen Event-Id geändert haben.
@@ -51,7 +47,7 @@ public class APIController {
                                             @PathVariable("id") long eventId) {
 
         return APIHelper.wrap(eventStoreService.findMaxEventId(),
-                              projectionService.projectNewGroups(eventId));
+                              projectionService.projectChangedGroups(eventId));
     }
 
     /**
@@ -63,7 +59,7 @@ public class APIController {
     public List<String> getApiUserGroups(@ApiParam("Nutzer-Id")
                                          @PathVariable("id") String userId) {
 
-        return IdHelper.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
+        return CommonHelper.uuidsToString(eventStoreService.findExistingUserGroups(userId));
     }
 
     /**
@@ -75,7 +71,7 @@ public class APIController {
     public Group getApiGroup(@ApiParam("Gruppen-Id der gefordeten Gruppe")
                              @PathVariable("id") String groupId) {
 
-        return projectionService.projectSingleGroup(UUID.fromString(groupId));
+        return projectionService.projectGroupById(UUID.fromString(groupId));
     }
 
 }

@@ -27,7 +27,7 @@ class DomainTest {
     @ArchTest
     public static final ArchRule classesInEventPackageShouldHaveEventInName = classes()
             .that().resideInAPackage("..domain.event..")
-            .should().haveSimpleNameEndingWith("Event");
+            .should().haveSimpleNameNotContaining("..Event..");
 
     @ArchTest
     public static final ArchRule exceptionClassesShouldBeInExceptionPackage = classes()
