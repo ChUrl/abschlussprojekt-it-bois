@@ -7,9 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.helper.APIHelper;
-import mops.gruppen2.domain.helper.IdHelper;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.helper.CommonHelper;
+import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.web.api.GroupRequestWrapper;
@@ -60,7 +59,7 @@ public class APIController {
     public List<String> getApiUserGroups(@ApiParam("Nutzer-Id")
                                          @PathVariable("id") String userId) {
 
-        return IdHelper.uuidsToString(eventStoreService.findExistingUserGroups(new User(userId)));
+        return CommonHelper.uuidsToString(eventStoreService.findExistingUserGroups(userId));
     }
 
     /**

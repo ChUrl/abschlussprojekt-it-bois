@@ -1,36 +1,40 @@
 package mops.gruppen2.domain.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
-import mops.gruppen2.domain.helper.IdHelper;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Type;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.helper.CommonHelper;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Type;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static mops.gruppen2.domain.event.EventType.CREATEGROUP;
+import static mops.gruppen2.domain.event.EventType.SETDESCRIPTION;
+import static mops.gruppen2.domain.event.EventType.SETLIMIT;
+import static mops.gruppen2.domain.event.EventType.SETTITLE;
+import static mops.gruppen2.domain.helper.CommonHelper.eventTypesToString;
+
 /**
  * Liefert verschiedene Projektionen auf Gruppen.
  * Benötigt ausschließlich den EventStoreService.
  */
-@Service
 @Log4j2
+@RequiredArgsConstructor
+@Service
 public class ProjectionService {
 
     private final EventStoreService eventStoreService;
-
-    public ProjectionService(EventStoreService eventStoreService) {
-        this.eventStoreService = eventStoreService;
-    }
 
 
     // ################################## STATISCHE PROJEKTIONEN #################################
@@ -121,11 +125,16 @@ public class ProjectionService {
     @Cacheable("groups")
     public List<Group> projectPublicGroups() throws EventException {
         List<UUID> groupIds = eventStoreService.findExistingGroupIds();
+
+        if (groupIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                        "CreateGroupEvent",
-                                                                        "UpdateGroupDescriptionEvent",
-                                                                        "UpdateGroupTitleEvent",
-                                                                        "UpdateUserMaxEvent");
+                                                                        eventTypesToString(CREATEGROUP,
+                                                                                           SETDESCRIPTION,
+                                                                                           SETTITLE,
+                                                                                           SETLIMIT));
 
         List<Group> groups = projectGroups(events);
 
@@ -143,9 +152,14 @@ public class ProjectionService {
     @Cacheable("groups")
     public List<Group> projectLectures() {
         List<UUID> groupIds = eventStoreService.findExistingGroupIds();
+
+        if (groupIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                        "CreateGroupEvent",
-                                                                        "UpdateGroupTitleEvent");
+                                                                        eventTypesToString(CREATEGROUP,
+                                                                                           SETTITLE));
 
         List<Group> lectures = projectGroups(events);
 
@@ -158,17 +172,22 @@ public class ProjectionService {
      * Projiziert Gruppen, in welchen der User aktuell teilnimmt.
      * Die Gruppen enthalten nur Metainformationen: Titel und Beschreibung.
      *
-     * @param user Die Id
+     * @param userid Die Id
      *
      * @return Liste aus Gruppen
      */
     @Cacheable("groups")
-    public List<Group> projectUserGroups(User user) {
-        List<UUID> groupIds = eventStoreService.findExistingUserGroups(user);
+    public List<Group> projectUserGroups(String userid) {
+        List<UUID> groupIds = eventStoreService.findExistingUserGroups(userid);
+
+        if (groupIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<Event> groupEvents = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                             "CreateGroupEvent",
-                                                                             "UpdateGroupTitleEvent",
-                                                                             "UpdateGroupDescriptionEvent");
+                                                                             eventTypesToString(CREATEGROUP,
+                                                                                                SETTITLE,
+                                                                                                SETDESCRIPTION));
 
         return projectGroups(groupEvents);
     }
@@ -185,10 +204,6 @@ public class ProjectionService {
      * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
      */
     public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
-        if (IdHelper.isEmpty(groupId)) {
-            throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
-        }
-
         try {
             List<Event> events = eventStoreService.findGroupEvents(groupId);
             return projectSingleGroup(events);
@@ -198,27 +213,28 @@ public class ProjectionService {
         }
     }
 
-    /**
-     * Projiziert eine einzelne Gruppe, welche leer sein darf.
-     */
-    public Group projectParent(UUID parentId) {
-        if (IdHelper.isEmpty(parentId)) {
+    public Group projectParent(UUID parent) {
+        if (CommonHelper.uuidIsEmpty(parent)) {
             return new Group();
         }
 
-        return projectSingleGroup(parentId);
+        return projectSingleGroup(parent);
     }
 
     /**
      * Entfernt alle Gruppen, in welchen ein User teilnimmt, aus einer Gruppenliste.
      *
      * @param groups Gruppenliste, aus der entfernt wird
-     * @param user   User, welcher teilnimmt
+     * @param userid User, welcher teilnimmt
      */
-    void removeUserGroups(List<Group> groups, User user) {
-        List<UUID> userGroups = eventStoreService.findExistingUserGroups(user);
+    void removeUserGroups(List<Group> groups, String userid) {
+        List<UUID> userGroups = eventStoreService.findExistingUserGroups(userid);
 
-        groups.removeIf(group -> userGroups.contains(group.getGroupid()));
+        groups.removeIf(group -> userGroups.contains(group.getId()));
+    }
+
+    public Group projectGroupByLink(String link) {
+        return projectSingleGroup(eventStoreService.findGroupByLink(link));
     }
 }
 

@@ -1,9 +1,9 @@
 package mops.gruppen2.web;
 
 import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.model.Role;
-import mops.gruppen2.domain.model.Type;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.Role;
+import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.domain.model.group.User;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,15 +20,15 @@ public class ModelAttributeControllerAdvice {
         // Prevent NullPointerException if not logged in
         if (token != null) {
             model.addAttribute("account", new Account(token));
-            model.addAttribute("user", new User(token));
+            model.addAttribute("principal", new User(token));
         }
 
         // Add enums
-        model.addAttribute("member", Role.MEMBER);
-        model.addAttribute("admin", Role.ADMIN);
-        model.addAttribute("public", Type.PUBLIC);
-        model.addAttribute("private", Type.PRIVATE);
-        model.addAttribute("lecture", Type.LECTURE);
+        model.addAttribute("REGULAR", Role.REGULAR);
+        model.addAttribute("ADMIN", Role.ADMIN);
+        model.addAttribute("PUBLIC", Type.PUBLIC);
+        model.addAttribute("PRIVATE", Type.PRIVATE);
+        model.addAttribute("LECTURE", Type.LECTURE);
     }
 
 }

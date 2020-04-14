@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.helper.ValidationHelper;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Type;
-import mops.gruppen2.domain.model.User;
-import mops.gruppen2.domain.service.InviteService;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Type;
 import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.SearchService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -31,7 +29,6 @@ import java.util.List;
 @RequestMapping("/gruppen2")
 public class SearchAndInviteController {
 
-    private final InviteService inviteService;
     private final ProjectionService projectionService;
     private final SearchService searchService;
 
@@ -50,8 +47,8 @@ public class SearchAndInviteController {
                              Model model,
                              @RequestParam("string") String search) {
 
-        User user = new User(token);
-        List<Group> groups = searchService.searchPublicGroups(search, user);
+        String principal = token.getName();
+        List<Group> groups = searchService.searchPublicGroups(search, principal);
 
         model.addAttribute("groups", groups);
 
@@ -64,19 +61,19 @@ public class SearchAndInviteController {
                           Model model,
                           @PathVariable("link") String link) {
 
-        User user = new User(token);
-        Group group = projectionService.projectSingleGroup(inviteService.getGroupIdFromLink(link));
+        String principal = token.getName();
+        Group group = projectionService.projectGroupByLink(link);
 
         model.addAttribute("group", group);
 
         // Gruppe öffentlich
         if (group.getType() == Type.PUBLIC) {
-            return "redirect:/gruppen2/details/" + group.getGroupid();
+            return "redirect:/gruppen2/details/" + group.getId();
         }
 
         // Bereits Mitglied
-        if (ValidationHelper.checkIfMember(group, user)) {
-            return "redirect:/gruppen2/details/" + group.getGroupid();
+        if (ValidationHelper.checkIfMember(group, principal)) {
+            return "redirect:/gruppen2/details/" + group.getId();
         }
 
         return "link";

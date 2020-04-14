@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.event;
 
 import mops.gruppen2.TestBuilder;
-import mops.gruppen2.domain.exception.GroupIdMismatchException;
-import mops.gruppen2.domain.model.Group;
+import mops.gruppen2.domain.exception.IdMismatchException;
+import mops.gruppen2.domain.model.group.Group;
 import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.createPublicGroupEvent;
@@ -18,7 +18,7 @@ class EventTest {
 
         Group group = TestBuilder.apply(createEvent);
 
-        assertThrows(GroupIdMismatchException.class, () -> addEvent.apply(group));
+        assertThrows(IdMismatchException.class, () -> addEvent.apply(group));
     }
 
 }

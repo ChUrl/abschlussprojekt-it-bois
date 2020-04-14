@@ -16,13 +16,13 @@
         <!--Gruppenliste belegte Gruppen-->
         <div class="content" th:each="group: ${groups}">
             <div class="content-heading row">
-                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getGroupid()})}"
+                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
                    th:text="${group.getTitle()}"></a>
 
                 <span th:replace="~{fragments/groups :: badges}"></span>
             </div>
             <div class="content-text-in">
-                <span th:text="${group.getDescription().getGroupDescription()}"></span>
+                <span th:text="${group.getDescription()}"></span>
             </div>
         </div>
 

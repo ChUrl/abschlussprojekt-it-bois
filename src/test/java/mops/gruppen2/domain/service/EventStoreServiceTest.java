@@ -2,7 +2,7 @@ package mops.gruppen2.domain.service;
 
 import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +73,7 @@ class EventStoreServiceTest {
         EventDTO dto = EventStoreService.getDTOFromEvent(event);
 
         assertThat(dto.getGroup_id()).isEqualTo(event.getGroupid().toString());
-        assertThat(dto.getUser_id()).isEqualTo(event.getUserid());
+        assertThat(dto.getUser_id()).isEqualTo(event.getTarget());
         assertThat(dto.getEvent_id()).isEqualTo(null);
         assertThat(dto.getEvent_type()).isEqualTo("CreateGroupEvent");
     }

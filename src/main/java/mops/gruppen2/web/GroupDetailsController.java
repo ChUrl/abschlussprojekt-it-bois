@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.helper.CsvHelper;
-import mops.gruppen2.domain.helper.IdHelper;
 import mops.gruppen2.domain.helper.ValidationHelper;
-import mops.gruppen2.domain.model.Description;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Limit;
-import mops.gruppen2.domain.model.Title;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.User;
+import mops.gruppen2.domain.model.group.wrapper.Description;
+import mops.gruppen2.domain.model.group.wrapper.Limit;
+import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.InviteService;
 import mops.gruppen2.domain.service.ProjectionService;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,7 +36,6 @@ import java.util.UUID;
 @RequestMapping("/gruppen2")
 public class GroupDetailsController {
 
-    private final InviteService inviteService;
     private final GroupService groupService;
     private final ProjectionService projectionService;
 
@@ -48,18 +45,17 @@ public class GroupDetailsController {
                                  Model model,
                                  @PathVariable("id") String groupId) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
         // Parent Badge
-        UUID parentId = group.getParent();
-        Group parent = projectionService.projectParent(parentId);
+        Group parent = projectionService.projectParent(group.getParent());
 
         model.addAttribute("group", group);
         model.addAttribute("parent", parent);
 
         // Detailseite für nicht-Mitglieder
-        if (!ValidationHelper.checkIfMember(group, user)) {
+        if (!ValidationHelper.checkIfMember(group, principal)) {
             return "preview";
         }
 
@@ -72,14 +68,14 @@ public class GroupDetailsController {
     public String postDetailsJoin(KeycloakAuthenticationToken token,
                                   @PathVariable("id") String groupId) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        if (ValidationHelper.checkIfMember(group, user)) {
+        if (ValidationHelper.checkIfMember(group, principal)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
-        groupService.addUser(user, group);
+        groupService.addMember(group, principal, principal, new User(token));
 
         return "redirect:/gruppen2/details/" + groupId;
     }
@@ -90,12 +86,10 @@ public class GroupDetailsController {
     public String postDetailsLeave(KeycloakAuthenticationToken token,
                                    @PathVariable("id") String groupId) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationHelper.throwIfNoMember(group, user);
-
-        groupService.deleteUser(user, group);
+        groupService.deleteUser(group, principal, principal);
 
         return "redirect:/gruppen2";
     }
@@ -107,15 +101,15 @@ public class GroupDetailsController {
                                  HttpServletRequest request,
                                  @PathVariable("id") String groupId) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
         // Invite Link
         String actualURL = request.getRequestURL().toString();
         String serverURL = actualURL.substring(0, actualURL.indexOf("gruppen2/"));
-        String link = serverURL + "gruppen2/join/" + inviteService.getLinkByGroup(group);
+        String link = serverURL + "gruppen2/join/" + group.getLink();
 
-        ValidationHelper.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, principal);
 
         model.addAttribute("group", group);
         model.addAttribute("link", link);
@@ -131,11 +125,11 @@ public class GroupDetailsController {
                                       @Valid Title title,
                                       @Valid Description description) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateTitle(user, group, title);
-        groupService.updateDescription(user, group, description);
+        groupService.setTitle(group, principal, title);
+        groupService.setDescription(group, principal, description);
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -146,10 +140,10 @@ public class GroupDetailsController {
     public String postDetailsEditUserLimit(KeycloakAuthenticationToken token,
                                            @PathVariable("id") String groupId,
                                            @Valid Limit limit) {
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.updateUserLimit(user, group, limit);
+        groupService.setLimit(group, principal, limit);
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -161,10 +155,10 @@ public class GroupDetailsController {
                                      @PathVariable("id") String groupId,
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        User user = new User(token);
-        Group group = projectionService.projectSingleGroup(IdHelper.stringToUUID(groupId));
+        String principal = token.getName();
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        groupService.addUsersToGroup(CsvHelper.readCsvFile(file), group, user);
+        groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -174,17 +168,17 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditRole(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
-                                      @PathVariable("userid") String userId) {
+                                      @PathVariable("userid") String target) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationHelper.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, principal);
 
-        groupService.toggleMemberRole(new User(userId), group);
+        groupService.toggleMemberRole(group, principal, target);
 
         // Falls sich der User selbst die Rechte genommen hat
-        if (!ValidationHelper.checkIfAdmin(group, user)) {
+        if (!ValidationHelper.checkIfAdmin(group, principal)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 
@@ -196,16 +190,16 @@ public class GroupDetailsController {
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDelete(KeycloakAuthenticationToken token,
                                         @PathVariable("id") String groupId,
-                                        @PathVariable("userid") String userId) {
+                                        @PathVariable("userid") String target) {
 
-        User user = new User(token);
+        String principal = token.getName();
         Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
 
-        ValidationHelper.throwIfNoAdmin(group, user);
+        ValidationHelper.throwIfNoAdmin(group, principal);
 
         // Der eingeloggte User kann sich nicht selbst entfernen (er kann aber verlassen)
-        if (!userId.equals(user.getUserid())) {
-            groupService.deleteUser(new User(userId), group);
+        if (!principal.equals(target)) {
+            groupService.deleteUser(group, principal, target);
         }
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
@@ -215,12 +209,12 @@ public class GroupDetailsController {
     @PostMapping("/details/{id}/edit/destroy")
     @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDestroy(KeycloakAuthenticationToken token,
-                                         @PathVariable("id") String groupId) {
+                                         @PathVariable("id") String groupid) {
 
-        User user = new User(token);
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        String principal = token.getName();
+        Group group = projectionService.projectSingleGroup(UUID.fromString(groupid));
 
-        groupService.deleteGroup(user, group);
+        groupService.deleteGroup(group, principal);
 
         return "redirect:/gruppen2";
     }

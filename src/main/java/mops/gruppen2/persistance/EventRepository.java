@@ -30,28 +30,28 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
 
     @Query("SELECT * FROM event"
            + " WHERE group_id IN (:userIds) ")
-    List<EventDTO> findEventDTOsByUser(@Param("groupIds") List<String> userIds);
+    List<EventDTO> findEventDTOsByUser(@Param("groupIds") String... userIds);
 
     @Query("SELECT * FROM event"
            + " WHERE event_type IN (:types)")
-    List<EventDTO> findEventDTOsByType(@Param("types") List<String> types);
+    List<EventDTO> findEventDTOsByType(@Param("types") String... types);
 
     @Query("SELECT * FROM event"
            + " WHERE event_type IN (:types) AND group_id IN (:groupIds)")
-    List<EventDTO> findEventDTOsByGroupAndType(@Param("types") List<String> types,
-                                               @Param("groupIds") List<String> groupIds);
+    List<EventDTO> findEventDTOsByGroupAndType(@Param("groupIds") List<String> groupIds,
+                                               @Param("types") String... types);
 
     @Query("SELECT * FROM event"
            + " WHERE event_type IN (:types) AND user_id = :userId")
-    List<EventDTO> findEventDTOsByUserAndType(@Param("types") List<String> types,
-                                              @Param("userId") String userId);
+    List<EventDTO> findEventDTOsByUserAndType(@Param("userId") String userId,
+                                              @Param("types") String... types);
 
     // ################################ LATEST EVENT DTOs ########################################
 
     @Query("WITH ranked_events AS ("
            + "SELECT *, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY event_id DESC) AS rn"
            + " FROM event"
-           + " WHERE user_id = :userId AND event_type IN ('AddUserEvent', 'DeleteUserEvent')"
+           + " WHERE user_id = :userId AND event_type IN ('ADDMEMBER', 'KICKMEMBER')"
            + ")"
            + "SELECT * FROM ranked_events WHERE rn = 1;")
     List<EventDTO> findLatestEventDTOsPartitionedByGroupByUser(@Param("userId") String userId);
@@ -62,7 +62,7 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
            + " WHERE event_type IN (:types)"
            + ")"
            + "SELECT * FROM ranked_events WHERE rn = 1;")
-    List<EventDTO> findLatestEventDTOsPartitionedByGroupByType(@Param("types") List<String> types);
+    List<EventDTO> findLatestEventDTOsPartitionedByGroupByType(@Param("types") String... types);
 
     // ######################################### COUNT ###########################################
 

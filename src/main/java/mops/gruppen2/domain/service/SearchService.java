@@ -2,9 +2,8 @@ package mops.gruppen2.domain.service;
 
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Type;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.SortHelper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +32,10 @@ public class SearchService {
      * @throws EventException Projektionsfehler
      */
     @Cacheable("groups")
-    public List<Group> searchPublicGroups(String search, User user) throws EventException {
+    public List<Group> searchPublicGroups(String search, String userid) {
         List<Group> groups = projectionService.projectPublicGroups();
-        projectionService.removeUserGroups(groups, user);
-        sortByGroupType(groups);
+        projectionService.removeUserGroups(groups, userid);
+        SortHelper.sortByGroupType(groups);
 
         if (search.isEmpty()) {
             return groups;
@@ -45,25 +44,8 @@ public class SearchService {
         log.debug("Es wurde gesucht nach: {}", search);
 
         return groups.stream()
-                     .filter(group -> group.toString().toLowerCase().contains(search.toLowerCase()))
+                     .filter(group -> group.format().toLowerCase().contains(search.toLowerCase()))
                      .collect(Collectors.toList());
     }
 
-    /**
-     * Sortiert die übergebene Liste an Gruppen, sodass Veranstaltungen am Anfang der Liste sind.
-     *
-     * @param groups Die Liste von Gruppen die sortiert werden soll
-     */
-    private static void sortByGroupType(List<Group> groups) {
-        groups.sort((Group g1, Group g2) -> {
-            if (g1.getType() == Type.LECTURE) {
-                return -1;
-            }
-            if (g2.getType() == Type.LECTURE) {
-                return 0;
-            }
-
-            return 1;
-        });
-    }
 }

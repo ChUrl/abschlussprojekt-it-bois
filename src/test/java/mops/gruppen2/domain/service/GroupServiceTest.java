@@ -3,9 +3,9 @@ package mops.gruppen2.domain.service;
 import mops.gruppen2.Gruppen2Application;
 import mops.gruppen2.TestBuilder;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Type;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.persistance.EventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -82,7 +82,7 @@ class GroupServiceTest {
         List<Group> groups = ProjectionService.projectGroups(eventList);
 
         assertThat(groups).hasSize(1);
-        assertThat(groups.get(0).getMembers()).hasSize(5);
+        assertThat(groups.get(0).getMemberships()).hasSize(5);
         assertThat(groups.get(0).getType()).isEqualTo(Type.PRIVATE);
     }
 
@@ -95,7 +95,7 @@ class GroupServiceTest {
         List<Group> groups = ProjectionService.projectGroups(eventList);
 
         assertThat(groups).hasSize(20);
-        assertThat(groups.stream().map(group -> group.getMembers().size()).reduce(Integer::sum).get()).isEqualTo(70);
+        assertThat(groups.stream().map(group -> group.getMemberships().size()).reduce(Integer::sum).get()).isEqualTo(70);
     }
 
     //TODO: EventStoreServiceTest

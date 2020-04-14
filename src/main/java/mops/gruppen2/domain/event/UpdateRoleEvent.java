@@ -4,11 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
-import mops.gruppen2.domain.helper.ValidationHelper;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Role;
-import mops.gruppen2.domain.model.User;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Role;
 
 /**
  * Aktualisiert die Gruppenrolle eines Teilnehmers.
@@ -21,18 +20,21 @@ public class UpdateRoleEvent extends Event {
     @JsonProperty("role")
     Role role;
 
-    public UpdateRoleEvent(Group group, User user, Role tole) {
-        super(group.getGroupid(), user.getUserid());
-        role = tole;
+    public UpdateRoleEvent(Group group, String exec, String target, Role role) {
+        super(group.getId(), exec, target);
+        this.role = role;
     }
 
     @Override
-    protected void applyEvent(Group group) throws UserNotFoundException {
-        ValidationHelper.throwIfNoMember(group, new User(userid));
+    protected void applyEvent(Group group) throws UserNotFoundException, LastAdminException {
+        group.memberPutRole(target, role);
 
-        group.getRoles().put(userid, role);
+        log.trace("\t\t\t\t\tNeue Admin: {}", group.getAdmins());
+    }
 
-        log.trace("\t\t\t\t\tNeue Rollen: {}", group.getRoles());
+    @Override
+    public String getType() {
+        return EventType.UPDATEROLE.toString();
     }
 
 }

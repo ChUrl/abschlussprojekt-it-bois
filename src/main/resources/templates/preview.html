@@ -14,10 +14,10 @@
 
         <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
 
-        <div class="content" th:unless="${group.getType() == private}"
+        <div class="content" th:unless="${group.isPrivate()}"
              th:insert="~{fragments/groups :: joingroup}"></div>
 
-        <div class="content row" th:if="${group.getType() == private}">
+        <div class="content row" th:if="${group.isPrivate()}">
             <span class="col"></span>
 
             <a class="btn btn-primary" href="/gruppen2">Startseite.</a>

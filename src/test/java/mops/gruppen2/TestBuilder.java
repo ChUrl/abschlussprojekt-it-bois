@@ -2,18 +2,17 @@ package mops.gruppen2;
 
 import com.github.javafaker.Faker;
 import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.event.AddUserEvent;
-import mops.gruppen2.domain.event.CreateGroupEvent;
-import mops.gruppen2.domain.event.DeleteGroupEvent;
-import mops.gruppen2.domain.event.DeleteUserEvent;
+import mops.gruppen2.domain.event.AddMemberEvent;
+import mops.gruppen2.domain.event.DestroyGroupEvent;
 import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.event.UpdateGroupDescriptionEvent;
-import mops.gruppen2.domain.event.UpdateGroupTitleEvent;
+import mops.gruppen2.domain.event.KickMemberEvent;
+import mops.gruppen2.domain.event.SetDescriptionEvent;
+import mops.gruppen2.domain.event.SetLimitEvent;
+import mops.gruppen2.domain.event.SetTitleEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
-import mops.gruppen2.domain.event.UpdateUserLimitEvent;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Role;
-import mops.gruppen2.domain.model.Type;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Role;
+import mops.gruppen2.domain.model.group.Type;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,7 +92,7 @@ public class TestBuilder {
         eventList.add(createPublicGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
-        eventList.add(new UpdateUserLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
+        eventList.add(new SetLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -106,7 +105,7 @@ public class TestBuilder {
         eventList.add(createPrivateGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
-        eventList.add(new UpdateUserLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
+        eventList.add(new SetLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -207,7 +206,7 @@ public class TestBuilder {
         String firstname = firstname();
         String lastname = lastname();
 
-        return new AddUserEvent(
+        return new AddMemberEvent(
                 groupId,
                 userId,
                 firstname,
@@ -224,13 +223,13 @@ public class TestBuilder {
     public static List<Event> deleteUserEvents(int count, List<Event> eventList) {
         List<Event> removeEvents = new ArrayList<>();
         List<Event> shuffle = eventList.parallelStream()
-                                       .filter(event -> event instanceof AddUserEvent)
+                                       .filter(event -> event instanceof AddMemberEvent)
                                        .collect(Collectors.toList());
 
         Collections.shuffle(shuffle);
 
         for (Event event : shuffle) {
-            removeEvents.add(new DeleteUserEvent(event.getGroupid(), event.getUserid()));
+            removeEvents.add(new KickMemberEvent(event.getGroupid(), event.getTarget()));
 
             if (removeEvents.size() >= count) {
                 break;
@@ -248,13 +247,13 @@ public class TestBuilder {
      * @return Eventliste
      */
     public static List<Event> deleteUserEvents(Group group) {
-        return group.getMembers().parallelStream()
+        return group.getMemberships().parallelStream()
                     .map(user -> deleteUserEvent(group.getGroupid(), user.getUserId()))
                     .collect(Collectors.toList());
     }
 
     public static Event deleteUserEvent(UUID groupId, String userId) {
-        return new DeleteUserEvent(
+        return new KickMemberEvent(
                 groupId,
                 userId
         );
@@ -265,7 +264,7 @@ public class TestBuilder {
     }
 
     public static Event updateGroupDescriptionEvent(UUID groupId, String description) {
-        return new UpdateGroupDescriptionEvent(
+        return new SetDescriptionEvent(
                 groupId,
                 faker.random().hex(),
                 description
@@ -277,7 +276,7 @@ public class TestBuilder {
     }
 
     public static Event updateGroupTitleEvent(UUID groupId, String title) {
-        return new UpdateGroupTitleEvent(
+        return new SetTitleEvent(
                 groupId,
                 faker.random().hex(),
                 title
@@ -285,7 +284,7 @@ public class TestBuilder {
     }
 
     public static Event updateUserLimitMaxEvent(UUID groupId) {
-        return new UpdateUserLimitEvent(groupId, firstname(), Long.MAX_VALUE);
+        return new SetLimitEvent(groupId, firstname(), Long.MAX_VALUE);
     }
 
     public static Event updateRoleEvent(UUID groupId, String userId, Role role) {
@@ -297,7 +296,7 @@ public class TestBuilder {
     }
 
     public static Event deleteGroupEvent(UUID groupId) {
-        return new DeleteGroupEvent(groupId, faker.random().hex());
+        return new DestroyGroupEvent(groupId, faker.random().hex());
     }
 
     private static String firstname() {

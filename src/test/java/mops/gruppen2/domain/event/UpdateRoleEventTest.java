@@ -1,8 +1,8 @@
 package mops.gruppen2.domain.event;
 
 import mops.gruppen2.domain.exception.UserNotFoundException;
-import mops.gruppen2.domain.model.Group;
-import mops.gruppen2.domain.model.Role;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Role;
 import org.junit.jupiter.api.Test;
 
 import static mops.gruppen2.TestBuilder.addUserEvent;
@@ -10,7 +10,6 @@ import static mops.gruppen2.TestBuilder.apply;
 import static mops.gruppen2.TestBuilder.createPublicGroupEvent;
 import static mops.gruppen2.TestBuilder.updateUserLimitMaxEvent;
 import static mops.gruppen2.TestBuilder.uuidMock;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UpdateRoleEventTest {
