@@ -9,6 +9,8 @@ import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Role;
 
+import java.util.UUID;
+
 /**
  * Aktualisiert die Gruppenrolle eines Teilnehmers.
  */
@@ -20,8 +22,8 @@ public class UpdateRoleEvent extends Event {
     @JsonProperty("role")
     Role role;
 
-    public UpdateRoleEvent(Group group, String exec, String target, Role role) {
-        super(group.getId(), exec, target);
+    public UpdateRoleEvent(UUID groupId, String exec, String target, Role role) {
+        super(groupId, exec, target);
         this.role = role;
     }
 

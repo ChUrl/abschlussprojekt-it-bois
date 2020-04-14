@@ -9,6 +9,7 @@ import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Description;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 /**
  * Ändert nur die Gruppenbeschreibung.
@@ -21,8 +22,8 @@ public class SetDescriptionEvent extends Event {
     @JsonProperty("desc")
     Description description;
 
-    public SetDescriptionEvent(Group group, String exec, @Valid Description description) {
-        super(group.getId(), exec, null);
+    public SetDescriptionEvent(UUID groupId, String exec, @Valid Description description) {
+        super(groupId, exec, null);
         this.description = description;
     }
 

@@ -9,6 +9,7 @@ import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 /**
  * Ändert nur den Gruppentitel.
@@ -21,8 +22,8 @@ public class SetTitleEvent extends Event {
     @JsonProperty("title")
     Title title;
 
-    public SetTitleEvent(Group group, String exec, @Valid Title title) {
-        super(group.getId(), exec, null);
+    public SetTitleEvent(UUID groupId, String exec, @Valid Title title) {
+        super(groupId, exec, null);
         this.title = title;
     }
 

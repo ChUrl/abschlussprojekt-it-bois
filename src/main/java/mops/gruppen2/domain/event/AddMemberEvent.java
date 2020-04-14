@@ -10,6 +10,8 @@ import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.User;
 
+import java.util.UUID;
+
 /**
  * Fügt einen einzelnen Nutzer einer Gruppe hinzu.
  */
@@ -21,8 +23,8 @@ public class AddMemberEvent extends Event {
     @JsonProperty("user")
     User user;
 
-    public AddMemberEvent(Group group, String exec, String target, User user) throws IdMismatchException {
-        super(group.getId(), exec, target);
+    public AddMemberEvent(UUID groupId, String exec, String target, User user) throws IdMismatchException {
+        super(groupId, exec, target);
         this.user = user;
 
         if (!target.equals(user.getId())) {

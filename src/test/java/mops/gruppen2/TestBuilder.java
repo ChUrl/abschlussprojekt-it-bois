@@ -1,30 +1,8 @@
 package mops.gruppen2;
 
-import com.github.javafaker.Faker;
-import mops.gruppen2.domain.Account;
-import mops.gruppen2.domain.event.AddMemberEvent;
-import mops.gruppen2.domain.event.DestroyGroupEvent;
-import mops.gruppen2.domain.event.Event;
-import mops.gruppen2.domain.event.KickMemberEvent;
-import mops.gruppen2.domain.event.SetDescriptionEvent;
-import mops.gruppen2.domain.event.SetLimitEvent;
-import mops.gruppen2.domain.event.SetTitleEvent;
-import mops.gruppen2.domain.event.UpdateRoleEvent;
-import mops.gruppen2.domain.model.group.Group;
-import mops.gruppen2.domain.model.group.Role;
-import mops.gruppen2.domain.model.group.Type;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 public class TestBuilder {
 
-    private static final Faker faker = new Faker();
+    /*private static final Faker faker = new Faker();
 
     public static Account account(String name) {
         return new Account(name,
@@ -47,13 +25,13 @@ public class TestBuilder {
         return apply(new Group(), events);
     }
 
-    /**
+    *//**
      * Baut eine UUID.
      *
      * @param id Integer id
      *
      * @return UUID
-     */
+     *//*
     public static UUID uuidMock(int id) {
         String idString = String.valueOf(Math.abs(id + 1));
         return UUID.fromString("00000000-0000-0000-0000-"
@@ -61,14 +39,14 @@ public class TestBuilder {
                                + idString);
     }
 
-    /**
+    *//**
      * Generiert ein EventLog mit mehreren Gruppen und Usern.
      *
      * @param count       Gruppenanzahl
      * @param membercount Mitgliederanzahl pro Gruppe
      *
      * @return Eventliste
-     */
+     *//*
     public static List<Event> completePublicGroups(int count, int membercount) {
         return IntStream.range(0, count)
                         .parallel()
@@ -92,7 +70,7 @@ public class TestBuilder {
         eventList.add(createPublicGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
-        eventList.add(new SetLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
+        eventList.add(new SetLimitEvent(groupId, "fgsadggas", new Limit(Long.MAX_VALUE)));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -105,7 +83,7 @@ public class TestBuilder {
         eventList.add(createPrivateGroupEvent(groupId));
         eventList.add(updateGroupTitleEvent(groupId));
         eventList.add(updateGroupDescriptionEvent(groupId));
-        eventList.add(new SetLimitEvent(groupId, "fgsadggas", Long.MAX_VALUE));
+        eventList.add(new SetLimitEvent(groupId, "fgsadggas", new Limit(Long.MAX_VALUE)));
         eventList.addAll(addUserEvents(membercount, groupId));
 
         return eventList;
@@ -119,13 +97,13 @@ public class TestBuilder {
         return completePrivateGroup(100);
     }
 
-    /**
+    *//**
      * Generiert mehrere CreateGroupEvents, 1 <= groupId <= count.
      *
      * @param count Anzahl der verschiedenen Gruppen
      *
      * @return Eventliste
-     */
+     *//*
     public static List<Event> createPublicGroupEvents(int count) {
         return IntStream.range(0, count)
                         .parallel()
@@ -149,8 +127,9 @@ public class TestBuilder {
                         .collect(Collectors.toList());
     }
 
-    public static Event createPrivateGroupEvent(UUID groupId) {
-        return createGroupEvent(groupId, Type.PRIVATE);
+    public static List<Event> createPrivateGroupEvents(UUID groupId) {
+        return (new ArrayList<>()).addAll(createGroupEvent(groupId)),
+        new SetTypeEvent(groupId);
     }
 
     public static Event createPrivateGroupEvent() {
@@ -165,13 +144,10 @@ public class TestBuilder {
         return createPublicGroupEvent(UUID.randomUUID());
     }
 
-    public static Event createGroupEvent(UUID groupId, Type type) {
-        return new CreateGroupEvent(
-                groupId,
-                faker.random().hex(),
-                null,
-                type
-        );
+    public static Event createGroupEvent(UUID groupId) {
+        return new CreateGroupEvent(groupId,
+                                    faker.random().hex(),
+                                    LocalDateTime.now());
     }
 
     public static Event createLectureEvent() {
@@ -187,14 +163,14 @@ public class TestBuilder {
         );
     }
 
-    /**
+    *//**
      * Generiert mehrere AddUserEvents für eine Gruppe, 1 <= user_id <= count.
      *
      * @param count   Anzahl der Mitglieder
      * @param groupId Gruppe, zu welcher geaddet wird
      *
      * @return Eventliste
-     */
+     *//*
     public static List<Event> addUserEvents(int count, UUID groupId) {
         return IntStream.range(0, count)
                         .parallel()
@@ -239,13 +215,13 @@ public class TestBuilder {
         return removeEvents;
     }
 
-    /**
+    *//**
      * Erzeugt mehrere DeleteUserEvents, sodass eine Gruppe komplett geleert wird.
      *
      * @param group Gruppe welche geleert wird
      *
      * @return Eventliste
-     */
+     *//*
     public static List<Event> deleteUserEvents(Group group) {
         return group.getMemberships().parallelStream()
                     .map(user -> deleteUserEvent(group.getGroupid(), user.getUserId()))
@@ -317,5 +293,5 @@ public class TestBuilder {
 
     private static String clean(String string) {
         return string.replaceAll("['\";,]", "");
-    }
+    }*/
 }

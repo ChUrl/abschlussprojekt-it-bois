@@ -10,6 +10,7 @@ import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Log4j2
 @Value
@@ -19,8 +20,8 @@ public class SetLimitEvent extends Event {
     @JsonProperty("limit")
     Limit limit;
 
-    public SetLimitEvent(Group group, String exec, @Valid Limit limit) {
-        super(group.getId(), exec, null);
+    public SetLimitEvent(UUID groupId, String exec, @Valid Limit limit) {
+        super(groupId, exec, null);
         this.limit = limit;
     }
 

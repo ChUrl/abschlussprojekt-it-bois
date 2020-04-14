@@ -62,7 +62,7 @@ public class ProjectionService {
      *
      * @throws EventException Projektionsfehler
      */
-    private static List<Group> projectGroupsByEvents(List<Event> events) throws EventException {
+    public static List<Group> projectGroupsByEvents(List<Event> events) throws EventException {
         Map<UUID, Group> groupMap = new HashMap<>();
 
         events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupid())));

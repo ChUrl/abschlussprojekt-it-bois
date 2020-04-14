@@ -161,7 +161,7 @@ public class GroupService {
      * Prüft, ob der Nutzer schon Mitglied ist und ob Gruppe voll ist.
      */
     public void addMember(Group group, String exec, String target, User user) {
-        applyAndSave(group, new AddMemberEvent(group, exec, target, user));
+        applyAndSave(group, new AddMemberEvent(group.getId(), exec, target, user));
     }
 
     /**
@@ -169,7 +169,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Mitglied ist und ob er der letzte Admin ist.
      */
     public void kickMember(Group group, String exec, String target) {
-        applyAndSave(group, new KickMemberEvent(group, exec, target));
+        applyAndSave(group, new KickMemberEvent(group.getId(), exec, target));
 
         if (ValidationHelper.checkIfGroupEmpty(group)) {
             deleteGroup(group, exec);
@@ -185,7 +185,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new DestroyGroupEvent(group, exec));
+        applyAndSave(group, new DestroyGroupEvent(group.getId(), exec));
     }
 
     /**
@@ -198,7 +198,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetTitleEvent(group, exec, title));
+        applyAndSave(group, new SetTitleEvent(group.getId(), exec, title));
     }
 
     /**
@@ -211,7 +211,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetDescriptionEvent(group, exec, description));
+        applyAndSave(group, new SetDescriptionEvent(group.getId(), exec, description));
     }
 
     /**
@@ -224,7 +224,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new UpdateRoleEvent(group, exec, target, role));
+        applyAndSave(group, new UpdateRoleEvent(group.getId(), exec, target, role));
     }
 
     /**
@@ -237,7 +237,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetLimitEvent(group, exec, userLimit));
+        applyAndSave(group, new SetLimitEvent(group.getId(), exec, userLimit));
     }
 
     public void setParent(Group group, String exec, Parent parent) {
@@ -245,7 +245,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetParentEvent(group, exec, parent));
+        applyAndSave(group, new SetParentEvent(group.getId(), exec, parent));
     }
 
     public void setLink(Group group, String exec, Link link) {
@@ -253,7 +253,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetInviteLinkEvent(group, exec, link));
+        applyAndSave(group, new SetInviteLinkEvent(group.getId(), exec, link));
     }
 
     private void setType(Group group, String exec, Type type) {
@@ -261,7 +261,7 @@ public class GroupService {
             return;
         }
 
-        applyAndSave(group, new SetTypeEvent(group, exec, type));
+        applyAndSave(group, new SetTypeEvent(group.getId(), exec, type));
     }
 
     private void applyAndSave(Group group, Event event) throws EventException {

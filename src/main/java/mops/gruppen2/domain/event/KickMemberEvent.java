@@ -7,6 +7,8 @@ import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 
+import java.util.UUID;
+
 /**
  * Entfernt ein einzelnes Mitglied einer Gruppe.
  */
@@ -15,8 +17,8 @@ import mops.gruppen2.domain.model.group.Group;
 @AllArgsConstructor
 public class KickMemberEvent extends Event {
 
-    public KickMemberEvent(Group group, String exec, String target) {
-        super(group.getId(), exec, target);
+    public KickMemberEvent(UUID groupId, String exec, String target) {
+        super(groupId, exec, target);
     }
 
     @Override

@@ -9,6 +9,7 @@ import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Log4j2
 @Value
@@ -18,8 +19,8 @@ public class SetParentEvent extends Event {
     @JsonProperty("parent")
     Parent parent;
 
-    public SetParentEvent(Group group, String exec, @Valid Parent parent) {
-        super(group.getId(), exec, null);
+    public SetParentEvent(UUID groupId, String exec, @Valid Parent parent) {
+        super(groupId, exec, null);
         this.parent = parent;
     }
 

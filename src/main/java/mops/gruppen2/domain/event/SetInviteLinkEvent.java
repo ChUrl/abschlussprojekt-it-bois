@@ -9,6 +9,7 @@ import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Link;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Log4j2
 @Value
@@ -18,8 +19,8 @@ public class SetInviteLinkEvent extends Event {
     @JsonProperty("link")
     Link link;
 
-    public SetInviteLinkEvent(Group group, String exec, @Valid Link link) {
-        super(group.getId(), exec, null);
+    public SetInviteLinkEvent(UUID groupId, String exec, @Valid Link link) {
+        super(groupId, exec, null);
         this.link = link;
     }
 
