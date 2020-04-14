@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Log4j2
-@Profile({"dev", "docker"})
+@Profile("dev")
 @Aspect
 @Component
 public class LogAspect {
