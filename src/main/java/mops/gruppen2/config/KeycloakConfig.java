@@ -2,6 +2,7 @@ package mops.gruppen2.config;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,12 +16,13 @@ import org.springframework.web.client.RestTemplate;
  */
 
 @Configuration
+@KeycloakConfiguration
 public class KeycloakConfig {
 
     @Value("${keycloak.resource}")
     private String clientId;
 
-    @Value("${keycloak.credentials.secret}")
+    @Value("1a13cd9e-5242-4c29-8c50-45ee53464010")
     private String clientSecret;
 
     @Value("${hhu_keycloak.token-uri}")
