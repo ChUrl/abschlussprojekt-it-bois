@@ -52,10 +52,10 @@ public abstract class Event {
 
     public void init(long version) {
         if (this.version != 0) {
-            throw new BadArgumentException("Event wurde schon initialisiert. (" + getType() + ")");
+            throw new BadArgumentException("Event wurde schon initialisiert. (" + type() + ")");
         }
 
-        log.trace("Event wurde initialisiert. (" + getType() + "," + version + ")");
+        log.trace("Event wurde initialisiert. (" + type() + "," + version + ")");
 
         this.version = version;
     }
@@ -88,5 +88,5 @@ public abstract class Event {
     protected abstract void applyEvent(Group group) throws EventException;
 
     @JsonIgnore
-    public abstract String getType();
+    public abstract String type();
 }

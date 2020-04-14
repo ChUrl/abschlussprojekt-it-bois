@@ -1,5 +1,6 @@
 package mops.gruppen2.domain.model.group.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
@@ -17,5 +18,10 @@ public class Description {
     @Override
     public String toString() {
         return value;
+    }
+
+    @JsonIgnore
+    public static Description EMPTY() {
+        return new Description("EMPTY");
     }
 }

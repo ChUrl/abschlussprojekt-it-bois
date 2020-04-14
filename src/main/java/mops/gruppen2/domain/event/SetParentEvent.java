@@ -31,7 +31,7 @@ public class SetParentEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.SETPARENT.toString();
     }
 }

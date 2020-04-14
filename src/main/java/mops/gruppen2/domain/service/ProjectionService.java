@@ -7,7 +7,6 @@ import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
 import mops.gruppen2.domain.helper.CommonHelper;
 import mops.gruppen2.domain.model.group.Group;
-import mops.gruppen2.domain.model.group.Type;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static mops.gruppen2.domain.event.EventType.CREATEGROUP;
-import static mops.gruppen2.domain.event.EventType.SETDESCRIPTION;
-import static mops.gruppen2.domain.event.EventType.SETLIMIT;
-import static mops.gruppen2.domain.event.EventType.SETTITLE;
-import static mops.gruppen2.domain.helper.CommonHelper.eventTypesToString;
 
 /**
  * Liefert verschiedene Projektionen auf Gruppen.
@@ -41,23 +33,6 @@ public class ProjectionService {
 
 
     /**
-     * Konstruiert Gruppen aus einer Liste von Events.
-     *
-     * @param events Liste an Events
-     *
-     * @return Liste an Projizierten Gruppen
-     *
-     * @throws EventException Projektionsfehler
-     */
-    static List<Group> projectGroups(List<Event> events) throws EventException {
-        Map<UUID, Group> groupMap = new HashMap<>();
-
-        events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupid())));
-
-        return new ArrayList<>(groupMap.values());
-    }
-
-    /**
      * Projiziert Events, geht aber davon aus, dass alle zu derselben Gruppe gehören.
      *
      * @param events Eventliste
@@ -66,7 +41,7 @@ public class ProjectionService {
      *
      * @throws EventException Projektionsfehler, z.B. falls Events von verschiedenen Gruppen übergeben werden
      */
-    static Group projectSingleGroup(List<Event> events) throws EventException {
+    private static Group projectGroupByEvents(List<Event> events) throws EventException {
         if (events.isEmpty()) {
             throw new GroupNotFoundException(ProjectionService.class.toString());
         }
@@ -76,6 +51,23 @@ public class ProjectionService {
         events.forEach(event -> event.apply(group));
 
         return group;
+    }
+
+    /**
+     * Konstruiert Gruppen aus einer Liste von Events.
+     *
+     * @param events Liste an Events
+     *
+     * @return Liste an Projizierten Gruppen
+     *
+     * @throws EventException Projektionsfehler
+     */
+    private static List<Group> projectGroupsByEvents(List<Event> events) throws EventException {
+        Map<UUID, Group> groupMap = new HashMap<>();
+
+        events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupid())));
+
+        return new ArrayList<>(groupMap.values());
     }
 
     /**
@@ -100,6 +92,41 @@ public class ProjectionService {
 
 
     /**
+     * Gibt die Gruppe zurück, die zu der übergebenen Id passt.
+     * Enthält alle verfügbaren Informationen, also auch User (langsam).
+     * Gibt eine leere Gruppe zurück, falls die Id leer ist.
+     *
+     * @param groupId Die Id der gesuchten Gruppe
+     *
+     * @return Die gesuchte Gruppe
+     *
+     * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
+     */
+    public Group projectGroupById(UUID groupId) throws GroupNotFoundException {
+        try {
+            List<Event> events = eventStoreService.findGroupEvents(groupId);
+            return projectGroupByEvents(events);
+        } catch (Exception e) {
+            log.error("Gruppe {} wurde nicht gefunden!", groupId.toString(), e);
+            throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
+        }
+    }
+
+    public Group projectParent(UUID parent) {
+        if (CommonHelper.uuidIsEmpty(parent)) {
+            return new Group();
+        }
+
+        return projectGroupById(parent);
+    }
+
+    public List<Group> projectGroupsByIds(List<UUID> groupids) {
+        List<Event> events = eventStoreService.findGroupEvents(groupids);
+
+        return projectGroupsByEvents(events);
+    }
+
+    /**
      * Projiziert Gruppen, welche sich seit einer übergebenen eventId geändert haben.
      * Die Gruppen werden dabei vollständig konstruiert.
      *
@@ -107,10 +134,10 @@ public class ProjectionService {
      *
      * @return Liste an Gruppen
      */
-    public List<Group> projectNewGroups(long status) {
-        List<Event> events = eventStoreService.findChangedGroupEvents(status);
+    public List<Group> projectChangedGroups(long status) {
+        List<UUID> changedids = eventStoreService.findChangedGroups(status);
 
-        return projectGroups(events);
+        return projectGroupsByIds(changedids);
     }
 
     /**
@@ -124,23 +151,13 @@ public class ProjectionService {
      */
     @Cacheable("groups")
     public List<Group> projectPublicGroups() throws EventException {
-        List<UUID> groupIds = eventStoreService.findExistingGroupIds();
+        List<UUID> groupIds = eventStoreService.findPublicGroupIds();
 
         if (groupIds.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                        eventTypesToString(CREATEGROUP,
-                                                                                           SETDESCRIPTION,
-                                                                                           SETTITLE,
-                                                                                           SETLIMIT));
-
-        List<Group> groups = projectGroups(events);
-
-        return groups.stream()
-                     .filter(group -> group.getType() != Type.PRIVATE)
-                     .collect(Collectors.toList());
+        return projectGroupsByIds(groupIds);
     }
 
     /**
@@ -151,21 +168,13 @@ public class ProjectionService {
      */
     @Cacheable("groups")
     public List<Group> projectLectures() {
-        List<UUID> groupIds = eventStoreService.findExistingGroupIds();
+        List<UUID> groupIds = eventStoreService.findLectureGroupIds();
 
         if (groupIds.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Event> events = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                        eventTypesToString(CREATEGROUP,
-                                                                                           SETTITLE));
-
-        List<Group> lectures = projectGroups(events);
-
-        return lectures.stream()
-                       .filter(group -> group.getType() == Type.LECTURE)
-                       .collect(Collectors.toList());
+        return projectGroupsByIds(groupIds);
     }
 
     /**
@@ -184,41 +193,7 @@ public class ProjectionService {
             return Collections.emptyList();
         }
 
-        List<Event> groupEvents = eventStoreService.findEventsByGroupAndType(groupIds,
-                                                                             eventTypesToString(CREATEGROUP,
-                                                                                                SETTITLE,
-                                                                                                SETDESCRIPTION));
-
-        return projectGroups(groupEvents);
-    }
-
-    /**
-     * Gibt die Gruppe zurück, die zu der übergebenen Id passt.
-     * Enthält alle verfügbaren Informationen, also auch User (langsam).
-     * Gibt eine leere Gruppe zurück, falls die Id leer ist.
-     *
-     * @param groupId Die Id der gesuchten Gruppe
-     *
-     * @return Die gesuchte Gruppe
-     *
-     * @throws GroupNotFoundException Wenn die Gruppe nicht gefunden wird
-     */
-    public Group projectSingleGroup(UUID groupId) throws GroupNotFoundException {
-        try {
-            List<Event> events = eventStoreService.findGroupEvents(groupId);
-            return projectSingleGroup(events);
-        } catch (Exception e) {
-            log.error("Gruppe {} wurde nicht gefunden!", groupId.toString(), e);
-            throw new GroupNotFoundException(groupId + ": " + ProjectionService.class);
-        }
-    }
-
-    public Group projectParent(UUID parent) {
-        if (CommonHelper.uuidIsEmpty(parent)) {
-            return new Group();
-        }
-
-        return projectSingleGroup(parent);
+        return projectGroupsByIds(groupIds);
     }
 
     /**
@@ -234,7 +209,7 @@ public class ProjectionService {
     }
 
     public Group projectGroupByLink(String link) {
-        return projectSingleGroup(eventStoreService.findGroupByLink(link));
+        return projectGroupById(eventStoreService.findGroupByLink(link));
     }
 }
 

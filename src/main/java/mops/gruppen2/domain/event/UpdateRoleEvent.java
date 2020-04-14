@@ -33,7 +33,7 @@ public class UpdateRoleEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.UPDATEROLE.toString();
     }
 

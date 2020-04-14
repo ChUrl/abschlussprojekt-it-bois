@@ -2,7 +2,6 @@ package mops.gruppen2.domain.model.group;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.GroupFullException;
@@ -11,6 +10,7 @@ import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import mops.gruppen2.domain.helper.CommonHelper;
 import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.model.group.wrapper.Body;
 import mops.gruppen2.domain.model.group.wrapper.Description;
@@ -36,12 +36,10 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 public class Group {
 
     // Metainformationen
     @EqualsAndHashCode.Include
-    @ToString.Include
     private UUID groupid;
 
     @Getter
@@ -53,7 +51,6 @@ public class Group {
 
     private Link link = Link.RANDOM();
 
-    @ToString.Include
     private GroupMeta meta = GroupMeta.EMPTY();
 
     private GroupOptions options = GroupOptions.DEFAULT();
@@ -62,9 +59,9 @@ public class Group {
     //private LocalDateTime age;
 
     // Inhalt
-    private Title title;
+    private Title title = Title.EMPTY();
 
-    private Description description;
+    private Description description = Description.EMPTY();
 
     private Body body;
 
@@ -123,6 +120,12 @@ public class Group {
         memberships.put(target, memberships.get(target).setRole(role));
     }
 
+    public boolean memberHasRole(String target, Role role) {
+        ValidationHelper.throwIfNoMember(this, target);
+
+        return memberships.get(target).getRole() == role;
+    }
+
     public boolean isMember(String target) {
         return memberships.containsKey(target);
     }
@@ -148,7 +151,7 @@ public class Group {
     }
 
     public UUID getParent() {
-        return parent.getGroupid();
+        return parent.getValue();
     }
 
     public long getLimit() {
@@ -189,6 +192,10 @@ public class Group {
 
     public boolean isEmpty() {
         return size() == 0;
+    }
+
+    public boolean exists() {
+        return groupid != null && !CommonHelper.uuidIsEmpty(groupid);
     }
 
     public boolean isPublic() {
@@ -272,22 +279,35 @@ public class Group {
 
 
     public void destroy(String userid) throws NoAccessException {
-        ValidationHelper.throwIfNoAdmin(this, userid);
+        if (!isEmpty()) {
+            ValidationHelper.throwIfNoAdmin(this, userid);
+        }
 
         groupid = null;
-        parent = null;
         type = null;
-        title = null;
-        description = null;
+        parent = null;
         limit = null;
-        memberships = null;
         link = null;
         meta = null;
         options = null;
+        title = null;
+        description = null;
         body = null;
+        memberships = null;
     }
 
     public String format() {
         return title + " " + description;
+    }
+
+    @Override
+    public String toString() {
+        return "group("
+               + (groupid == null ? "groupid: null" : groupid.toString())
+               + ", "
+               + (parent == null ? "parent: null" : parent.toString())
+               + ", "
+               + (meta == null ? "meta: null" : meta.toString())
+               + ")";
     }
 }

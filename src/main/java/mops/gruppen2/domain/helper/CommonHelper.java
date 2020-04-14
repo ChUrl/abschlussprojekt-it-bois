@@ -32,4 +32,10 @@ public final class CommonHelper {
     public static boolean uuidIsEmpty(UUID uuid) {
         return "00000000-0000-0000-0000-000000000000".equals(uuid.toString());
     }
+
+    public static List<UUID> stringsToUUID(List<String> groupids) {
+        return groupids.stream()
+                       .map(UUID::fromString)
+                       .collect(Collectors.toList());
+    }
 }

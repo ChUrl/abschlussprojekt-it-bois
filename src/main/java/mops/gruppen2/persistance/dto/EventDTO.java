@@ -16,8 +16,8 @@ public class EventDTO {
     String group_id;
     long group_version;
 
-    String exec_user_id;
-    String target_user_id;
+    String exec_id;
+    String target_id;
 
     String event_type;
     String event_payload;

@@ -32,9 +32,11 @@ public class SearchService {
      * @throws EventException Projektionsfehler
      */
     @Cacheable("groups")
-    public List<Group> searchPublicGroups(String search, String userid) {
+    public List<Group> searchPublicGroups(String search, String principal) {
         List<Group> groups = projectionService.projectPublicGroups();
-        projectionService.removeUserGroups(groups, userid);
+        System.out.println(groups);
+        projectionService.removeUserGroups(groups, principal);
+        System.out.println(groups);
         SortHelper.sortByGroupType(groups);
 
         if (search.isEmpty()) {

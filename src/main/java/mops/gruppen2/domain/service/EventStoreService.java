@@ -8,14 +8,18 @@ import mops.gruppen2.domain.event.AddMemberEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.event.EventType;
+import mops.gruppen2.domain.event.SetTypeEvent;
 import mops.gruppen2.domain.exception.BadPayloadException;
 import mops.gruppen2.domain.exception.InvalidInviteException;
+import mops.gruppen2.domain.helper.CommonHelper;
 import mops.gruppen2.domain.helper.JsonHelper;
+import mops.gruppen2.domain.model.group.Type;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 import static mops.gruppen2.domain.event.EventType.CREATEGROUP;
 import static mops.gruppen2.domain.event.EventType.DESTROYGROUP;
 import static mops.gruppen2.domain.event.EventType.SETLINK;
+import static mops.gruppen2.domain.event.EventType.SETTYPE;
 import static mops.gruppen2.domain.helper.CommonHelper.eventTypesToString;
 import static mops.gruppen2.domain.helper.CommonHelper.uuidsToString;
 
@@ -93,7 +98,7 @@ public class EventStoreService {
                                 event.getVersion(),
                                 event.getExec(),
                                 event.getTarget(),
-                                event.getType(),
+                                event.type(),
                                 payload);
         } catch (JsonProcessingException e) {
             log.error("Event ({}) konnte nicht serialisiert werden!", event, e);
@@ -155,13 +160,12 @@ public class EventStoreService {
      *
      * @return Liste von neuen und alten Events
      */
-    List<Event> findChangedGroupEvents(long status) {
+    List<UUID> findChangedGroups(long status) {
         List<String> changedGroupIds = eventStore.findGroupIdsWhereEventIdGreaterThanStatus(status);
-        List<EventDTO> groupEventDTOS = eventStore.findEventDTOsByGroup(changedGroupIds);
 
         log.debug("Seit Event {} haben sich {} Gruppen geändert!", status, changedGroupIds.size());
 
-        return getEventsFromDTOs(groupEventDTOS);
+        return CommonHelper.stringsToUUID(changedGroupIds);
     }
 
     /**
@@ -177,6 +181,30 @@ public class EventStoreService {
                            .filter(event -> event instanceof CreateGroupEvent)
                            .map(Event::getGroupid)
                            .collect(Collectors.toList());
+    }
+
+    public List<UUID> findPublicGroupIds() {
+        List<UUID> groups = findExistingGroupIds();
+        List<Event> typeEvents = findLatestEventsFromGroupsByType(SETTYPE);
+
+        typeEvents.removeIf(event -> ((SetTypeEvent) event).getType() == Type.PRIVATE);
+        typeEvents.removeIf(event -> !groups.contains(event.getGroupid()));
+
+        return typeEvents.stream()
+                         .map(Event::getGroupid)
+                         .collect(Collectors.toList());
+    }
+
+    public List<UUID> findLectureGroupIds() {
+        List<UUID> groups = findExistingGroupIds();
+        List<Event> typeEvents = findLatestEventsFromGroupsByType(SETTYPE);
+
+        typeEvents.removeIf(event -> ((SetTypeEvent) event).getType() != Type.LECTURE);
+        typeEvents.removeIf(event -> !groups.contains(event.getGroupid()));
+
+        return typeEvents.stream()
+                         .map(Event::getGroupid)
+                         .collect(Collectors.toList());
     }
 
     /**
@@ -239,16 +267,16 @@ public class EventStoreService {
     }
 
     List<Event> findEventsByType(String... types) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByType(types));
+        return getEventsFromDTOs(eventStore.findEventDTOsByType(Arrays.asList(types)));
     }
 
     List<Event> findEventsByType(String type) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByType(type));
+        return getEventsFromDTOs(eventStore.findEventDTOsByType(Collections.singletonList(type)));
     }
 
     List<Event> findEventsByGroupAndType(List<UUID> groupIds, String... types) {
         return getEventsFromDTOs(eventStore.findEventDTOsByGroupAndType(uuidsToString(groupIds),
-                                                                        types));
+                                                                        Arrays.asList(types)));
     }
 
     /**
@@ -259,7 +287,7 @@ public class EventStoreService {
      * @return Eine Liste von einem Add- oder DeleteUserEvent pro Gruppe
      */
     private List<Event> findLatestEventsFromGroupsByUser(String userid) {
-        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByUser(userid));
+        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupTarget(userid));
     }
 
 
@@ -271,6 +299,6 @@ public class EventStoreService {
      * @return Eine Liste von einem Event pro Gruppe
      */
     private List<Event> findLatestEventsFromGroupsByType(EventType... types) {
-        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByType(eventTypesToString(types)));
+        return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByType(Arrays.asList(eventTypesToString(types))));
     }
 }

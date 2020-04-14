@@ -34,7 +34,7 @@ public class SetTitleEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.SETTITLE.toString();
     }
 

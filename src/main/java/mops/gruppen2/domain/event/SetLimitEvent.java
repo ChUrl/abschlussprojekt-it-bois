@@ -32,7 +32,7 @@ public class SetLimitEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.SETLIMIT.toString();
     }
 }

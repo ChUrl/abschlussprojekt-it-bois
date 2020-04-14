@@ -46,7 +46,7 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         // Parent Badge
         Group parent = projectionService.projectParent(group.getParent());
@@ -69,7 +69,7 @@ public class GroupDetailsController {
                                   @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         if (ValidationHelper.checkIfMember(group, principal)) {
             return "redirect:/gruppen2/details/" + groupId;
@@ -87,9 +87,9 @@ public class GroupDetailsController {
                                    @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
-        groupService.deleteUser(group, principal, principal);
+        groupService.kickMember(group, principal, principal);
 
         return "redirect:/gruppen2";
     }
@@ -102,7 +102,7 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         // Invite Link
         String actualURL = request.getRequestURL().toString();
@@ -126,7 +126,7 @@ public class GroupDetailsController {
                                       @Valid Description description) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         groupService.setTitle(group, principal, title);
         groupService.setDescription(group, principal, description);
@@ -141,7 +141,7 @@ public class GroupDetailsController {
                                            @PathVariable("id") String groupId,
                                            @Valid Limit limit) {
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         groupService.setLimit(group, principal, limit);
 
@@ -156,7 +156,7 @@ public class GroupDetailsController {
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
 
@@ -171,7 +171,7 @@ public class GroupDetailsController {
                                       @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
@@ -193,13 +193,13 @@ public class GroupDetailsController {
                                         @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupId));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
         // Der eingeloggte User kann sich nicht selbst entfernen (er kann aber verlassen)
         if (!principal.equals(target)) {
-            groupService.deleteUser(group, principal, target);
+            groupService.kickMember(group, principal, target);
         }
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
@@ -212,7 +212,7 @@ public class GroupDetailsController {
                                          @PathVariable("id") String groupid) {
 
         String principal = token.getName();
-        Group group = projectionService.projectSingleGroup(UUID.fromString(groupid));
+        Group group = projectionService.projectGroupById(UUID.fromString(groupid));
 
         groupService.deleteGroup(group, principal);
 

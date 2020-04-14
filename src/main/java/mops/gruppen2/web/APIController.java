@@ -47,7 +47,7 @@ public class APIController {
                                             @PathVariable("id") long eventId) {
 
         return APIHelper.wrap(eventStoreService.findMaxEventId(),
-                              projectionService.projectNewGroups(eventId));
+                              projectionService.projectChangedGroups(eventId));
     }
 
     /**
@@ -71,7 +71,7 @@ public class APIController {
     public Group getApiGroup(@ApiParam("Gruppen-Id der gefordeten Gruppe")
                              @PathVariable("id") String groupId) {
 
-        return projectionService.projectSingleGroup(UUID.fromString(groupId));
+        return projectionService.projectGroupById(UUID.fromString(groupId));
     }
 
 }

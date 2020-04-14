@@ -33,7 +33,7 @@ public class CreateGroupEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.CREATEGROUP.toString();
     }
 

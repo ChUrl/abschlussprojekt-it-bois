@@ -2,6 +2,7 @@ package mops.gruppen2.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.event.AddMemberEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DestroyGroupEvent;
@@ -36,6 +37,7 @@ import java.util.UUID;
  * Es werden übergebene Gruppen bearbeitet und dementsprechend Events erzeugt und gespeichert.
  */
 @Log4j2
+@TraceMethodCalls
 @RequiredArgsConstructor
 @Service
 public class GroupService {
@@ -166,11 +168,11 @@ public class GroupService {
      * Erzeugt, speichert ein DeleteUserEvent und wendet es auf eine Gruppe an.
      * Prüft, ob der Nutzer Mitglied ist und ob er der letzte Admin ist.
      */
-    public void deleteUser(Group group, String exec, String target) {
+    public void kickMember(Group group, String exec, String target) {
         applyAndSave(group, new KickMemberEvent(group, exec, target));
 
         if (ValidationHelper.checkIfGroupEmpty(group)) {
-            deleteGroup(group, target);
+            deleteGroup(group, exec);
         }
     }
 
@@ -179,6 +181,10 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist.
      */
     public void deleteGroup(Group group, String exec) {
+        if (!group.exists()) {
+            return;
+        }
+
         applyAndSave(group, new DestroyGroupEvent(group, exec));
     }
 
@@ -188,6 +194,10 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void setTitle(Group group, String exec, Title title) {
+        if (group.getTitle().equals(title.getValue())) {
+            return;
+        }
+
         applyAndSave(group, new SetTitleEvent(group, exec, title));
     }
 
@@ -197,6 +207,10 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void setDescription(Group group, String exec, Description description) {
+        if (group.getDescription().equals(description.getValue())) {
+            return;
+        }
+
         applyAndSave(group, new SetDescriptionEvent(group, exec, description));
     }
 
@@ -206,6 +220,10 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     private void updateRole(Group group, String exec, String target, Role role) {
+        if (group.memberHasRole(target, role)) {
+            return;
+        }
+
         applyAndSave(group, new UpdateRoleEvent(group, exec, target, role));
     }
 
@@ -215,18 +233,34 @@ public class GroupService {
      * Bei keiner Änderung wird nichts erzeugt.
      */
     public void setLimit(Group group, String exec, Limit userLimit) {
+        if (userLimit.getValue() == group.getLimit()) {
+            return;
+        }
+
         applyAndSave(group, new SetLimitEvent(group, exec, userLimit));
     }
 
     public void setParent(Group group, String exec, Parent parent) {
+        if (parent.getValue() == group.getParent()) {
+            return;
+        }
+
         applyAndSave(group, new SetParentEvent(group, exec, parent));
     }
 
     public void setLink(Group group, String exec, Link link) {
+        if (group.getLink().equals(link.getValue())) {
+            return;
+        }
+
         applyAndSave(group, new SetInviteLinkEvent(group, exec, link));
     }
 
     private void setType(Group group, String exec, Type type) {
+        if (group.getType() == type) {
+            return;
+        }
+
         applyAndSave(group, new SetTypeEvent(group, exec, type));
     }
 

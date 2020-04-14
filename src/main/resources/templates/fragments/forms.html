@@ -1,6 +1,11 @@
 <!DOCTYPE HTML>
-<!--suppress ALL -->
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--/*@thymesVar id="parent" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="group" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="member" type="mops.gruppen2.domain.model.group.User"*/-->
+<!--/*@thymesVar id="account" type="mops.gruppen2.domain.Account"*/-->
+<!--/*@thymesVar id="lectures" type="java.util.List<mops.gruppen2.domain.model.group.Group>"*/-->
 
 <!--Meta-->
 <th:block th:fragment="meta">
@@ -13,6 +18,7 @@
         <input type="text" class="form-control" name="title" minlength="4" maxlength="128"
                th:value="${group?.getTitle()}" required>
     </div>
+
 
     <!--Gruppenbeschreibung-->
     <div class="input-group"

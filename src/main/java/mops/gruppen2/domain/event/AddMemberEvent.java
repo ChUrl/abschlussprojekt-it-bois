@@ -38,7 +38,7 @@ public class AddMemberEvent extends Event {
     }
 
     @Override
-    public String getType() {
+    public String type() {
         return EventType.ADDMEMBER.toString();
     }
 }

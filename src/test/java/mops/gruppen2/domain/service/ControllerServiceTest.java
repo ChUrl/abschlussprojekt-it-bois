@@ -21,6 +21,7 @@ class ControllerServiceTest {
     Account account;
     Account account2;
     Account account3;
+    GroupEmpty
     @Autowired
     EventStoreService eventStoreService;
     @Autowired

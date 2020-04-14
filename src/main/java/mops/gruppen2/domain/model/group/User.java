@@ -26,7 +26,7 @@ public class User {
     @JsonProperty("familyname")
     String familyname;
 
-    @JsonProperty("mail")
+    @JsonProperty("email")
     String email;
 
     public User(KeycloakAuthenticationToken token) {
