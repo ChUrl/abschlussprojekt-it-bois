@@ -13,31 +13,31 @@ services:
       - './mysql/db/storage:/var/lib/mysql'
       - './mysql/db/entrypoint:/docker-entrypoint-initdb.d/'
 
-  keymysql:
-    image: mysql:8.0
-    container_name: 'keymysql'
-    environment:
-      MYSQL_DATABASE: 'keycloak'
-      MYSQL_USER: 'keycloak'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'root'
-    volumes:
-      - './mysql/keycloak/storage:/var/lib/mysql'
-  keycloak:
-    image: jboss/keycloak
-    container_name: 'keycloak'
-    depends_on:
-      - keymysql
-    environment:
-      DB_VENDOR: 'MYSQL'
-      DB_ADDR: 'keymysql'
-      DB_DATABASE: 'keycloak'
-      DB_USER: 'keycloak'
-      DB_PASSWORD: 'password'
-      KEYCLOAK_USER: 'admin'
-      KEYCLOAK_PASSWORD: 'admin'
-    ports:
-      - '8082:8080'
+    keymysql:
+      image: mysql:8.0
+      container_name: 'keymysql'
+      environment:
+        MYSQL_DATABASE: 'keycloak'
+        MYSQL_USER: 'keycloak'
+        MYSQL_PASSWORD: 'password'
+        MYSQL_ROOT_PASSWORD: 'root'
+      volumes:
+        - './mysql/keycloak/storage:/var/lib/mysql'
+    keycloak:
+      image: jboss/keycloak
+      container_name: 'keycloak'
+      depends_on:
+        - keymysql
+      environment:
+        DB_VENDOR: 'MYSQL'
+        DB_ADDR: 'keymysql'
+        DB_DATABASE: 'keycloak'
+        DB_USER: 'keycloak'
+        DB_PASSWORD: 'password'
+        KEYCLOAK_USER: 'admin'
+        KEYCLOAK_PASSWORD: 'admin'
+      ports:
+        - '8082:8080'
 
   gruppenapp:
     build: .
