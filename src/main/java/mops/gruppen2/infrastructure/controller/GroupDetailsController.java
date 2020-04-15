@@ -13,7 +13,6 @@ import mops.gruppen2.domain.service.helper.CsvHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +66,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/join")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsJoin(KeycloakAuthenticationToken token,
                                   @PathVariable("id") String groupId) {
 
@@ -85,7 +83,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/leave")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsLeave(KeycloakAuthenticationToken token,
                                    @PathVariable("id") String groupId) {
 
@@ -122,7 +119,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/meta")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditMeta(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
                                       @Valid Title title,
@@ -141,7 +137,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/userlimit")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditUserLimit(KeycloakAuthenticationToken token,
                                            @PathVariable("id") String groupId,
                                            @Valid Limit limit) {
@@ -155,7 +150,6 @@ public class GroupDetailsController {
 
     @RolesAllowed("ROLE_orga")
     @PostMapping("/details/{id}/edit/csv")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditCsv(KeycloakAuthenticationToken token,
                                      @PathVariable("id") String groupId,
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
@@ -170,7 +164,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/role/{userid}")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditRole(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
                                       @PathVariable("userid") String target) {
@@ -192,7 +185,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/delete/{userid}")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDelete(KeycloakAuthenticationToken token,
                                         @PathVariable("id") String groupId,
                                         @PathVariable("userid") String target) {
@@ -212,7 +204,6 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/destroy")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDestroy(KeycloakAuthenticationToken token,
                                          @PathVariable("id") String groupid) {
 

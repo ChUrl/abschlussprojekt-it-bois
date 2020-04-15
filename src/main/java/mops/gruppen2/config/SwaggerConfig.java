@@ -1,6 +1,5 @@
 package mops.gruppen2.config;
 
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,7 +15,6 @@ import java.util.Collections;
 
 @Profile("dev")
 @Configuration
-@EnableCaching
 @EnableSwagger2
 public class SwaggerConfig {
 

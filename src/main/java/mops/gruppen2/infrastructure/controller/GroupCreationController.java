@@ -16,7 +16,6 @@ import mops.gruppen2.domain.service.helper.ProjectionHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +51,6 @@ public class GroupCreationController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/create")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postCreateOrga(KeycloakAuthenticationToken token,
                                  @RequestParam("type") Type type,
                                  @RequestParam("parent") @Valid Parent parent,

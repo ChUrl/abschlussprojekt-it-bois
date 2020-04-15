@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.infrastructure.GroupCache;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,7 +29,6 @@ public class SearchService {
      * @throws EventException Projektionsfehler
      */
     //TODO: search in lectures
-    @Cacheable("groups")
     public List<Group> searchPublicGroups(String search, String principal) {
         List<Group> groups = groupCache.publics();
 
