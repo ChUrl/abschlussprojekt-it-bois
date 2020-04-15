@@ -8,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.helper.CommonHelper;
-import mops.gruppen2.domain.service.helper.ProjectionHelper;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +29,6 @@ public class APIController {
     //TODO: redo api
 
     private final EventStoreService eventStoreService;
-    private final ProjectionHelper projectionHelper;
 
     /**
      * Erzeugt eine Liste aus Gruppen, welche sich seit einer übergebenen Event-Id geändert haben.

@@ -25,11 +25,11 @@ class ServiceTest {
     @ArchTest
     public static final ArchRule serviceClassesShouldBeInServicePackage = classes()
             .that().areAnnotatedWith(Service.class)
-            .should().resideInAPackage("..service..");
+            .should().resideInAPackage("..service");
 
     @ArchTest
     public static final ArchRule classesInServicePackageShouldHaveServiceInName = classes()
-            .that().resideInAPackage("..service..")
+            .that().resideInAPackage("..service")
             .should().haveSimpleNameEndingWith("Service");
 
     @ArchIgnore

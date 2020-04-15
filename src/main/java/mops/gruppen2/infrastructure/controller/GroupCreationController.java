@@ -12,7 +12,6 @@ import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.helper.CsvHelper;
-import mops.gruppen2.domain.service.helper.ProjectionHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -36,9 +35,7 @@ import javax.validation.Valid;
 public class GroupCreationController {
 
     private final GroupCache groupCache;
-
     private final GroupService groupService;
-    private final ProjectionHelper projectionHelper;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/create")

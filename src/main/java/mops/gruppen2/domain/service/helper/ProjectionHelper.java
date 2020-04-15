@@ -6,7 +6,6 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.infrastructure.GroupCache;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import java.util.UUID;
  */
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Service
 public final class ProjectionHelper {
 
     public static void project(Map<UUID, Group> groups, List<Event> events, GroupCache cache) {
