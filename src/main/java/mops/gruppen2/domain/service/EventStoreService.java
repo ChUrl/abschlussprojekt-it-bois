@@ -3,7 +3,6 @@ package mops.gruppen2.domain.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.event.AddMemberEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.Event;
@@ -11,9 +10,9 @@ import mops.gruppen2.domain.event.EventType;
 import mops.gruppen2.domain.event.SetTypeEvent;
 import mops.gruppen2.domain.exception.BadPayloadException;
 import mops.gruppen2.domain.exception.InvalidInviteException;
-import mops.gruppen2.domain.helper.CommonHelper;
-import mops.gruppen2.domain.helper.JsonHelper;
 import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.domain.service.helper.CommonHelper;
+import mops.gruppen2.domain.service.helper.JsonHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
@@ -29,13 +28,12 @@ import static mops.gruppen2.domain.event.EventType.CREATEGROUP;
 import static mops.gruppen2.domain.event.EventType.DESTROYGROUP;
 import static mops.gruppen2.domain.event.EventType.SETLINK;
 import static mops.gruppen2.domain.event.EventType.SETTYPE;
-import static mops.gruppen2.domain.helper.CommonHelper.eventTypesToString;
-import static mops.gruppen2.domain.helper.CommonHelper.uuidsToString;
+import static mops.gruppen2.domain.service.helper.CommonHelper.eventTypesToString;
+import static mops.gruppen2.domain.service.helper.CommonHelper.uuidsToString;
 
 @Log4j2
 @RequiredArgsConstructor
 @Service
-@TraceMethodCalls
 public class EventStoreService {
 
     private final EventRepository eventStore;
@@ -300,5 +298,9 @@ public class EventStoreService {
      */
     private List<Event> findLatestEventsFromGroupsByType(EventType... types) {
         return getEventsFromDTOs(eventStore.findLatestEventDTOsPartitionedByGroupByType(Arrays.asList(eventTypesToString(types))));
+    }
+
+    public List<Event> findAllEvents() {
+        return getEventsFromDTOs(eventStore.findAllEvents());
     }
 }

@@ -1,4 +1,4 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure;
 
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.model.group.Role;

@@ -1,4 +1,4 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

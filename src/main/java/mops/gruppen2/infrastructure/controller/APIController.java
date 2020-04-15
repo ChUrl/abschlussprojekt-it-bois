@@ -1,4 +1,4 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure.controller;
 
 
 import io.swagger.annotations.ApiOperation;
@@ -6,12 +6,12 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.helper.APIHelper;
-import mops.gruppen2.domain.helper.CommonHelper;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.ProjectionService;
-import mops.gruppen2.web.api.GroupRequestWrapper;
+import mops.gruppen2.domain.service.helper.APIHelper;
+import mops.gruppen2.domain.service.helper.CommonHelper;
+import mops.gruppen2.infrastructure.api.GroupRequestWrapper;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

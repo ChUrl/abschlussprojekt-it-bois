@@ -13,6 +13,7 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
 
     // ####################################### GROUP IDs #########################################
 
+
     /*@Query("SELECT DISTINCT group_id FROM event"
            + " WHERE user_id = :userId AND event_type = :type")
     List<String> findGroupIdsByUserAndType(@Param("userId") String userId,
@@ -22,7 +23,12 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
            + " WHERE event_id > :status")
     List<String> findGroupIdsWhereEventIdGreaterThanStatus(@Param("status") long status);
 
+
     // ####################################### EVENT DTOs ########################################
+
+
+    @Query("SELECT * FROM event")
+    List<EventDTO> findAllEvents();
 
     @Query("SELECT * FROM event"
            + " WHERE group_id IN (:groupIds) ")
@@ -47,6 +53,7 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
                                               @Param("types") String... types);*/
 
     // ################################ LATEST EVENT DTOs ########################################
+
 
     @Query("WITH ranked_events AS ("
            + "SELECT *, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY event_id DESC) AS rn"

@@ -5,8 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
-import mops.gruppen2.domain.helper.CommonHelper;
 import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.service.helper.CommonHelper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -62,12 +62,12 @@ public class ProjectionService {
      *
      * @throws EventException Projektionsfehler
      */
-    public static List<Group> projectGroupsByEvents(List<Event> events) throws EventException {
+    public static Map<UUID, Group> projectGroupsByEvents(List<Event> events) throws EventException {
         Map<UUID, Group> groupMap = new HashMap<>();
 
         events.forEach(event -> event.apply(getOrCreateGroup(groupMap, event.getGroupid())));
 
-        return new ArrayList<>(groupMap.values());
+        return groupMap;
     }
 
     /**
@@ -90,6 +90,10 @@ public class ProjectionService {
 
     // ############################### PROJEKTIONEN MIT DATENBANK ################################
 
+
+    public Map<UUID, Group> projectAllGroups() {
+        return projectGroupsByEvents(eventStoreService.findAllEvents());
+    }
 
     /**
      * Gibt die Gruppe zurück, die zu der übergebenen Id passt.
@@ -120,7 +124,7 @@ public class ProjectionService {
         return projectGroupById(parent);
     }
 
-    public List<Group> projectGroupsByIds(List<UUID> groupids) {
+    public Map<UUID, Group> projectGroupsByIds(List<UUID> groupids) {
         List<Event> events = eventStoreService.findGroupEvents(groupids);
 
         return projectGroupsByEvents(events);
@@ -137,7 +141,7 @@ public class ProjectionService {
     public List<Group> projectChangedGroups(long status) {
         List<UUID> changedids = eventStoreService.findChangedGroups(status);
 
-        return projectGroupsByIds(changedids);
+        return new ArrayList<>(projectGroupsByIds(changedids).values());
     }
 
     /**
@@ -157,7 +161,7 @@ public class ProjectionService {
             return Collections.emptyList();
         }
 
-        return projectGroupsByIds(groupIds);
+        return new ArrayList<>(projectGroupsByIds(groupIds).values());
     }
 
     /**
@@ -174,7 +178,7 @@ public class ProjectionService {
             return Collections.emptyList();
         }
 
-        return projectGroupsByIds(groupIds);
+        return new ArrayList<>(projectGroupsByIds(groupIds).values());
     }
 
     /**
@@ -193,7 +197,7 @@ public class ProjectionService {
             return Collections.emptyList();
         }
 
-        return projectGroupsByIds(groupIds);
+        return new ArrayList<>(projectGroupsByIds(groupIds).values());
     }
 
     /**

@@ -10,14 +10,14 @@ import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
-import mops.gruppen2.domain.helper.CommonHelper;
-import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.model.group.wrapper.Body;
 import mops.gruppen2.domain.model.group.wrapper.Description;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
+import mops.gruppen2.domain.service.helper.CommonHelper;
+import mops.gruppen2.domain.service.helper.ValidationHelper;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

@@ -1,10 +1,8 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.helper.CsvHelper;
-import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.domain.model.group.wrapper.Description;
@@ -12,6 +10,8 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.ProjectionService;
+import mops.gruppen2.domain.service.helper.CsvHelper;
+import mops.gruppen2.domain.service.helper.ValidationHelper;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;

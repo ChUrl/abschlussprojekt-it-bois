@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.ToString;
 import lombok.Value;
-import mops.gruppen2.domain.helper.CommonHelper;
+import mops.gruppen2.domain.service.helper.CommonHelper;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

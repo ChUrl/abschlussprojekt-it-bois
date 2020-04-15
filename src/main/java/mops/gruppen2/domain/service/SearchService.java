@@ -1,5 +1,6 @@
 package mops.gruppen2.domain.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.model.group.Group;
@@ -11,14 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Log4j2
 public class SearchService {
 
     private final ProjectionService projectionService;
-
-    public SearchService(ProjectionService projectionService) {
-        this.projectionService = projectionService;
-    }
 
     /**
      * Filtert alle öffentliche Gruppen nach dem Suchbegriff und gibt diese als sortierte Liste zurück.

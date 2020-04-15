@@ -1,4 +1,4 @@
-package mops.gruppen2.domain.helper;
+package mops.gruppen2.domain.service.helper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
