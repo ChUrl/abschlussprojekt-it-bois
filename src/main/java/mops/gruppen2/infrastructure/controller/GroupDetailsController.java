@@ -1,19 +1,18 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
-import mops.gruppen2.domain.helper.CsvHelper;
-import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.domain.model.group.wrapper.Description;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.ProjectionService;
+import mops.gruppen2.domain.service.helper.CsvHelper;
+import mops.gruppen2.domain.service.helper.ValidationHelper;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +35,8 @@ import java.util.UUID;
 @RequestMapping("/gruppen2")
 public class GroupDetailsController {
 
+    private final GroupCache groupCache;
     private final GroupService groupService;
-    private final ProjectionService projectionService;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}")
@@ -46,10 +45,13 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         // Parent Badge
-        Group parent = projectionService.projectParent(group.getParent());
+        Group parent = Group.EMPTY();
+        if (group.hasParent()) {
+            parent = groupCache.group(group.getParent());
+        }
 
         model.addAttribute("group", group);
         model.addAttribute("parent", parent);
@@ -64,12 +66,11 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/join")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsJoin(KeycloakAuthenticationToken token,
                                   @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         if (ValidationHelper.checkIfMember(group, principal)) {
             return "redirect:/gruppen2/details/" + groupId;
@@ -82,12 +83,11 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/leave")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsLeave(KeycloakAuthenticationToken token,
                                    @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.kickMember(group, principal, principal);
 
@@ -102,7 +102,7 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         // Invite Link
         String actualURL = request.getRequestURL().toString();
@@ -119,14 +119,15 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/meta")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditMeta(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
                                       @Valid Title title,
                                       @Valid Description description) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
+
+        System.out.println(group);
 
         groupService.setTitle(group, principal, title);
         groupService.setDescription(group, principal, description);
@@ -136,12 +137,11 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/userlimit")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditUserLimit(KeycloakAuthenticationToken token,
                                            @PathVariable("id") String groupId,
                                            @Valid Limit limit) {
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.setLimit(group, principal, limit);
 
@@ -150,13 +150,12 @@ public class GroupDetailsController {
 
     @RolesAllowed("ROLE_orga")
     @PostMapping("/details/{id}/edit/csv")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditCsv(KeycloakAuthenticationToken token,
                                      @PathVariable("id") String groupId,
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
 
@@ -165,13 +164,12 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/role/{userid}")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditRole(KeycloakAuthenticationToken token,
                                       @PathVariable("id") String groupId,
                                       @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
@@ -187,13 +185,12 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/delete/{userid}")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDelete(KeycloakAuthenticationToken token,
                                         @PathVariable("id") String groupId,
                                         @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
@@ -207,12 +204,11 @@ public class GroupDetailsController {
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @PostMapping("/details/{id}/edit/destroy")
-    @CacheEvict(value = "groups", allEntries = true)
     public String postDetailsEditDestroy(KeycloakAuthenticationToken token,
                                          @PathVariable("id") String groupid) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupid));
+        Group group = groupCache.group(UUID.fromString(groupid));
 
         groupService.deleteGroup(group, principal);
 

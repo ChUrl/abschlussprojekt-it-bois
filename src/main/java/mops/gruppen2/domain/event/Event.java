@@ -11,6 +11,7 @@ import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.exception.IdMismatchException;
 import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.util.UUID;
 
@@ -30,7 +31,6 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor // Lombok needs a default constructor in the base class
 public abstract class Event {
-
 
     @JsonProperty("groupid")
     protected UUID groupid;
@@ -60,7 +60,7 @@ public abstract class Event {
         this.version = version;
     }
 
-    public Group apply(Group group) throws EventException {
+    public void apply(Group group, GroupCache cache) throws EventException {
         log.trace("Event wird angewendet:\t{}", this);
 
         if (version == 0) {
@@ -68,20 +68,29 @@ public abstract class Event {
         }
 
         checkGroupIdMatch(group.getId());
-        group.update(version);
+        group.updateVersion(version);
         applyEvent(group);
-
-        return group;
+        updateCache(cache, group);
     }
 
-    private void checkGroupIdMatch(UUID groupId) throws IdMismatchException {
+    private void checkGroupIdMatch(UUID groupid) throws IdMismatchException {
         // CreateGroupEvents müssen die Id erst initialisieren
         if (this instanceof CreateGroupEvent) {
             return;
         }
 
-        if (!groupid.equals(groupId)) {
+        if (!this.groupid.equals(groupid)) {
             throw new IdMismatchException("Das Event gehört zu einer anderen Gruppe");
+        }
+    }
+
+    private void updateCache(GroupCache cache, Group group) {
+        if (this instanceof CreateGroupEvent) {
+            cache.put(group);
+        }
+
+        if (this instanceof DestroyGroupEvent) {
+            cache.remove(group);
         }
     }
 

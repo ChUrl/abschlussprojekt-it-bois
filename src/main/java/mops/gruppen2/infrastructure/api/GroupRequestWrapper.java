@@ -1,4 +1,4 @@
-package mops.gruppen2.web.api;
+package mops.gruppen2.infrastructure.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

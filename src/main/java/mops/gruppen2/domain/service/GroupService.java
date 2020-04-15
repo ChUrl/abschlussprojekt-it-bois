@@ -2,7 +2,6 @@ package mops.gruppen2.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.event.AddMemberEvent;
 import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.DestroyGroupEvent;
@@ -16,7 +15,6 @@ import mops.gruppen2.domain.event.SetTitleEvent;
 import mops.gruppen2.domain.event.SetTypeEvent;
 import mops.gruppen2.domain.event.UpdateRoleEvent;
 import mops.gruppen2.domain.exception.EventException;
-import mops.gruppen2.domain.helper.ValidationHelper;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Role;
 import mops.gruppen2.domain.model.group.Type;
@@ -26,6 +24,8 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
+import mops.gruppen2.domain.service.helper.ValidationHelper;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,11 +37,11 @@ import java.util.UUID;
  * Es werden übergebene Gruppen bearbeitet und dementsprechend Events erzeugt und gespeichert.
  */
 @Log4j2
-@TraceMethodCalls
 @RequiredArgsConstructor
 @Service
 public class GroupService {
 
+    private final GroupCache groupCache;
     private final EventStoreService eventStoreService;
 
     // ################################# GRUPPE ERSTELLEN ########################################
@@ -266,7 +266,7 @@ public class GroupService {
 
     private void applyAndSave(Group group, Event event) throws EventException {
         event.init(group.version() + 1);
-        event.apply(group);
+        event.apply(group, groupCache);
 
         eventStoreService.saveEvent(event);
     }

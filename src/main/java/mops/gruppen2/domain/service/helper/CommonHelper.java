@@ -1,4 +1,4 @@
-package mops.gruppen2.domain.helper;
+package mops.gruppen2.domain.service.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

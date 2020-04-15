@@ -1,10 +1,10 @@
-package mops.gruppen2.domain.helper;
+package mops.gruppen2.domain.service.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.model.group.Group;
-import mops.gruppen2.web.api.GroupRequestWrapper;
+import mops.gruppen2.infrastructure.api.GroupRequestWrapper;
 
 import java.util.List;
 

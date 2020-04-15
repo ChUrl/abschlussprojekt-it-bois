@@ -1,5 +1,6 @@
-package mops.gruppen2.web;
+package mops.gruppen2.infrastructure;
 
+import lombok.RequiredArgsConstructor;
 import mops.gruppen2.domain.Account;
 import mops.gruppen2.domain.model.group.Role;
 import mops.gruppen2.domain.model.group.Type;
@@ -9,8 +10,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+@RequiredArgsConstructor
 @ControllerAdvice
 public class ModelAttributeControllerAdvice {
+
+    private final GroupCache groupCache;
 
     // Add modelAttributes before each @RequestMapping
     @ModelAttribute

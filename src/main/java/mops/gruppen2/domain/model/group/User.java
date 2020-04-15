@@ -56,4 +56,8 @@ public class User {
     public String format() {
         return givenname + " " + familyname;
     }
+
+    public boolean isMember(Group group) {
+        return group.getMembers().contains(this);
+    }
 }
