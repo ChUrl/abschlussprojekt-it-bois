@@ -73,6 +73,7 @@ public class Group {
 
     // ####################################### Members ###########################################
 
+
     public List<User> getMembers() {
         return SortHelper.sortByMemberRole(new ArrayList<>(memberships.values())).stream()
                          .map(Membership::getUser)
@@ -210,6 +211,10 @@ public class Group {
         return type == Type.LECTURE;
     }
 
+    public boolean hasParent() {
+        return !parent.isEmpty();
+    }
+
 
     // ######################################## Setters ##########################################
 
@@ -262,7 +267,7 @@ public class Group {
         this.link = link;
     }
 
-    public void update(long version) throws IdMismatchException {
+    public void updateVersion(long version) throws IdMismatchException {
         meta = meta.setVersion(version);
     }
 
@@ -309,5 +314,9 @@ public class Group {
                + ", "
                + (meta == null ? "meta: null" : meta.toString())
                + ")";
+    }
+
+    public static Group EMPTY() {
+        return new Group();
     }
 }

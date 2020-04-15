@@ -25,6 +25,7 @@ import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ import java.util.UUID;
 @Service
 public class GroupService {
 
+    private final GroupCache groupCache;
     private final EventStoreService eventStoreService;
 
     // ################################# GRUPPE ERSTELLEN ########################################
@@ -264,7 +266,7 @@ public class GroupService {
 
     private void applyAndSave(Group group, Event event) throws EventException {
         event.init(group.version() + 1);
-        event.apply(group);
+        event.apply(group, groupCache);
 
         eventStoreService.saveEvent(event);
     }

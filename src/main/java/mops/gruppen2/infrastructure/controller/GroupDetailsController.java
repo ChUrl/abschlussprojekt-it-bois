@@ -9,9 +9,9 @@ import mops.gruppen2.domain.model.group.wrapper.Description;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.helper.CsvHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -36,8 +36,8 @@ import java.util.UUID;
 @RequestMapping("/gruppen2")
 public class GroupDetailsController {
 
+    private final GroupCache groupCache;
     private final GroupService groupService;
-    private final ProjectionService projectionService;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}")
@@ -46,10 +46,13 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         // Parent Badge
-        Group parent = projectionService.projectParent(group.getParent());
+        Group parent = Group.EMPTY();
+        if (group.hasParent()) {
+            parent = groupCache.group(group.getParent());
+        }
 
         model.addAttribute("group", group);
         model.addAttribute("parent", parent);
@@ -69,7 +72,7 @@ public class GroupDetailsController {
                                   @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         if (ValidationHelper.checkIfMember(group, principal)) {
             return "redirect:/gruppen2/details/" + groupId;
@@ -87,7 +90,7 @@ public class GroupDetailsController {
                                    @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.kickMember(group, principal, principal);
 
@@ -102,7 +105,7 @@ public class GroupDetailsController {
                                  @PathVariable("id") String groupId) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         // Invite Link
         String actualURL = request.getRequestURL().toString();
@@ -126,7 +129,9 @@ public class GroupDetailsController {
                                       @Valid Description description) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
+
+        System.out.println(group);
 
         groupService.setTitle(group, principal, title);
         groupService.setDescription(group, principal, description);
@@ -141,7 +146,7 @@ public class GroupDetailsController {
                                            @PathVariable("id") String groupId,
                                            @Valid Limit limit) {
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.setLimit(group, principal, limit);
 
@@ -156,7 +161,7 @@ public class GroupDetailsController {
                                      @RequestParam(value = "file", required = false) MultipartFile file) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
 
@@ -171,7 +176,7 @@ public class GroupDetailsController {
                                       @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
@@ -193,7 +198,7 @@ public class GroupDetailsController {
                                         @PathVariable("userid") String target) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupId));
+        Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
 
@@ -212,7 +217,7 @@ public class GroupDetailsController {
                                          @PathVariable("id") String groupid) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupById(UUID.fromString(groupid));
+        Group group = groupCache.group(UUID.fromString(groupid));
 
         groupService.deleteGroup(group, principal);
 

@@ -4,32 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.AddMemberEvent;
-import mops.gruppen2.domain.event.CreateGroupEvent;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.event.EventType;
-import mops.gruppen2.domain.event.SetTypeEvent;
 import mops.gruppen2.domain.exception.BadPayloadException;
-import mops.gruppen2.domain.exception.InvalidInviteException;
-import mops.gruppen2.domain.model.group.Type;
-import mops.gruppen2.domain.service.helper.CommonHelper;
 import mops.gruppen2.domain.service.helper.JsonHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static mops.gruppen2.domain.event.EventType.CREATEGROUP;
 import static mops.gruppen2.domain.event.EventType.DESTROYGROUP;
-import static mops.gruppen2.domain.event.EventType.SETLINK;
-import static mops.gruppen2.domain.event.EventType.SETTYPE;
 import static mops.gruppen2.domain.service.helper.CommonHelper.eventTypesToString;
-import static mops.gruppen2.domain.service.helper.CommonHelper.uuidsToString;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -74,12 +63,6 @@ public class EventStoreService {
 
     //########################################### DTOs ###########################################
 
-
-    private static List<EventDTO> getDTOsFromEvents(List<Event> events) {
-        return events.stream()
-                     .map(EventStoreService::getDTOFromEvent)
-                     .collect(Collectors.toList());
-    }
 
     /**
      * Erzeugt aus einem Event Objekt ein EventDTO Objekt.
@@ -130,81 +113,6 @@ public class EventStoreService {
     // ######################################## QUERIES ##########################################
 
 
-    List<Event> findGroupEvents(UUID groupId) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByGroup(Collections.singletonList(groupId.toString())));
-    }
-
-    /**
-     * Sucht alle Events, welche zu einer der übergebenen Gruppen gehören.
-     *
-     * @param groupIds Liste an IDs
-     *
-     * @return Liste an Events
-     */
-    List<Event> findGroupEvents(List<UUID> groupIds) {
-        List<EventDTO> eventDTOS = new ArrayList<>();
-
-        for (UUID groupId : groupIds) {
-            eventDTOS.addAll(eventStore.findEventDTOsByGroup(Collections.singletonList(groupId.toString())));
-        }
-
-        return getEventsFromDTOs(eventDTOS);
-    }
-
-    /**
-     * Findet alle Events zu Gruppen, welche seit dem neuen Status verändert wurden.
-     *
-     * @param status Die Id des zuletzt gespeicherten Events
-     *
-     * @return Liste von neuen und alten Events
-     */
-    List<UUID> findChangedGroups(long status) {
-        List<String> changedGroupIds = eventStore.findGroupIdsWhereEventIdGreaterThanStatus(status);
-
-        log.debug("Seit Event {} haben sich {} Gruppen geändert!", status, changedGroupIds.size());
-
-        return CommonHelper.stringsToUUID(changedGroupIds);
-    }
-
-    /**
-     * Liefert Gruppen-Ids von existierenden (ungelöschten) Gruppen.
-     *
-     * @return GruppenIds (UUID) als Liste
-     */
-    List<UUID> findExistingGroupIds() {
-        List<Event> createEvents = findLatestEventsFromGroupsByType(CREATEGROUP,
-                                                                    DESTROYGROUP);
-
-        return createEvents.stream()
-                           .filter(event -> event instanceof CreateGroupEvent)
-                           .map(Event::getGroupid)
-                           .collect(Collectors.toList());
-    }
-
-    public List<UUID> findPublicGroupIds() {
-        List<UUID> groups = findExistingGroupIds();
-        List<Event> typeEvents = findLatestEventsFromGroupsByType(SETTYPE);
-
-        typeEvents.removeIf(event -> ((SetTypeEvent) event).getType() == Type.PRIVATE);
-        typeEvents.removeIf(event -> !groups.contains(event.getGroupid()));
-
-        return typeEvents.stream()
-                         .map(Event::getGroupid)
-                         .collect(Collectors.toList());
-    }
-
-    public List<UUID> findLectureGroupIds() {
-        List<UUID> groups = findExistingGroupIds();
-        List<Event> typeEvents = findLatestEventsFromGroupsByType(SETTYPE);
-
-        typeEvents.removeIf(event -> ((SetTypeEvent) event).getType() != Type.LECTURE);
-        typeEvents.removeIf(event -> !groups.contains(event.getGroupid()));
-
-        return typeEvents.stream()
-                         .map(Event::getGroupid)
-                         .collect(Collectors.toList());
-    }
-
     /**
      * Liefert Gruppen-Ids von existierenden (ungelöschten) Gruppen, in welchen der User teilnimmt.
      *
@@ -232,20 +140,6 @@ public class EventStoreService {
                          .collect(Collectors.toList());
     }
 
-    public UUID findGroupByLink(String link) {
-        List<Event> groupEvents = findEventsByType(eventTypesToString(SETLINK));
-
-        if (groupEvents.size() > 1) {
-            throw new InvalidInviteException("Es existieren mehrere Gruppen mit demselben Link.");
-        }
-
-        if (groupEvents.isEmpty()) {
-            throw new InvalidInviteException("Link nicht gefunden.");
-        }
-
-        return groupEvents.get(0).getGroupid();
-    }
-
 
     // #################################### SIMPLE QUERIES #######################################
 
@@ -260,21 +154,8 @@ public class EventStoreService {
             return eventStore.findMaxEventId();
         } catch (NullPointerException e) {
             log.debug("Keine Events vorhanden!");
-            return 1;
+            return 0;
         }
-    }
-
-    List<Event> findEventsByType(String... types) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByType(Arrays.asList(types)));
-    }
-
-    List<Event> findEventsByType(String type) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByType(Collections.singletonList(type)));
-    }
-
-    List<Event> findEventsByGroupAndType(List<UUID> groupIds, String... types) {
-        return getEventsFromDTOs(eventStore.findEventDTOsByGroupAndType(uuidsToString(groupIds),
-                                                                        Arrays.asList(types)));
     }
 
     /**
@@ -302,5 +183,9 @@ public class EventStoreService {
 
     public List<Event> findAllEvents() {
         return getEventsFromDTOs(eventStore.findAllEvents());
+    }
+
+    public List<Event> findNewEvents(long version, long maxid) {
+        return getEventsFromDTOs(eventStore.findNewEvents(version, maxid));
     }
 }

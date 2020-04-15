@@ -5,9 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
-import mops.gruppen2.domain.service.ProjectionService;
 import mops.gruppen2.domain.service.SearchService;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +29,7 @@ import java.util.List;
 @RequestMapping("/gruppen2")
 public class SearchAndInviteController {
 
-    private final ProjectionService projectionService;
+    private final GroupCache groupCache;
     private final SearchService searchService;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
@@ -62,7 +62,7 @@ public class SearchAndInviteController {
                           @PathVariable("link") String link) {
 
         String principal = token.getName();
-        Group group = projectionService.projectGroupByLink(link);
+        Group group = groupCache.group(link);
 
         model.addAttribute("group", group);
 

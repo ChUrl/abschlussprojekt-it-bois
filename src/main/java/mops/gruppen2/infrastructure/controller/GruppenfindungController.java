@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.aspect.annotation.TraceMethodCall;
 import mops.gruppen2.domain.exception.PageNotFoundException;
-import mops.gruppen2.domain.service.ProjectionService;
+import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,22 +20,25 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class GruppenfindungController {
 
-    private final ProjectionService projectionService;
+    private final GroupCache groupCache;
 
     // For convenience
-    //@GetMapping("")
-    //public String redirect() {
-    //    return "redirect:/gruppen2";
-    //}
+    @GetMapping("")
+    public String redirect() {
+        return "redirect:/gruppen2";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "redirect:/gruppen2";
+    }
 
     @TraceMethodCall
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/gruppen2")
     public String getIndexPage(KeycloakAuthenticationToken token,
                                Model model) {
-
-        String principal = token.getName();
-        model.addAttribute("groups", projectionService.projectUserGroups(principal));
+        model.addAttribute("groups", groupCache.userGroups(token.getName()));
 
         return "index";
     }
