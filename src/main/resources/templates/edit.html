@@ -34,7 +34,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text">Einladungslink:</span>
             </div>
-            <input class="form-control" readonly th:value="${link}" type="text">
+            <input class="form-control" id="linkview" readonly th:value="${link}" type="text">
             <div class="input-group-append">
                 <button type="button" class="btn btn-secondary"
                         onclick="copyLink()">Link kopieren

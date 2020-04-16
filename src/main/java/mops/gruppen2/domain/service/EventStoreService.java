@@ -39,20 +39,6 @@ public class EventStoreService {
         }
     }
 
-    /**
-     * Speichert alle Events aus der übergebenen Liste in der DB.
-     *
-     * @param events Liste an Events die gespeichert werden soll
-     */
-    @SafeVarargs
-    public final void saveAll(List<Event>... events) {
-        for (List<Event> eventlist : events) {
-            for (Event event : eventlist) {
-                eventStore.save(getDTOFromEvent(event));
-            }
-        }
-    }
-
 
     //########################################### DTOs ###########################################
 
@@ -105,7 +91,7 @@ public class EventStoreService {
 
     // #################################### SIMPLE QUERIES #######################################
 
-    
+
     public List<Event> findAllEvents() {
         return getEventsFromDTOs(eventStore.findAllEvents());
     }

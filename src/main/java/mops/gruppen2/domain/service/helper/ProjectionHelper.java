@@ -41,7 +41,7 @@ public final class ProjectionHelper {
      */
     private static Group getOrCreateGroup(Map<UUID, Group> groups, UUID groupId) {
         if (!groups.containsKey(groupId)) {
-            groups.put(groupId, new Group());
+            groups.put(groupId, Group.EMPTY());
         }
 
         return groups.get(groupId);

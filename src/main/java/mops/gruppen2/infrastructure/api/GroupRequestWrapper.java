@@ -1,8 +1,6 @@
 package mops.gruppen2.infrastructure.api;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import mops.gruppen2.domain.model.group.Group;
 
 import java.util.List;
 
@@ -10,9 +8,8 @@ import java.util.List;
  * Kombiniert den Status und die Gruppenliste zur ausgabe über die API.
  */
 @AllArgsConstructor
-@Getter
 public class GroupRequestWrapper {
 
-    private final long status;
-    private final List<Group> groupList;
+    private final long version;
+    private final List<GroupWrapper> groups;
 }

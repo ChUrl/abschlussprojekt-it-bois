@@ -57,7 +57,7 @@ public class GroupDetailsController {
         model.addAttribute("parent", parent);
 
         // Detailseite für nicht-Mitglieder
-        if (!ValidationHelper.checkIfMember(group, principal)) {
+        if (!group.isMember(principal)) {
             return "preview";
         }
 
@@ -72,7 +72,7 @@ public class GroupDetailsController {
         String principal = token.getName();
         Group group = groupCache.group(UUID.fromString(groupId));
 
-        if (ValidationHelper.checkIfMember(group, principal)) {
+        if (group.isMember(principal)) {
             return "redirect:/gruppen2/details/" + groupId;
         }
 

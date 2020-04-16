@@ -17,36 +17,15 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ValidationHelper {
 
-    /**
-     * Überprüft, ob ein User in einer Gruppe teilnimmt.
-     */
-    public static boolean checkIfMember(Group group, String userid) {
-        return group.isMember(userid);
-    }
-
     public static boolean checkIfLastMember(Group group, String userid) {
-        return checkIfMember(group, userid) && group.size() == 1;
-    }
-
-    /**
-     * Überprüft, ob eine Gruppe voll ist.
-     */
-    public static boolean checkIfGroupFull(Group group) {
-        return group.isFull();
-    }
-
-    /**
-     * Überprüft, ob eine Gruppe leer ist.
-     */
-    public static boolean checkIfGroupEmpty(Group group) {
-        return group.isEmpty();
+        return group.isMember(userid) && group.size() == 1;
     }
 
     /**
      * Überprüft, ob ein User in einer Gruppe Admin ist.
      */
     public static boolean checkIfAdmin(Group group, String userid) {
-        if (checkIfMember(group, userid)) {
+        if (group.isMember(userid)) {
             return group.isAdmin(userid);
         }
         return false;
@@ -61,14 +40,14 @@ public final class ValidationHelper {
 
 
     public static void throwIfMember(Group group, String userid) throws UserAlreadyExistsException {
-        if (checkIfMember(group, userid)) {
+        if (group.isMember(userid)) {
             log.error("Benutzer {} ist schon in Gruppe {}", userid, group);
             throw new UserAlreadyExistsException(userid);
         }
     }
 
     public static void throwIfNoMember(Group group, String userid) throws UserNotFoundException {
-        if (!checkIfMember(group, userid)) {
+        if (!group.isMember(userid)) {
             log.error("Benutzer {} ist nicht in Gruppe {}!", userid, group);
             throw new UserNotFoundException(userid);
         }
@@ -91,7 +70,7 @@ public final class ValidationHelper {
     }
 
     public static void throwIfGroupFull(Group group) throws GroupFullException {
-        if (checkIfGroupFull(group)) {
+        if (group.isFull()) {
             log.error("Die Gruppe {} ist voll!", group);
             throw new GroupFullException(group.getId().toString());
         }

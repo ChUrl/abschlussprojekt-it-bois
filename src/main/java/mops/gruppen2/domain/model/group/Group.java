@@ -1,7 +1,9 @@
 package mops.gruppen2.domain.model.group;
 
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.GroupFullException;
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
  * Muss beim Start gesetzt werden: groupid, meta
  */
 @Log4j2
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Group {
 
@@ -54,9 +57,6 @@ public class Group {
     private GroupMeta meta = GroupMeta.EMPTY();
 
     private GroupOptions options = GroupOptions.DEFAULT();
-
-    //@ToString.Exclude
-    //private LocalDateTime age;
 
     // Inhalt
     private Title title = Title.EMPTY();
@@ -112,6 +112,12 @@ public class Group {
         memberships.remove(target);
     }
 
+    public boolean memberHasRole(String target, Role role) {
+        ValidationHelper.throwIfNoMember(this, target);
+
+        return memberships.get(target).getRole() == role;
+    }
+
     public void memberPutRole(String target, Role role) throws UserNotFoundException, LastAdminException {
         ValidationHelper.throwIfNoMember(this, target);
         if (role == Role.REGULAR) {
@@ -119,12 +125,6 @@ public class Group {
         }
 
         memberships.put(target, memberships.get(target).setRole(role));
-    }
-
-    public boolean memberHasRole(String target, Role role) {
-        ValidationHelper.throwIfNoMember(this, target);
-
-        return memberships.get(target).getRole() == role;
     }
 
     public boolean isMember(String target) {

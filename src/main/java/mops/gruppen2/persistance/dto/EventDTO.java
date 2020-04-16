@@ -11,10 +11,10 @@ import org.springframework.data.relational.core.mapping.Table;
 public class EventDTO {
 
     @Id
-    Long event_id;
+    Long event_id; // Cache-Version
 
     String group_id;
-    long group_version;
+    long group_version; // Group-Version
 
     String exec_id;
     String target_id;

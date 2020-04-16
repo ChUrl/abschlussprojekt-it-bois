@@ -35,7 +35,7 @@ public class GroupCache {
     // ######################################## CACHE ###########################################
 
 
-    public void init() {
+    void init() {
         ProjectionHelper.project(groups, eventStoreService.findAllEvents(), this);
     }
 

@@ -22,6 +22,14 @@ public final class SortHelper {
                 return 1;
             }
 
+            if (g1.getType() == Type.PUBLIC) {
+                return -1;
+            }
+
+            if (g2.getType() == Type.PUBLIC) {
+                return 1;
+            }
+
             return 0;
         });
     }

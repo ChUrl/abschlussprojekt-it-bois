@@ -36,7 +36,7 @@ public abstract class Event {
     protected UUID groupid;
 
     @JsonProperty("version")
-    protected long version;
+    protected long version; // Group-Version
 
     @JsonProperty("exec")
     protected String exec;
@@ -68,8 +68,8 @@ public abstract class Event {
         }
 
         checkGroupIdMatch(group.getId());
-        group.updateVersion(version);
         updateCache(cache, group);
+        group.updateVersion(version);
         applyEvent(group);
     }
 
