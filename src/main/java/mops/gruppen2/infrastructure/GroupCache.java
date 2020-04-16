@@ -24,8 +24,7 @@ public class GroupCache {
     private final Map<UUID, Group> groups = new HashMap<>();
 
     public void init() {
-        long maxid = eventStoreService.findMaxEventId();
-        ProjectionHelper.project(groups, eventStoreService.findNewEvents(0, maxid), this);
+        ProjectionHelper.project(groups, eventStoreService.findAllEvents(), this);
     }
 
     public void put(Group group) {
