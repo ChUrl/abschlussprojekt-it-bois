@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -23,6 +24,12 @@ public class SetTypeEvent extends Event {
         super(groupId, exec, null);
 
         this.type = type;
+    }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {
+        cache.typesRemove(group);
+        cache.typesPut(type, group);
     }
 
     @Override

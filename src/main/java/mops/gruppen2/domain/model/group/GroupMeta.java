@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Log4j2
 @Value
 @ToString
-public class GroupMeta {
+class GroupMeta {
 
     long version;
     String creator;
     LocalDateTime creationDate;
 
-    public GroupMeta setVersion(long version) throws IdMismatchException {
+    GroupMeta setVersion(long version) throws IdMismatchException {
         if (this.version >= version) {
             throw new IdMismatchException("Die Gruppe ist bereits auf einem neueren Stand.");
         }
@@ -25,7 +25,7 @@ public class GroupMeta {
         return new GroupMeta(version, creator, creationDate);
     }
 
-    public GroupMeta setCreator(String userid) throws BadArgumentException {
+    GroupMeta setCreator(String userid) throws BadArgumentException {
         if (creator != null) {
             throw new BadArgumentException("Gruppe hat schon einen Ersteller.");
         }
@@ -33,7 +33,7 @@ public class GroupMeta {
         return new GroupMeta(version, userid, creationDate);
     }
 
-    public GroupMeta setCreationDate(LocalDateTime date) throws BadArgumentException {
+    GroupMeta setCreationDate(LocalDateTime date) throws BadArgumentException {
         if (creationDate != null) {
             throw new BadArgumentException("Gruppe hat schon ein Erstellungsdatum.");
         }
@@ -41,7 +41,7 @@ public class GroupMeta {
         return new GroupMeta(version, creator, date);
     }
 
-    public static GroupMeta EMPTY() {
+    static GroupMeta EMPTY() {
         return new GroupMeta(0, null, null);
     }
 }

@@ -8,6 +8,7 @@ import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Role;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.util.UUID;
 
@@ -26,6 +27,9 @@ public class UpdateRoleEvent extends Event {
         super(groupId, exec, target);
         this.role = role;
     }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {}
 
     @Override
     protected void applyEvent(Group group) throws UserNotFoundException, LastAdminException {

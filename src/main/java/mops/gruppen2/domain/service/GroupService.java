@@ -24,7 +24,6 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
-import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
@@ -139,7 +138,7 @@ public class GroupService {
         Event event = new CreateGroupEvent(groupid,
                                            exec,
                                            date);
-        Group group = new Group();
+        Group group = Group.EMPTY();
         applyAndSave(group, event);
 
         return group;
@@ -171,7 +170,7 @@ public class GroupService {
     public void kickMember(Group group, String exec, String target) {
         applyAndSave(group, new KickMemberEvent(group.getId(), exec, target));
 
-        if (ValidationHelper.checkIfGroupEmpty(group)) {
+        if (group.isEmpty()) {
             deleteGroup(group, exec);
         }
     }

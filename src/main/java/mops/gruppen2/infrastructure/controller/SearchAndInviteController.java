@@ -6,7 +6,6 @@ import mops.gruppen2.aspect.annotation.TraceMethodCalls;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
 import mops.gruppen2.domain.service.SearchService;
-import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -48,7 +47,7 @@ public class SearchAndInviteController {
                              @RequestParam("string") String search) {
 
         String principal = token.getName();
-        List<Group> groups = searchService.searchPublicGroups(search, principal);
+        List<Group> groups = searchService.search(search, principal);
 
         model.addAttribute("groups", groups);
 
@@ -72,7 +71,7 @@ public class SearchAndInviteController {
         }
 
         // Bereits Mitglied
-        if (ValidationHelper.checkIfMember(group, principal)) {
+        if (group.isMember(principal)) {
             return "redirect:/gruppen2/details/" + group.getId();
         }
 

@@ -36,7 +36,7 @@ public abstract class Event {
     protected UUID groupid;
 
     @JsonProperty("version")
-    protected long version;
+    protected long version; // Group-Version
 
     @JsonProperty("exec")
     protected String exec;
@@ -68,9 +68,9 @@ public abstract class Event {
         }
 
         checkGroupIdMatch(group.getId());
+        updateCache(cache, group);
         group.updateVersion(version);
         applyEvent(group);
-        updateCache(cache, group);
     }
 
     private void checkGroupIdMatch(UUID groupid) throws IdMismatchException {
@@ -84,15 +84,7 @@ public abstract class Event {
         }
     }
 
-    private void updateCache(GroupCache cache, Group group) {
-        if (this instanceof CreateGroupEvent) {
-            cache.put(group);
-        }
-
-        if (this instanceof DestroyGroupEvent) {
-            cache.remove(group);
-        }
-    }
+    protected abstract void updateCache(GroupCache cache, Group group);
 
     protected abstract void applyEvent(Group group) throws EventException;
 

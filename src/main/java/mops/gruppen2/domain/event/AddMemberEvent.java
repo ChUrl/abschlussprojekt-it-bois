@@ -9,6 +9,7 @@ import mops.gruppen2.domain.exception.IdMismatchException;
 import mops.gruppen2.domain.exception.UserAlreadyExistsException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.User;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.util.UUID;
 
@@ -30,6 +31,11 @@ public class AddMemberEvent extends Event {
         if (!target.equals(user.getId())) {
             throw new IdMismatchException("Der User passt nicht zur angegebenen userid.");
         }
+    }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {
+        cache.usersPut(target, group);
     }
 
     @Override

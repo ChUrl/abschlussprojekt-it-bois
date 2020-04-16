@@ -28,11 +28,6 @@ public class GruppenfindungController {
         return "redirect:/gruppen2";
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "redirect:/gruppen2";
-    }
-
     @TraceMethodCall
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/gruppen2")

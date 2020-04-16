@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class ModelAttributeControllerAdvice {
 
-    private final GroupCache groupCache;
-
     // Add modelAttributes before each @RequestMapping
     @ModelAttribute
     public void modelAttributes(KeycloakAuthenticationToken token,

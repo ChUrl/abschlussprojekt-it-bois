@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.SortHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,10 +31,12 @@ public class SearchService {
      * @throws EventException Projektionsfehler
      */
     //TODO: search in lectures
-    public List<Group> searchPublicGroups(String search, String principal) {
-        List<Group> groups = groupCache.publics();
-
+    public List<Group> search(String search, String principal) {
+        List<Group> groups = new ArrayList<>();
+        groups.addAll(groupCache.publics());
+        groups.addAll(groupCache.lectures());
         groups = removeUserGroups(groups, principal);
+        SortHelper.sortByGroupType(groups);
 
         if (search.isEmpty()) {
             return groups;
@@ -50,5 +54,4 @@ public class SearchService {
                      .filter(group -> !group.isMember(principal))
                      .collect(Collectors.toList());
     }
-
 }

@@ -9,7 +9,7 @@ function enable(id) {
 }
 
 function copyLink() {
-    const copyText = document.getElementById("groupLink");
+    const copyText = document.getElementById("linkview");
 
     copyText.select();
     copyText.setSelectionRange(0, 99999);
