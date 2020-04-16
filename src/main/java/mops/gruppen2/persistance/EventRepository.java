@@ -14,6 +14,6 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
     // ####################################### EVENT DTOs ########################################
 
 
-    @Query("SELECT *")
+    @Query("SELECT * FROM event")
     List<EventDTO> findAllEvents();
 }
