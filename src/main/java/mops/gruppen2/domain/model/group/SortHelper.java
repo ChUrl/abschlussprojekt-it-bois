@@ -13,7 +13,7 @@ public final class SortHelper {
      *
      * @param groups Die Liste von Gruppen die sortiert werden soll
      */
-    public static List<Group> sortByGroupType(List<Group> groups) {
+    public static void sortByGroupType(List<Group> groups) {
         groups.sort((Group g1, Group g2) -> {
             if (g1.getType() == Type.LECTURE) {
                 return -1;
@@ -24,8 +24,6 @@ public final class SortHelper {
 
             return 0;
         });
-
-        return groups;
     }
 
     public static List<Membership> sortByMemberRole(List<Membership> memberships) {

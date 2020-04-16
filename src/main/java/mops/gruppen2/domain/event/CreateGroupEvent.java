@@ -6,6 +6,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,6 +22,12 @@ public class CreateGroupEvent extends Event {
     public CreateGroupEvent(UUID groupId, String exec, LocalDateTime date) {
         super(groupId, exec, null);
         this.date = date;
+    }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {
+        cache.groupsPut(groupid, group);
+        cache.linksPut(group.getLink(), group);
     }
 
     @Override

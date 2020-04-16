@@ -48,7 +48,7 @@ public class SearchAndInviteController {
                              @RequestParam("string") String search) {
 
         String principal = token.getName();
-        List<Group> groups = searchService.searchPublicGroups(search, principal);
+        List<Group> groups = searchService.search(search, principal);
 
         model.addAttribute("groups", groups);
 

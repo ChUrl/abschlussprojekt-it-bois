@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Link;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -22,6 +23,12 @@ public class SetInviteLinkEvent extends Event {
     public SetInviteLinkEvent(UUID groupId, String exec, @Valid Link link) {
         super(groupId, exec, null);
         this.link = link;
+    }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {
+        cache.linksRemove(group.getLink());
+        cache.linksPut(link.getValue(), group);
     }
 
     @Override

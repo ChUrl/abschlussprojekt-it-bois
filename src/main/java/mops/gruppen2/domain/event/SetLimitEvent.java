@@ -8,6 +8,7 @@ import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -24,6 +25,9 @@ public class SetLimitEvent extends Event {
         super(groupId, exec, null);
         this.limit = limit;
     }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {}
 
     @Override
     protected void applyEvent(Group group) throws BadArgumentException, NoAccessException {

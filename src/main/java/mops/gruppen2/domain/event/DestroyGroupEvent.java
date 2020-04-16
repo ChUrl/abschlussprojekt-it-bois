@@ -5,6 +5,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.util.UUID;
 
@@ -15,6 +16,11 @@ public class DestroyGroupEvent extends Event {
 
     public DestroyGroupEvent(UUID groupId, String exec) {
         super(groupId, exec, null);
+    }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {
+        cache.groupsRemove(group);
     }
 
     @Override

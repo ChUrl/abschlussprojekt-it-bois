@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -23,6 +24,9 @@ public class SetParentEvent extends Event {
         super(groupId, exec, null);
         this.parent = parent;
     }
+
+    @Override
+    protected void updateCache(GroupCache cache, Group group) {}
 
     @Override
     protected void applyEvent(Group group) throws NoAccessException {
