@@ -11,32 +11,56 @@
 <main th:fragment="bodycontent">
     <div class="container-fluid">
 
-        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+        <h1 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;" th:text="${group.getTitle()}"></h1>
 
-        <div class="row">
+        <div class="d-flex flex-row flex-wrap mr-n4 mt-n2">
             <!--Gruppendetails-->
-            <div class="col-9 px-0">
+            <div class="flex-grow-1 mr-4 mt-2" style="flex-basis: 65%;">
 
-                <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
+                <div class="content overflow-hidden" th:insert="~{fragments/groups :: groupcontent}"></div>
 
-                <div class="content">
+
+                <!--Integrationen-->
+                <div class="d-flex flex-wrap mr-n2">
+                    <!--Materialsammlung-->
+                    <div class="content flex-grow-1 mr-2">
+
+                    </div>
+
+                    <!--Foren-->
+                    <div class="content flex-grow-1 mr-2">
+
+                    </div>
+
+                    <!--Termine-->
+                    <div class="content flex-grow-1 mr-2">
+
+                    </div>
+
+                    <!--Modulhandbuch-->
+                    <div class="content flex-grow-1 mr-2">
+
+                    </div>
+                </div>
+
+                <div class="content overflow-hidden">
                     <!--Button-Bar-->
-                    <div class="row">
-                        <a class="btn btn-primary" href="/gruppen2">Fertig</a>
+                    <div class="d-flex flex-row flex-wrap mr-n2 mt-n2">
+                        <a class="btn btn-primary flex-grow-1 mr-2 mt-2" style="max-width: 250px;" href="/gruppen2">Fertig</a>
 
-                        <!--Spacer-->
-                        <span class="col"></span>
-
-                        <form method="post" th:action="@{/gruppen2/details/{id}/leave(id=${group.getId()})}">
-                            <button class="btn btn-danger btn-bar" type="submit">Gruppe verlassen
-                            </button>
-                        </form>
+                        <div class="ml-auto mr-2 mt-2 flex-grow-1" style="max-width: 250px;">
+                            <form method="post" th:action="@{/gruppen2/details/{id}/leave(id=${group.getId()})}">
+                                <button class="btn btn-danger w-100" type="submit">
+                                    Gruppe verlassen
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!--Teilnehmerliste-->
-            <div class="col-3 def-cursor">
+            <div class="def-cursor flex-grow-1 mr-4 mt-2 mw-100 overflow-hidden">
                 <!--Anzahl Text-->
                 <div class="mb-2">
                     <span>Teilnehmer: </span>
@@ -56,13 +80,12 @@
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between"
                             th:each="member : ${group.getMembers()}">
-                            <span th:text="${member.format()}"></span>
-                            <span th:replace="~{fragments/groups :: userbadges}"></span>
+                            <span class="overflow-hidden" th:text="${member.format()}"></span>
+                            <span class="overflow-hidden" th:replace="~{fragments/groups :: userbadges}"></span>
                         </li>
                     </ul>
                 </div>
             </div>
-
         </div>
     </div>
 </main>
