@@ -49,14 +49,14 @@
 </th:block>
 
 <th:block th:fragment="groupcontentlink">
-    <div class="content-heading row">
+    <div class="content-heading row overflow-hidden">
         <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
            th:text="${group.getTitle()}"></a>
 
         <span th:replace="~{fragments/groups :: badges}"></span>
     </div>
 
-    <div class="content-text-in">
+    <div class="content-text-in overflow-hidden" style="text-overflow: ellipsis;">
         <span th:text="${group.getDescription()}"></span>
     </div>
 </th:block>

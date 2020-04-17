@@ -11,23 +11,26 @@
 <main th:fragment="bodycontent">
     <div class="container-fluid">
 
-        <h1 class="def-cursor">Meine Gruppen</h1>
+        <h1 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">Meine Gruppen</h1>
 
         <!--Gruppenliste belegte Gruppen-->
         <div th:unless="${lectures.isEmpty()}">
-            <h3 class="def-cursor">Veranstaltungen</h3>
+            <h3 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">
+                Veranstaltungen</h3>
             <div class="content" th:each="group: ${lectures}"
                  th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
 
         <div th:unless="${publics.isEmpty()}">
-            <h3 class="def-cursor">Öffentliche Gruppen</h3>
+            <h3 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">Öffentliche
+                                                                                    Gruppen</h3>
             <div class="content" th:each="group: ${publics}"
                  th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
 
         <div th:unless="${privates.isEmpty()}">
-            <h3 class="def-cursor">Private Gruppen</h3>
+            <h3 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">Private
+                                                                                    Gruppen</h3>
             <div class="content" th:each="group: ${privates}"
                  th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
