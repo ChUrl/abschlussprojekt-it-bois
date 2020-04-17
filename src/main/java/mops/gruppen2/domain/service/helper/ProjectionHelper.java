@@ -7,6 +7,9 @@ import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.infrastructure.GroupCache;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,6 +21,22 @@ import java.util.UUID;
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProjectionHelper {
+
+
+    public static List<Group> project(List<Event> events) {
+        Map<UUID, Group> groups = new HashMap<>();
+
+        if (events.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        log.trace(groups);
+        log.trace(events);
+
+        events.forEach(event -> event.apply(getOrCreateGroup(groups, event.getGroupid())));
+
+        return new ArrayList<>(groups.values());
+    }
 
     public static void project(Map<UUID, Group> groups, List<Event> events, GroupCache cache) {
         if (events.isEmpty()) {

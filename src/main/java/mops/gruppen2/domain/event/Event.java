@@ -82,6 +82,18 @@ public abstract class Event {
         applyEvent(group);
     }
 
+    public void apply(Group group) throws EventException {
+        log.trace("Event wird angewendet:\t{}", this);
+
+        if (version == 0) {
+            throw new BadArgumentException("Event wurde nicht initialisiert.");
+        }
+
+        checkGroupIdMatch(group.getId());
+        group.updateVersion(version);
+        applyEvent(group);
+    }
+
     private void checkGroupIdMatch(UUID groupid) throws IdMismatchException {
         // CreateGroupEvents müssen die Id erst initialisieren
         if (this instanceof CreateGroupEvent) {

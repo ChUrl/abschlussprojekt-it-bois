@@ -23,4 +23,10 @@ public interface EventRepository extends CrudRepository<EventDTO, Long> {
 
     @Query("SELECT event_payload FROM event WHERE group_id = :groupid")
     List<String> findGroupPayloads(@Param("groupid") String groupId);
+
+    @Query("SELECT MAX(event_id) FROM event")
+    long findMaxEventId();
+
+    @Query("SELECT DISTINCT group_id FROM event WHERE event_id > :eventid")
+    List<String> findChangedGroupIds(@Param("eventid") long eventid);
 }

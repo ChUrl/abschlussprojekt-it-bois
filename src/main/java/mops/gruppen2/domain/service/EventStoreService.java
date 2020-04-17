@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.BadPayloadException;
+import mops.gruppen2.domain.service.helper.CommonHelper;
 import mops.gruppen2.domain.service.helper.FileHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -102,11 +104,27 @@ public class EventStoreService {
         return getEventsFromDTOs(eventStore.findGroupEvents(groupId.toString()));
     }
 
+    public List<Event> findGroupEvents(List<UUID> ids) {
+        return ids.stream()
+                  .map(id -> eventStore.findGroupEvents(id.toString()))
+                  .map(EventStoreService::getEventsFromDTOs)
+                  .flatMap(Collection::stream)
+                  .collect(Collectors.toList());
+    }
+
     public List<String> findGroupPayloads(UUID groupId) {
         return eventStore.findGroupPayloads(groupId.toString());
     }
 
     public List<EventDTO> findGroupDTOs(UUID groupid) {
         return eventStore.findGroupEvents(groupid.toString());
+    }
+
+    public List<UUID> findChangedGroups(long eventid) {
+        return CommonHelper.stringsToUUID(eventStore.findChangedGroupIds(eventid));
+    }
+
+    public long findMaxEventId() {
+        return eventStore.findMaxEventId();
     }
 }
