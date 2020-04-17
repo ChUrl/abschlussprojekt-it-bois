@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.sql.Timestamp;
+
 @Table("event")
 @Getter
 @AllArgsConstructor
@@ -21,4 +23,6 @@ public class EventDTO {
 
     String event_type;
     String event_payload;
+
+    Timestamp timestamp;
 }

@@ -40,6 +40,11 @@ public class CreateGroupEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Gruppe erstellt.";
+    }
+
+    @Override
     public String type() {
         return EventType.CREATEGROUP.toString();
     }

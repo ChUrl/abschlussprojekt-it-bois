@@ -10,6 +10,7 @@ import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,8 @@ public class EventStoreService {
                                 event.getExec(),
                                 event.getTarget(),
                                 event.type(),
-                                payload);
+                                payload,
+                                Timestamp.valueOf(event.getDate()));
         } catch (JsonProcessingException e) {
             log.error("Event ({}) konnte nicht serialisiert werden!", event, e);
             throw new BadPayloadException(EventStoreService.class.toString());
@@ -94,5 +96,9 @@ public class EventStoreService {
 
     public List<Event> findAllEvents() {
         return getEventsFromDTOs(eventStore.findAllEvents());
+    }
+
+    public List<Event> findGroupEvents(String groupId) {
+        return getEventsFromDTOs(eventStore.findGroupEvents(groupId));
     }
 }

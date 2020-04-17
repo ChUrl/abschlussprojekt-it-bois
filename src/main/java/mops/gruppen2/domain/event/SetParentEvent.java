@@ -36,6 +36,11 @@ public class SetParentEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Veranstaltungszugehörigkeit gesetzt: " + parent.getValue() + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETPARENT.toString();
     }

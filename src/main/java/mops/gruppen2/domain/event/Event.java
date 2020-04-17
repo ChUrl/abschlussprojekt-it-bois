@@ -13,6 +13,7 @@ import mops.gruppen2.domain.exception.IdMismatchException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.infrastructure.GroupCache;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Log4j2
@@ -44,6 +45,9 @@ public abstract class Event {
     @JsonProperty("target")
     protected String target;
 
+    @JsonProperty("date")
+    protected LocalDateTime date;
+
     public Event(UUID groupid, String exec, String target) {
         this.groupid = groupid;
         this.exec = exec;
@@ -54,6 +58,7 @@ public abstract class Event {
         if (this.version != 0) {
             throw new BadArgumentException("Event wurde schon initialisiert. (" + type() + ")");
         }
+        date = LocalDateTime.now();
 
         log.trace("Event wurde initialisiert. (" + type() + "," + version + ")");
 
@@ -87,6 +92,8 @@ public abstract class Event {
     protected abstract void updateCache(GroupCache cache, Group group);
 
     protected abstract void applyEvent(Group group) throws EventException;
+
+    public abstract String format();
 
     @JsonIgnore
     public abstract String type();

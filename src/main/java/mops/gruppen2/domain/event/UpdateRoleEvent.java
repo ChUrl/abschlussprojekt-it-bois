@@ -39,6 +39,11 @@ public class UpdateRoleEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Mitgliedsrolle gesetzt: " + target + ": " + role + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.UPDATEROLE.toString();
     }

@@ -8,5 +8,6 @@ CREATE TABLE event
     exec_id       VARCHAR(50)   NOT NULL,
     target_id     VARCHAR(50),
     event_type    VARCHAR(32)   NOT NULL,
+    timestamp     DATETIME      NOT NULL,
     event_payload VARCHAR(2500) NOT NULL
 );

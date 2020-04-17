@@ -39,6 +39,11 @@ public class SetInviteLinkEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Einladungslink gesetzt: " + link + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETLINK.toString();
     }

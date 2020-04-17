@@ -38,6 +38,11 @@ public class SetTypeEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Gruppentype gesetzt: " + type + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETTYPE.toString();
     }

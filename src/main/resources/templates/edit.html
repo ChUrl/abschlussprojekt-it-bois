@@ -36,8 +36,7 @@
             </div>
             <input class="form-control" id="linkview" readonly th:value="${link}" type="text">
             <div class="input-group-append">
-                <button type="button" class="btn btn-secondary"
-                        onclick="copyLink()">Link kopieren
+                <button type="button" class="btn btn-secondary" onclick="copyLink()">Link kopieren
                 </button>
             </div>
         </div>
@@ -86,6 +85,18 @@
                         <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="content-heading">
+                <span>Event-Historie</span>
+            </div>
+            <div class="row">
+                <!--Spacer-->
+                <span class="col"></span>
+
+                <a class="btn btn-primary btn-bar" th:href="@{/gruppen2/details/{id}/history(id=${group.getId()})}">Event-Log</a>
             </div>
         </div>
 

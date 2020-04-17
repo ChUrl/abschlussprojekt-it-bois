@@ -8,6 +8,7 @@ import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.domain.model.group.wrapper.Description;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
+import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.GroupService;
 import mops.gruppen2.domain.service.helper.CsvHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
@@ -37,6 +38,7 @@ public class GroupDetailsController {
 
     private final GroupCache groupCache;
     private final GroupService groupService;
+    private final EventStoreService eventStoreService;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}")
@@ -95,6 +97,17 @@ public class GroupDetailsController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping("details/{id}/history")
+    public String getDetailsHistory(KeycloakAuthenticationToken token,
+                                    Model model,
+                                    @PathVariable("id") String groupId) {
+
+        model.addAttribute("events", eventStoreService.findGroupEvents(groupId));
+
+        return "history";
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}/edit")
     public String getDetailsEdit(KeycloakAuthenticationToken token,
                                  Model model,
@@ -126,8 +139,6 @@ public class GroupDetailsController {
 
         String principal = token.getName();
         Group group = groupCache.group(UUID.fromString(groupId));
-
-        System.out.println(group);
 
         groupService.setTitle(group, principal, title);
         groupService.setDescription(group, principal, description);

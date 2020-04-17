@@ -31,6 +31,11 @@ public class DestroyGroupEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Gruppe gelöscht.";
+    }
+
+    @Override
     public String type() {
         return EventType.DESTROYGROUP.toString();
     }

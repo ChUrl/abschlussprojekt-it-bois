@@ -46,6 +46,11 @@ public class AddMemberEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Benutzer hinzugefügt: " + target + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.ADDMEMBER.toString();
     }
