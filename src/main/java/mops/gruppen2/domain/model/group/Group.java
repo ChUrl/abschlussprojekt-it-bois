@@ -303,7 +303,7 @@ public class Group {
     }
 
     public String format() {
-        return type + ": " + title + " - " + description;
+        return title + " - " + description;
     }
 
     @Override

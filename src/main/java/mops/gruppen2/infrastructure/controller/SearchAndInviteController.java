@@ -41,13 +41,40 @@ public class SearchAndInviteController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @PostMapping("/search")
-    public String postSearch(KeycloakAuthenticationToken token,
-                             Model model,
-                             @RequestParam("string") String search) {
+    @PostMapping("/search/string")
+    public String postSearchString(KeycloakAuthenticationToken token,
+                                   Model model,
+                                   @RequestParam("string") String search) {
 
         String principal = token.getName();
-        List<Group> groups = searchService.search(search, principal);
+        List<Group> groups = searchService.searchString(search, principal);
+
+        model.addAttribute("groups", groups);
+
+        return "search";
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping("/search/all")
+    public String getSearchAll(KeycloakAuthenticationToken token,
+                               Model model) {
+
+        String principal = token.getName();
+        List<Group> groups = searchService.searchString("", principal);
+
+        model.addAttribute("groups", groups);
+
+        return "search";
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping("/search/type/{type}")
+    public String getSearchType(KeycloakAuthenticationToken token,
+                                Model model,
+                                @PathVariable("type") Type type) {
+
+        String principal = token.getName();
+        List<Group> groups = searchService.searchType(type, principal);
 
         model.addAttribute("groups", groups);
 

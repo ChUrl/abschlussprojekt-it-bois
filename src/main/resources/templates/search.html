@@ -8,6 +8,9 @@
 
 <body>
 
+<!--/*@thymesVar id="LECTURE" type="mops.gruppen2.domain.model.group.Type"*/-->
+<!--/*@thymesVar id="PUBLIC" type="mops.gruppen2.domain.model.group.Type"*/-->
+
 <main th:fragment="bodycontent">
     <div class="container-fluid">
 
@@ -15,7 +18,7 @@
 
         <!--Suchfilter-->
         <div class="content top">
-            <form method="post" th:action="@{/gruppen2/search}">
+            <form method="post" th:action="@{/gruppen2/search/string}">
                 <div class="row mb-3">
                     <div class="input-group col mr-2">
                         <div class="input-group-prepend">
@@ -29,22 +32,15 @@
             </form>
 
             <div class="row">
-                <form method="post" th:action="@{/gruppen2/search}">
-                    <input type="hidden" name="string" value="">
-                    <button class="btn btn-info" type="submit">Alle Anzeigen</button>
-                </form>
+                <a class="btn btn-info" th:href="@{/gruppen2/search/all}">Alle Anzeigen</a>
 
                 <!--spacer-->
                 <span class="col"></span>
 
-                <form method="post" th:action="@{/gruppen2/search}">
-                    <input type="hidden" name="string" value="LECTURE">
-                    <button class="btn btn-info mr-2" type="submit">Vorlesungen</button>
-                </form>
-                <form method="post" th:action="@{/gruppen2/search}">
-                    <input type="hidden" name="string" value="PUBLIC">
-                    <button class="btn btn-info" type="submit">Öffentliche Gruppen</button>
-                </form>
+                <a class="btn btn-info mr-2"
+                   th:href="@{/gruppen2/search/type/{type}(type=${LECTURE})}">Vorlesungen</a>
+                <a class="btn btn-info" type="submit"
+                   th:href="@{/gruppen2/search/type/{type}(type=${PUBLIC})}">Öffentliche Gruppen</a>
             </div>
         </div>
 
