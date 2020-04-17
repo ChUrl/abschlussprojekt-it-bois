@@ -48,6 +48,19 @@
     <!--<div class="body-text-in" th:if="${group.getMembers().contains(user.getId())}"></div>-->
 </th:block>
 
+<th:block th:fragment="groupcontentlink">
+    <div class="content-heading row">
+        <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+           th:text="${group.getTitle()}"></a>
+
+        <span th:replace="~{fragments/groups :: badges}"></span>
+    </div>
+
+    <div class="content-text-in">
+        <span th:text="${group.getDescription()}"></span>
+    </div>
+</th:block>
+
 <!--Buttonbar zum Gruppe beitreten-->
 <th:block th:fragment="joingroup">
     <div class="content-heading">

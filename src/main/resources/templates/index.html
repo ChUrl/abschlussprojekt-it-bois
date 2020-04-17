@@ -13,51 +13,23 @@
 
         <h1 class="def-cursor">Meine Gruppen</h1>
 
-        <!--TODO: Fragment-->
         <!--Gruppenliste belegte Gruppen-->
         <div th:unless="${lectures.isEmpty()}">
             <h3 class="def-cursor">Veranstaltungen</h3>
-            <div class="content" th:each="group: ${lectures}">
-                <div class="content-heading row">
-                    <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                       th:text="${group.getTitle()}"></a>
-
-                    <span th:replace="~{fragments/groups :: badges}"></span>
-                </div>
-                <div class="content-text-in">
-                    <span th:text="${group.getDescription()}"></span>
-                </div>
-            </div>
+            <div class="content" th:each="group: ${lectures}"
+                 th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
 
         <div th:unless="${publics.isEmpty()}">
             <h3 class="def-cursor">Öffentliche Gruppen</h3>
-            <div class="content" th:each="group: ${publics}">
-                <div class="content-heading row">
-                    <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                       th:text="${group.getTitle()}"></a>
-
-                    <span th:replace="~{fragments/groups :: badges}"></span>
-                </div>
-                <div class="content-text-in">
-                    <span th:text="${group.getDescription()}"></span>
-                </div>
-            </div>
+            <div class="content" th:each="group: ${publics}"
+                 th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
 
         <div th:unless="${privates.isEmpty()}">
             <h3 class="def-cursor">Private Gruppen</h3>
-            <div class="content" th:each="group: ${privates}">
-                <div class="content-heading row">
-                    <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                       th:text="${group.getTitle()}"></a>
-
-                    <span th:replace="~{fragments/groups :: badges}"></span>
-                </div>
-                <div class="content-text-in">
-                    <span th:text="${group.getDescription()}"></span>
-                </div>
-            </div>
+            <div class="content" th:each="group: ${privates}"
+                 th:insert="fragments/groups :: groupcontentlink"></div>
         </div>
     </div>
 </main>
