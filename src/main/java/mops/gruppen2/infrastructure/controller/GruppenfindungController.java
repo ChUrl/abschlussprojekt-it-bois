@@ -33,7 +33,10 @@ public class GruppenfindungController {
     @GetMapping("/gruppen2")
     public String getIndexPage(KeycloakAuthenticationToken token,
                                Model model) {
-        model.addAttribute("groups", groupCache.userGroups(token.getName()));
+
+        model.addAttribute("lectures", groupCache.userLectures(token.getName()));
+        model.addAttribute("publics", groupCache.userPublics(token.getName()));
+        model.addAttribute("privates", groupCache.userPrivates(token.getName()));
 
         return "index";
     }

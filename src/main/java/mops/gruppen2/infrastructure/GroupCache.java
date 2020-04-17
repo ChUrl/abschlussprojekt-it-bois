@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -65,6 +66,24 @@ public class GroupCache {
         }
 
         return Collections.unmodifiableList(users.get(userid));
+    }
+
+    public List<Group> userLectures(String userid) {
+        return userGroups(userid).stream()
+                                 .filter(Group::isLecture)
+                                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Group> userPublics(String userid) {
+        return userGroups(userid).stream()
+                                 .filter(Group::isPublic)
+                                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Group> userPrivates(String userid) {
+        return userGroups(userid).stream()
+                                 .filter(Group::isPrivate)
+                                 .collect(Collectors.toUnmodifiableList());
     }
 
     public List<Group> publics() {
