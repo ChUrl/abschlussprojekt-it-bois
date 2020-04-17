@@ -7,17 +7,17 @@
 
 <!--Grouptype Badges-->
 <th:block th:fragment="badges">
-    <span class="badge badge-pill private"
+    <span class="badge badge-pill private align-self-start"
           title="Kann nicht über die Suche gefunden werden, beitritt ist per Einladungslink möglich."
           th:if='${group.isPrivate()}'>Privat</span>
-    <span class="badge badge-pill public"
+    <span class="badge badge-pill public align-self-start"
           title="Kann über die Suche gefunden werden, jeder kann beitreten."
           th:if="${group.isPublic()}">Öffentlich</span>
-    <span class="badge badge-pill lecture"
+    <span class="badge badge-pill lecture align-self-start"
           title="Offizielle Veranstaltung"
           th:if='${group.isLecture()}'>Veranstaltung</span>
 
-    <span class="badge badge-pill parent"
+    <span class="badge badge-pill parent align-self-start"
           th:if="${parent?.exists()}"
           th:title="${'Die Gruppe gehört zur Veranstaltung ' + parent.getTitle() + '.'}"
           th:text="${parent.getTitle()}">Parent</span>
@@ -72,15 +72,13 @@
         </span>
     </div>
 
-    <div class="row">
+    <div class="d-flex flex-row flex-wrap">
         <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}"
               th:unless="${group.isFull()}">
             <button class="btn btn-success" type="submit">Gruppe beitreten.</button>
         </form>
 
-        <div class="col" th:unless="${group.isFull()}"></div>
-
-        <a class="btn btn-primary" href="/gruppen2"
+        <a class="btn btn-primary ml-auto" href="/gruppen2"
            type="submit">Startseite.</a>
     </div>
 </th:block>

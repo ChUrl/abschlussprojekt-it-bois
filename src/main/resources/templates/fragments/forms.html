@@ -12,8 +12,8 @@
     <!--Gruppentitel-->
     <div class="input-group mb-2"
          title="Ein Gruppentitel zwischen 4 und 128 Zeichen. Der Titel ist öffentlich.">
-        <div class="input-group-prepend overflow-hidden" style="max-width: 50%;">
-            <span class="input-group-text text-monospace">Gruppentitel:</span>
+        <div class="input-group-prepend">
+            <span class="input-group-text">Gruppentitel:</span>
         </div>
         <input type="text" class="form-control" name="title" minlength="4" maxlength="128"
                th:value="${group?.getTitle()}" required>
@@ -23,8 +23,8 @@
     <!--Gruppenbeschreibung-->
     <div class="input-group"
          title="Eine kurze Gruppenbeschreibung zwischen 4 und 512 Zeichen. Die Beschreibung ist öffentlich.">
-        <div class="input-group-prepend overflow-hidden" style="max-width: 50%;">
-            <span class="input-group-text text-monospace">Beschreibung:</span>
+        <div class="input-group-prepend">
+            <span class="input-group-text">Beschreibung:</span>
         </div>
         <textarea class="form-control" name="description" minlength="4" maxlength="512"
                   th:text="${group?.getDescription()}" required></textarea>
@@ -50,8 +50,8 @@
 
         <div class="input-group flex-grow-1 mt-2 mr-2"
              title="Optional kann eine Veranstaltungszugehörigkeit festgelegt werden.">
-            <div class="input-group-prepend overflow-hidden" style="max-width: 50%;">
-                <span class="input-group-text text-monospace">Gehört zu:</span>
+            <div class="input-group-prepend">
+                <span class="input-group-text">Gehört zu:</span>
             </div>
             <input type="hidden" id="parentdummy" name="parent" value="00000000-0000-0000-0000-000000000000" disabled>
             <select class="custom-select" id="parentselect" name="parent">
@@ -84,15 +84,15 @@
 
         <div class="input-group flex-grow-1 mt-2 mr-2"
              title="999999 ist die maximal zulässige Teilnehmerzahl. Ist diese Obergrenze erreicht, gilt die Gruppe als unbegrenzt.">
-            <div class="input-group-prepend overflow-hidden" style="max-width: 25%">
-                <span class="input-group-text text-monospace overflow-hidden">Limit:</span>
+            <div class="input-group-prepend" style="max-width: 25%">
+                <span class="input-group-text">Limit:</span>
             </div>
             <input type="number" class="form-control" name="limit"
                    th:value="${group != null} ? ${group.getLimit()} : '999999'"
                    min="1" max="999999" id="limitselect" required
                    th:disabled="${group != null && group.getLimit() < 999999} ? 'false' : 'disabled'">
-            <div class="input-group-append overflow-hidden" style="max-width: 25%">
-                <span class="input-group-text text-monospace overflow-hidden">Teilnehmer</span>
+            <div class="input-group-append" style="max-width: 25%">
+                <span class="input-group-text">Teilnehmer</span>
             </div>
         </div>
     </div>
@@ -102,7 +102,7 @@
 <div th:fragment="csvimport" class="input-group" th:if="${account.getRoles().contains('orga')}"
      title="Das CSV folgt dem Format id,givenname,familyname,email.">
     <div class="input-group-prepend">
-        <span class="input-group-text text-monospace">CSV:</span>
+        <span class="input-group-text">CSV:</span>
     </div>
     <div class="custom-file">
         <input type="file" class="custom-file-input" id="file" name="file">

@@ -10,7 +10,7 @@
 
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <h1 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;" th:text="${group.getTitle()}"></h1>
+        <h1 th:text="${group.getTitle()}"></h1>
 
         <!--Fertig oder löschen-->
         <div class="content">
@@ -18,7 +18,7 @@
                 <a class="btn btn-primary flex-grow-1 mt-2 mr-2" style="max-width: 250px;"
                    th:href="@{/gruppen2/details/{id}(id=${group.getId()})}">Fertig</a>
 
-                <div class="mt-2 mr-2 flex-grow-1 ml-auto" style="max-width: 250px;">
+                <div class="mt-2 mr-2 flex-grow-1 ml-auto btn-spacer">
                     <form method="post" th:action="@{/gruppen2/details/{id}/edit/destroy(id=${group.getId()})}">
                         <button class="btn btn-danger w-100" type="submit">Gruppe löschen
                         </button>
@@ -51,9 +51,10 @@
                       method="post">
 
                     <div th:replace="~{fragments/forms :: meta}"></div>
-                    <div class="row">
-                        <span class="col"></span>
-                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+
+                    <div class="d-flex flex-row flex-wrap">
+                        <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                        </button>
                     </div>
                 </form>
             </div>
@@ -64,9 +65,10 @@
                       method="post">
 
                     <div th:replace="~{fragments/forms :: userlimit}"></div>
-                    <div class="row">
-                        <span class="col"></span>
-                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+
+                    <div class="d-flex flex-row flex-wrap">
+                        <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                        </button>
                     </div>
                 </form>
             </div>
@@ -78,9 +80,10 @@
                       enctype="multipart/form-data" method="post">
 
                     <div th:replace="~{fragments/forms :: csvimport}"></div>
-                    <div class="row">
-                        <span class="col"></span>
-                        <button type="submit" class="btn btn-secondary mt-2">Speichern</button>
+
+                    <div class="d-flex flex-row flex-wrap">
+                        <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                        </button>
                     </div>
                 </form>
             </div>
@@ -92,22 +95,22 @@
                 <span>Event-Historie</span>
             </div>
             <div class="d-flex flex-row flex-wrap mt-n2 mr-n2">
-                <a class="btn btn-primary mt-2 mr-2 flex-grow-1" style="max-width: 250px;"
+                <a class="btn btn-primary mt-2 mr-2 flex-grow-1"
                    th:href="@{/gruppen2/details/{id}/history(id=${group.getId()})}">Event-Log</a>
 
-                <a class="btn btn-info flex-grow-1 mt-2 mr-2 ml-auto" style="max-width: 250px;"
+                <a class="btn btn-info flex-grow-1 mt-2 mr-2 ml-auto"
                    th:href="@{/gruppen2/details/{id}/export/history/plain(id=${group.getId()})}"
                    title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann beim erstellen importiert werden.">
                     Event-Log exportieren (TXT)
                 </a>
 
-                <a class="btn btn-info flex-grow-1 mt-2 mr-2" style="max-width: 250px;"
+                <a class="btn btn-info flex-grow-1 mt-2 mr-2"
                    th:href="@{/gruppen2/details/{id}/export/history/sql(id=${group.getId()})}"
                    title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann als data.sql verwendet werden.">
                     Event-Log exportieren (SQL)
                 </a>
 
-                <a class="btn btn-info flex-grow-1 mt-2 mr-2" style="max-width: 250px;"
+                <a class="btn btn-info flex-grow-1 mt-2 mr-2"
                    th:href="@{/gruppen2/details/{id}/export/members(id=${group.getId()})}"
                    title="Exportiert die Teilnehmerliste. Kann beim erstellen (oder nachträglich) importiert werden.">
                     Teilnehmer exportieren
@@ -116,7 +119,7 @@
         </div>
 
         <!--Teilnehmerliste-->
-        <div class="content members overflow-hidden" style="max-width: 100%;">
+        <div class="content members">
             <div class="content-heading">
                 <span>Teilnehmer</span>
             </div>

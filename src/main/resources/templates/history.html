@@ -14,12 +14,10 @@
         <h1 class="def-cursor">Event-Log</h1>
 
         <div class="content" th:each="event : ${events}">
-            <div class="content-heading row">
+            <div class="content-heading d-flex flex-row flex-wrap">
                 <span th:text="${event.type()}"></span>
 
-                <span class="col"></span>
-
-                <span>Datum: </span>
+                <span class="ml-auto">Datum: </span>
                 <span th:text="${event.getDate()}"></span>
             </div>
 

@@ -11,12 +11,11 @@
 <main th:fragment="bodycontent">
     <div class="container">
 
-        <h1 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">Neue Gruppe</h1>
+        <h1>Neue Gruppe</h1>
 
-        <div class="content overflow-hidden">
-            <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
-                <h3 class="def-cursor overflow-hidden" style="text-overflow: ellipsis;">
-                    Eigenschaften:</h3>
+        <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
+            <div class="content">
+                <h3>Eigenschaften:</h3>
 
                 <!--Titel + Beschreibung-->
                 <div class="content-text" th:insert="~{fragments/forms :: meta}"></div>
@@ -33,13 +32,14 @@
 
                 <!--CSV Import-->
                 <div class="content-text mb-0" th:insert="~{fragments/forms :: csvimport}"></div>
-        </div>
+            </div>
 
-        <div class="content">
-            <!--Submit-->
-            <button class="btn btn-primary btn-block" type="submit">Gruppe Erstellen</button>
-            </form>
-        </div>
+            <div class="content d-flex flex-row flex-wrap">
+                <!--Submit-->
+                <button class="btn btn-primary btn-block ml-auto" type="submit">Gruppe Erstellen
+                </button>
+            </div>
+        </form>
     </div>
 </main>
 
