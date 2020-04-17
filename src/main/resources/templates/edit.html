@@ -93,10 +93,23 @@
                 <span>Event-Historie</span>
             </div>
             <div class="row">
+                <a class="btn btn-primary btn-bar"
+                   th:href="@{/gruppen2/details/{id}/history(id=${group.getId()})}">Event-Log</a>
+
                 <!--Spacer-->
                 <span class="col"></span>
 
-                <a class="btn btn-primary btn-bar" th:href="@{/gruppen2/details/{id}/history(id=${group.getId()})}">Event-Log</a>
+                <a class="btn btn-info btn-bar mr-2"
+                   th:href="@{/gruppen2/details/{id}/export/history(id=${group.getId()})}"
+                   title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann beim erstellen importiert werden.">
+                    Event-Log exportieren
+                </a>
+
+                <a class="btn btn-info btn-bar"
+                   th:href="@{/gruppen2/details/{id}/export/members(id=${group.getId()})}"
+                   title="Exportiert die Teilnehmerliste. Kann beim erstellen (oder nachträglich) importiert werden.">
+                    Teilnehmer exportieren
+                </a>
             </div>
         </div>
 

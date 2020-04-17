@@ -45,4 +45,20 @@ public final class CsvHelper {
 
         return reader.<User>readValues(stream).readAll();
     }
+
+    public static String writeCsvUserList(List<User> members) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("id,givenname,familyname,email");
+
+        members.forEach(user -> builder.append(user.getId())
+                                       .append(",")
+                                       .append(user.getGivenname())
+                                       .append(",")
+                                       .append(user.getFamilyname())
+                                       .append(",")
+                                       .append(user.getEmail())
+                                       .append("\n"));
+
+        return builder.toString();
+    }
 }

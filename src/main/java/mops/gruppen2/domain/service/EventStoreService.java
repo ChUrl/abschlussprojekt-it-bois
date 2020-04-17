@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.BadPayloadException;
+import mops.gruppen2.domain.exception.GroupNotFoundException;
 import mops.gruppen2.domain.service.helper.JsonHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -98,7 +100,14 @@ public class EventStoreService {
         return getEventsFromDTOs(eventStore.findAllEvents());
     }
 
-    public List<Event> findGroupEvents(String groupId) {
-        return getEventsFromDTOs(eventStore.findGroupEvents(groupId));
+    public List<Event> findGroupEvents(UUID groupId) {
+        return getEventsFromDTOs(eventStore.findGroupEvents(groupId.toString()));
+    }
+
+    public String findGroupPayloads(UUID groupId) {
+        return eventStore.findGroupPayloads(groupId.toString()).stream()
+                         .map(payload -> payload + "\n")
+                         .reduce((String payloadA, String payloadB) -> payloadA + payloadB)
+                         .orElseThrow(() -> new GroupNotFoundException("Keine Payloads gefunden."));
     }
 }

@@ -16,19 +16,23 @@ import mops.gruppen2.infrastructure.GroupCache;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 @Log4j2
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "class")
-@JsonSubTypes({@JsonSubTypes.Type(value = AddMemberEvent.class, name = "ADDMEMBER"),
-               @JsonSubTypes.Type(value = CreateGroupEvent.class, name = "CREATEGROUP"),
-               @JsonSubTypes.Type(value = DestroyGroupEvent.class, name = "DESTROYGROUP"),
-               @JsonSubTypes.Type(value = KickMemberEvent.class, name = "KICKMEMBER"),
-               @JsonSubTypes.Type(value = SetDescriptionEvent.class, name = "SETDESCRIPTION"),
-               @JsonSubTypes.Type(value = SetInviteLinkEvent.class, name = "SETLINK"),
-               @JsonSubTypes.Type(value = SetLimitEvent.class, name = "SETLIMIT"),
-               @JsonSubTypes.Type(value = SetParentEvent.class, name = "SETPARENT"),
-               @JsonSubTypes.Type(value = SetTitleEvent.class, name = "SETTITLE"),
-               @JsonSubTypes.Type(value = SetTypeEvent.class, name = "SETTYPE"),
-               @JsonSubTypes.Type(value = UpdateRoleEvent.class, name = "UPDATEROLE")})
+@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "class")
+@JsonSubTypes({@Type(value = AddMemberEvent.class, name = "ADDMEMBER"),
+               @Type(value = CreateGroupEvent.class, name = "CREATEGROUP"),
+               @Type(value = DestroyGroupEvent.class, name = "DESTROYGROUP"),
+               @Type(value = KickMemberEvent.class, name = "KICKMEMBER"),
+               @Type(value = SetDescriptionEvent.class, name = "SETDESCRIPTION"),
+               @Type(value = SetInviteLinkEvent.class, name = "SETLINK"),
+               @Type(value = SetLimitEvent.class, name = "SETLIMIT"),
+               @Type(value = SetParentEvent.class, name = "SETPARENT"),
+               @Type(value = SetTitleEvent.class, name = "SETTITLE"),
+               @Type(value = SetTypeEvent.class, name = "SETTYPE"),
+               @Type(value = UpdateRoleEvent.class, name = "UPDATEROLE")})
 @Getter
 @NoArgsConstructor // Lombok needs a default constructor in the base class
 public abstract class Event {
@@ -93,6 +97,7 @@ public abstract class Event {
 
     protected abstract void applyEvent(Group group) throws EventException;
 
+    @JsonIgnore
     public abstract String format();
 
     @JsonIgnore
