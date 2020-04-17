@@ -224,7 +224,9 @@ public class GroupDetailsController {
         Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
-        ValidationHelper.throwIfLastAdmin(group, principal);
+        if (target.equals(principal)) {
+            ValidationHelper.throwIfLastAdmin(group, principal);
+        }
 
         groupService.toggleMemberRole(group, principal, target);
 

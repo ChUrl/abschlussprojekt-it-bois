@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.EventException;
 import mops.gruppen2.domain.model.group.Group;
-import mops.gruppen2.domain.model.group.SortHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +29,11 @@ public class SearchService {
      *
      * @throws EventException Projektionsfehler
      */
-    //TODO: search in lectures
     public List<Group> search(String search, String principal) {
         List<Group> groups = new ArrayList<>();
         groups.addAll(groupCache.publics());
         groups.addAll(groupCache.lectures());
         groups = removeUserGroups(groups, principal);
-        SortHelper.sortByGroupType(groups);
 
         if (search.isEmpty()) {
             return groups;
@@ -44,6 +41,8 @@ public class SearchService {
 
         log.debug("Es wurde gesucht nach: {}", search);
 
+        // Die Suche nach Typ (LECTURE, PUBLIC), ist nicht wirklich sicher,
+        // da im gesamtstring danach gesucht wird
         return groups.stream()
                      .filter(group -> group.format().toLowerCase().contains(search.toLowerCase()))
                      .collect(Collectors.toList());

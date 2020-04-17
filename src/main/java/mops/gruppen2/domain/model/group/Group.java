@@ -19,6 +19,7 @@ import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.helper.CommonHelper;
+import mops.gruppen2.domain.service.helper.SortHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 
 import javax.validation.Valid;
@@ -302,7 +303,7 @@ public class Group {
     }
 
     public String format() {
-        return title + " " + description;
+        return type + ": " + title + " - " + description;
     }
 
     @Override

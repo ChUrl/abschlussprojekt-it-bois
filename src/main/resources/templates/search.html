@@ -16,14 +16,36 @@
         <!--Suchfilter-->
         <div class="content top">
             <form method="post" th:action="@{/gruppen2/search}">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text text-monospace">Suchbegriff:</span>
+                <div class="row mb-3">
+                    <div class="input-group col mr-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text text-monospace">Suchbegriff:</span>
+                        </div>
+                        <input class="form-control" required minlength="1" name="string" type="text">
                     </div>
-                    <input class="form-control" name="string" type="text">
+
+                    <button class="btn btn-primary" type="submit">Suchen</button>
                 </div>
-                <button class="btn btn-primary" type="submit">Suchen</button>
             </form>
+
+            <div class="row">
+                <form method="post" th:action="@{/gruppen2/search}">
+                    <input type="hidden" name="string" value="">
+                    <button class="btn btn-info" type="submit">Alle Anzeigen</button>
+                </form>
+
+                <!--spacer-->
+                <span class="col"></span>
+
+                <form method="post" th:action="@{/gruppen2/search}">
+                    <input type="hidden" name="string" value="LECTURE">
+                    <button class="btn btn-info mr-2" type="submit">Vorlesungen</button>
+                </form>
+                <form method="post" th:action="@{/gruppen2/search}">
+                    <input type="hidden" name="string" value="PUBLIC">
+                    <button class="btn btn-info" type="submit">Öffentliche Gruppen</button>
+                </form>
+            </div>
         </div>
 
         <!--Ergebnisliste-->
