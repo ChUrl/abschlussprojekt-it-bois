@@ -20,6 +20,8 @@ class GroupOptions {
     boolean hasMaterialIntegration;
     boolean hasTermineIntegration;
     boolean hasPortfolioIntegration;
+    boolean hasForumsIntegration;
+    boolean hasModulesIntegration;
 
     static GroupOptions DEFAULT() {
         return new GroupOptions(true,
@@ -29,6 +31,8 @@ class GroupOptions {
                                 null,
                                 null,
                                 null,
+                                true,
+                                true,
                                 true,
                                 true,
                                 true);

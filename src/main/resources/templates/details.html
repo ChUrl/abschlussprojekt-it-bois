@@ -20,26 +20,143 @@
                 <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
 
 
-                <!--Integrationen-->
-                <div class="d-flex flex-wrap mr-n2">
+                <!--Dummy Integrationen-->
+                <div class="d-flex flex-row flex-wrap mr-n2 mt-n2">
                     <!--Materialsammlung-->
-                    <div class="content flex-grow-1 mr-2">
+                    <div th:if="${group.hasMaterial()}" class="content flex-grow-1 mr-2 mt-2">
+                        <div class="content-heading">
+                            <span>Gruppenmaterialien</span>
+                        </div>
 
+                        <div class="content-text-in">
+                            <h3>Neue Materialien:</h3>
+                            <ul>
+                                <li><a href="/">Blatt 3.pdf</a></li>
+                                <li><a href="/">Vorlesung 5.pdf</a></li>
+                                <li><a href="/">Wikipedia.de/blabla</a></li>
+                            </ul>
+                            <h3>Angepinnt:</h3>
+                            <ul>
+                                <li><a href="/">Sicherheitsregeln.pdf</a></li>
+                                <li><a href="/">Bewertungskriterien.pdf</a></li>
+                            </ul>
+                        </div>
+                        <div class="content-text d-flex flex-row flex-wrap mt-n2 mr-n2">
+                            <a class="btn btn-success flex-grow-1 mt-2 mr-2" href="/">Neuer
+                                                                                      Upload.</a>
+                            <a class="btn btn-info ml-auto flex-grow-1 mt-2 mr-2" href="/">
+                                Zur Materialsammlung.</a>
+                        </div>
                     </div>
 
                     <!--Foren-->
-                    <div class="content flex-grow-1 mr-2">
+                    <div th:if="${group.hasForums()}" class="content flex-grow-1 mr-2 mt-2">
+                        <div class="content-heading">
+                            <span>Forum</span>
+                        </div>
 
+                        <div class="content-text-in">
+                            <h3>Letzte Aktivität:</h3>
+                            <ul>
+                                <li><a href="/">"Re: Ey schick lösung"</a></li>
+                                <li><a href="/">"Re: Aufgabe 2"</a></li>
+                                <li><a href="/">"Neu: Ankündigung"</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="content-text d-flex flex-row flex-wrap mt-n2 mr-n2">
+                            <a class="btn btn-success flex-grow-1 mt-2 mr-2" href="/">
+                                Frage stellen.</a>
+                            <a class="btn btn-info flex-grow-1 ml-auto mt-2 mr-2" href="/">
+                                Zum Forum.</a>
+                        </div>
                     </div>
 
                     <!--Termine-->
-                    <div class="content flex-grow-1 mr-2">
+                    <div th:if="${group.hasCalendar()}" class="content flex-grow-1 mr-2 mt-2">
+                        <div class="content-heading">
+                            <span>Gruppentermine</span>
+                        </div>
 
+                        <div class="content-text-in">
+                            <h3>Nächste Fristen:</h3>
+                            <ul>
+                                <li><a href="/">"Abgabe Übungsblatt 3"</a></li>
+                                <li><a href="/">"Feedback VL 5"</a></li>
+                                <li><a href="/">"Übungsgruppe belegen"</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="content-text d-flex flex-row flex-wrap mt-n2 mr-n2">
+                            <a class="btn btn-success flex-grow-1 mt-2 mr-2" href="/">
+                                Abstimmung starten.</a>
+                            <a class="btn btn-info flex-grow-1 ml-auto mt-2 mr-2" href="/">
+                                Zur Terminfindung.</a>
+                        </div>
+                    </div>
+
+                    <!--Portfolios-->
+                    <div th:if="${group.hasPortfolios()}" class="content flex-grow-1 mr-2 mt-2">
+                        <div class="content-heading">
+                            <span>Gruppenportfolio</span>
+                        </div>
+
+                        <div class="content-text-in">
+                            <h3>Neueste Einträge:</h3>
+                            <ul>
+                                <li><a href="/">"Praktikum Tag 5"</a></li>
+                                <li><a href="/">"Praktikum Tag 4"</a></li>
+                                <li><a href="/">"Nacharbeit Tag 3"</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="content-text d-flex flex-row flex-wrap mt-n2 mr-n2">
+                            <a class="btn btn-success flex-grow-1 mt-2 mr-2" href="/">
+                                Neue Seite.</a>
+                            <a class="btn btn-info flex-grow-1 ml-auto mt-2 mr-2" href="/">
+                                Zum Portfolio.</a>
+                        </div>
                     </div>
 
                     <!--Modulhandbuch-->
-                    <div class="content flex-grow-1 mr-2">
+                    <div th:if="${group.hasModules()}" class="content flex-grow-1 mr-2 mt-2">
+                        <div class="content-heading">
+                            <span>Modulhandbuch</span>
+                        </div>
 
+                        <div class="content-text-in">
+                            <h3>Veranstaltungsinfo:</h3>
+                            <p>
+                                Dieses Modul vermittelt grundlegende Programmierkenntnisse in einer
+                                objektorientierten Programmiersprache.
+                                Darüber hinaus werden einführend Aspekte von Algorithmen und
+                                Datenstrukturen behandelt.
+                                Es wird keine Programmiererfahrung vorausgesetzt.
+                            </p>
+                            <ul>
+                                <li>Grundlegende Begriffe der Informatik</li>
+                                <li>Primitive Datentypen und Variablen</li>
+                                <li>Kontrollstrukturen</li>
+                                <li>Eigene Datentypen (Klassen) und Arrays</li>
+                                <li>Programmstrukturen im Speicher (Heap, Stack)</li>
+                                <li>Konzepte der Objektorientierung (Polymorphie, Schnittstellen)
+                                </li>
+                                <li>Rekursion</li>
+                                <li>Fehlerbehandlung</li>
+                                <li>Dynamische Datenstrukturen (Listen, Binärbäume, Hashing)</li>
+                                <li>Suchen und Sortieren (ausgewählte Algorithmen, u.a. binäre
+                                    Suche, BubbleSort, QuickSort)
+                                </li>
+                                <li>Datenströme (Standard-Eingabe und -Ausgabe, einfache 2D-Grafik,
+                                    Dateien)
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="content-text d-flex flex-row flex-wrap mt-n2 mr-n2">
+                            <a class="btn btn-info flex-grow-1 ml-auto mt-2 mr-2" href="/">
+                                Zum Modulhandbuch.</a>
+                        </div>
                     </div>
                 </div>
 

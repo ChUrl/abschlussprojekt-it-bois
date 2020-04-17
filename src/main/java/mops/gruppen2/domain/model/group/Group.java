@@ -216,6 +216,26 @@ public class Group {
         return !parent.isEmpty();
     }
 
+    public boolean hasMaterial() {
+        return options.isHasMaterialIntegration();
+    }
+
+    public boolean hasForums() {
+        return options.isHasForumsIntegration();
+    }
+
+    public boolean hasCalendar() {
+        return options.isHasTermineIntegration();
+    }
+
+    public boolean hasModules() {
+        return options.isHasModulesIntegration();
+    }
+
+    public boolean hasPortfolios() {
+        return options.isHasPortfolioIntegration();
+    }
+
 
     // ######################################## Setters ##########################################
 
