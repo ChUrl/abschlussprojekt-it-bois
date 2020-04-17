@@ -10,7 +10,6 @@ import mops.gruppen2.infrastructure.api.GroupWrapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//TODO: sinnvolles format
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class APIHelper {

@@ -57,6 +57,7 @@ public class Group {
 
     private GroupMeta meta = GroupMeta.EMPTY();
 
+    //TODO: UI set + use for options
     private GroupOptions options = GroupOptions.DEFAULT();
 
     // Inhalt
@@ -64,6 +65,7 @@ public class Group {
 
     private Description description = Description.EMPTY();
 
+    //TODO: Asciidoc description
     private Body body;
 
     // Integrationen
