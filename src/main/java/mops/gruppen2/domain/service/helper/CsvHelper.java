@@ -48,7 +48,7 @@ public final class CsvHelper {
 
     public static String writeCsvUserList(List<User> members) {
         StringBuilder builder = new StringBuilder();
-        builder.append("id,givenname,familyname,email");
+        builder.append("id,givenname,familyname,email\n");
 
         members.forEach(user -> builder.append(user.getId())
                                        .append(",")

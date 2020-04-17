@@ -112,13 +112,13 @@ public class GroupDetailsController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @GetMapping("details/{id}/export/history")
+    @GetMapping(value = "details/{id}/export/history", produces = "text/plain;charset=UTF-8")
     public void getDetailsExportHistory(HttpServletResponse response,
                                         @PathVariable("id") String groupId) {
 
         String filename = "eventlog-" + groupId + ".txt";
 
-        response.setContentType("text/txt");
+        response.setContentType("text/txt;charset=UTF-8");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                            "attachment; filename=\"" + filename + "\"");
 
@@ -130,13 +130,13 @@ public class GroupDetailsController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @GetMapping("details/{id}/export/members")
+    @GetMapping(value = "details/{id}/export/members", produces = "text/csv;charset=UTF-8")
     public void getDetailsExportMembers(HttpServletResponse response,
                                         @PathVariable("id") String groupId) {
 
         String filename = "teilnehmer-" + groupId + ".csv";
 
-        response.setContentType("text/csv");
+        response.setContentType("text/csv;charset=UTF-8");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                            "attachment; filename=\"" + filename + "\"");
 
