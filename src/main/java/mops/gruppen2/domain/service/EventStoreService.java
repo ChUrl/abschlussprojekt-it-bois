@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.event.Event;
 import mops.gruppen2.domain.exception.BadPayloadException;
-import mops.gruppen2.domain.exception.GroupNotFoundException;
-import mops.gruppen2.domain.service.helper.JsonHelper;
+import mops.gruppen2.domain.service.helper.FileHelper;
 import mops.gruppen2.persistance.EventRepository;
 import mops.gruppen2.persistance.dto.EventDTO;
 import org.springframework.stereotype.Service;
@@ -55,15 +54,14 @@ public class EventStoreService {
      */
     private static EventDTO getDTOFromEvent(Event event) {
         try {
-            String payload = JsonHelper.serializeEvent(event);
+            String payload = FileHelper.serializeEventJson(event);
             return new EventDTO(null,
                                 event.getGroupid().toString(),
                                 event.getVersion(),
                                 event.getExec(),
                                 event.getTarget(),
-                                event.type(),
-                                payload,
-                                Timestamp.valueOf(event.getDate()));
+                                Timestamp.valueOf(event.getDate()),
+                                payload);
         } catch (JsonProcessingException e) {
             log.error("Event ({}) konnte nicht serialisiert werden!", event, e);
             throw new BadPayloadException(EventStoreService.class.toString());
@@ -85,7 +83,7 @@ public class EventStoreService {
 
     private static Event getEventFromDTO(EventDTO dto) {
         try {
-            return JsonHelper.deserializeEvent(dto.getEvent_payload());
+            return FileHelper.deserializeEventJson(dto.getEvent_payload());
         } catch (JsonProcessingException e) {
             log.error("Payload {} konnte nicht deserialisiert werden!", dto.getEvent_payload(), e);
             throw new BadPayloadException(EventStoreService.class.toString());
@@ -104,10 +102,11 @@ public class EventStoreService {
         return getEventsFromDTOs(eventStore.findGroupEvents(groupId.toString()));
     }
 
-    public String findGroupPayloads(UUID groupId) {
-        return eventStore.findGroupPayloads(groupId.toString()).stream()
-                         .map(payload -> payload + "\n")
-                         .reduce((String payloadA, String payloadB) -> payloadA + payloadB)
-                         .orElseThrow(() -> new GroupNotFoundException("Keine Payloads gefunden."));
+    public List<String> findGroupPayloads(UUID groupId) {
+        return eventStore.findGroupPayloads(groupId.toString());
+    }
+
+    public List<EventDTO> findGroupDTOs(UUID groupid) {
+        return eventStore.findGroupEvents(groupid.toString());
     }
 }

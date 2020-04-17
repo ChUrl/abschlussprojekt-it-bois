@@ -11,7 +11,7 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.helper.CsvHelper;
+import mops.gruppen2.domain.service.helper.FileHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -67,7 +67,7 @@ public class GroupCreationController {
 
         // ROLE_studentin kann kein CSV importieren
         if (token.getAccount().getRoles().contains("orga")) {
-            groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
+            groupService.addUsersToGroup(group, principal, FileHelper.readCsvFile(file));
         }
 
         return "redirect:/gruppen2/details/" + group.getId();

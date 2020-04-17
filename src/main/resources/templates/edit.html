@@ -100,9 +100,15 @@
                 <span class="col"></span>
 
                 <a class="btn btn-info btn-bar mr-2"
-                   th:href="@{/gruppen2/details/{id}/export/history(id=${group.getId()})}"
+                   th:href="@{/gruppen2/details/{id}/export/history/plain(id=${group.getId()})}"
                    title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann beim erstellen importiert werden.">
-                    Event-Log exportieren
+                    Event-Log exportieren (TXT)
+                </a>
+
+                <a class="btn btn-info btn-bar mr-2"
+                   th:href="@{/gruppen2/details/{id}/export/history/sql(id=${group.getId()})}"
+                   title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann als data.sql verwendet werden.">
+                    Event-Log exportieren (SQL)
                 </a>
 
                 <a class="btn btn-info btn-bar"

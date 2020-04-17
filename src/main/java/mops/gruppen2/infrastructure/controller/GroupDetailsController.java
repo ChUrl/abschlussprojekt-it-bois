@@ -10,7 +10,7 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.helper.CsvHelper;
+import mops.gruppen2.domain.service.helper.FileHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
@@ -112,9 +112,9 @@ public class GroupDetailsController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
-    @GetMapping(value = "details/{id}/export/history", produces = "text/plain;charset=UTF-8")
-    public void getDetailsExportHistory(HttpServletResponse response,
-                                        @PathVariable("id") String groupId) {
+    @GetMapping(value = "details/{id}/export/history/plain", produces = "text/plain;charset=UTF-8")
+    public void getDetailsExportHistoryPlain(HttpServletResponse response,
+                                             @PathVariable("id") String groupId) {
 
         String filename = "eventlog-" + groupId + ".txt";
 
@@ -123,7 +123,29 @@ public class GroupDetailsController {
                            "attachment; filename=\"" + filename + "\"");
 
         try {
-            response.getWriter().write(eventStoreService.findGroupPayloads(UUID.fromString(groupId)));
+            response.getWriter()
+                    .write(FileHelper.payloadsToPlain(
+                            eventStoreService.findGroupPayloads(UUID.fromString(groupId))));
+        } catch (IOException e) {
+            log.error("Payloads konnten nicht geschrieben werden.", e);
+        }
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping(value = "details/{id}/export/history/sql", produces = "application/sql;charset=UTF-8")
+    public void getDetailsExportHistorySql(HttpServletResponse response,
+                                           @PathVariable("id") String groupId) {
+
+        String filename = "data.sql";
+
+        response.setContentType("application/sql;charset=UTF-8");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                           "attachment; filename=\"" + filename + "\"");
+
+        try {
+            response.getWriter()
+                    .write(FileHelper.eventDTOsToSql(
+                            eventStoreService.findGroupDTOs(UUID.fromString(groupId))));
         } catch (IOException e) {
             log.error("Payloads konnten nicht geschrieben werden.", e);
         }
@@ -142,7 +164,7 @@ public class GroupDetailsController {
 
         try {
             response.getWriter()
-                    .print(CsvHelper.writeCsvUserList(groupCache.group(UUID.fromString(groupId)).getMembers()));
+                    .print(FileHelper.writeCsvUserList(groupCache.group(UUID.fromString(groupId)).getMembers()));
         } catch (IOException e) {
             log.error("Teilnehmerliste konnte nicht geschrieben werden.", e);
         }
@@ -209,7 +231,7 @@ public class GroupDetailsController {
         String principal = token.getName();
         Group group = groupCache.group(UUID.fromString(groupId));
 
-        groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
+        groupService.addUsersToGroup(group, principal, FileHelper.readCsvFile(file));
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
