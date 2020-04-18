@@ -3,6 +3,8 @@ package mops.gruppen2.infrastructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.GroupNotFoundException;
+import mops.gruppen2.domain.exception.IdMismatchException;
+import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
 import mops.gruppen2.domain.service.EventStoreService;
@@ -29,7 +31,7 @@ public class GroupCache {
 
     private final Map<UUID, Group> groups = new HashMap<>();
     private final Map<String, Group> links = new HashMap<>();
-    private final Map<String, List<Group>> users = new HashMap<>();
+    private final Map<String, List<Group>> users = new HashMap<>(); // Wird vielleicht zu groß?
     private final Map<Type, List<Group>> types = new EnumMap<>(Type.class);
 
 
@@ -58,6 +60,14 @@ public class GroupCache {
         }
 
         return links.get(link);
+    }
+
+    public List<Group> groups() {
+        if (groups.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return List.copyOf(groups.values());
     }
 
     public List<Group> userGroups(String userid) {
@@ -115,6 +125,9 @@ public class GroupCache {
 
 
     public void usersPut(String userid, Group group) {
+        if (!group.isMember(userid)) {
+            throw new UserNotFoundException("User ist kein Mitglied, Gruppe nicht gecached.");
+        }
         if (!users.containsKey(userid)) {
             users.put(userid, new ArrayList<>());
             log.debug("Ein User wurde dem Cache hinzugefügt.");
@@ -132,18 +145,34 @@ public class GroupCache {
     }
 
     public void groupsPut(UUID groupid, Group group) {
+        if (group.getId() != groupid) {
+            throw new IdMismatchException("ID passt nicht zu Gruppe, Gruppe nicht gecached.");
+        }
+
         groups.put(groupid, group);
     }
 
-    public void groupsRemove(Group group) {
-        groups.remove(group.getId());
+    public void groupsRemove(UUID groupid) {
+        if (!groups.containsKey(groupid)) {
+            return;
+        }
+
+        groups.remove(groupid);
     }
 
     public void linksPut(String link, Group group) {
+        if (!link.equals(group.getLink())) {
+            throw new IdMismatchException("Link passt nicht zu Gruppe, Gruppe nicht gecached.");
+        }
+
         links.put(link, group);
     }
 
     public void linksRemove(String link) {
+        if (!links.containsKey(link)) {
+            return;
+        }
+
         links.remove(link);
     }
 
@@ -151,6 +180,9 @@ public class GroupCache {
         if (!types.containsKey(type)) {
             types.put(type, new ArrayList<>());
             log.debug("Ein Typ wurde dem Cache hinzugefügt.");
+        }
+        if (group.getType() != type) {
+            throw new IdMismatchException("Typ passt nicht zu Gruppe, Gruppe nicht gecached.");
         }
 
         types.get(type).add(group);
