@@ -22,7 +22,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProjectionHelper {
 
-
     public static List<Group> project(List<Event> events) {
         Map<UUID, Group> groups = new HashMap<>();
 

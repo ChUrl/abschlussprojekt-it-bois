@@ -78,7 +78,7 @@ public abstract class Event {
 
         checkGroupIdMatch(group.getId());
         applyEvent(group);
-        updateCache(cache, group);
+        updateCache(cache, group); // Update erst nachdem apply keine exception geworfen hat
 
         // Danach hat die Gruppe nur Nullfelder
         if (this instanceof DestroyGroupEvent) {

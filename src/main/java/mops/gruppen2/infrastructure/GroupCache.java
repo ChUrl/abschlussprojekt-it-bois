@@ -21,6 +21,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Cached alle existierenden Gruppen und einige Beziehungen.
+ * Gruppen können nach Typ angefragt werden, nach ID, nach Link oder nach User.
+ * Der Cache wird von den Events aktualisiert.
+ * Beim Aufruf der init() Methode werden alle bisherigen Events projiziert und die Gruppen gespeichert.
+ * Die Komplette Anwendung verwendet eine Instanz des Caches.
+ */
 @Log4j2
 @RequiredArgsConstructor
 @Component

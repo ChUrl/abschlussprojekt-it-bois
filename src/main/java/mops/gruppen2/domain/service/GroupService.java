@@ -24,12 +24,15 @@ import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
+import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Behandelt Aufgaben, welche sich auf eine Gruppe beziehen.
@@ -94,9 +97,11 @@ public class GroupService {
      * @param exec     Ausführender User
      */
     public void addUsersToGroup(Group group, String exec, List<User> newUsers) {
-        setLimit(group, exec, getAdjustedUserLimit(newUsers, group));
+        List<User> users = newUsers.stream().distinct().collect(Collectors.toUnmodifiableList());
 
-        newUsers.forEach(newUser -> addUserSilent(group, exec, newUser.getId(), newUser));
+        setLimit(group, exec, getAdjustedUserLimit(users, group));
+
+        users.forEach(newUser -> addUserSilent(group, exec, newUser.getId(), newUser));
     }
 
     /**
@@ -123,6 +128,8 @@ public class GroupService {
      * @throws EventException Falls der User nicht gefunden wird
      */
     public void toggleMemberRole(Group group, String exec, String target) {
+        ValidationHelper.throwIfNoMember(group, target);
+
         updateRole(group, exec, target, group.getRole(target).toggle());
     }
 
@@ -192,7 +199,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob der Titel valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void setTitle(Group group, String exec, Title title) {
+    public void setTitle(Group group, String exec, @Valid Title title) {
         if (group.getTitle().equals(title.getValue())) {
             return;
         }
@@ -205,7 +212,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob die Beschreibung valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void setDescription(Group group, String exec, Description description) {
+    public void setDescription(Group group, String exec, @Valid Description description) {
         if (group.getDescription().equals(description.getValue())) {
             return;
         }
@@ -231,7 +238,7 @@ public class GroupService {
      * Prüft, ob der Nutzer Admin ist und ob das Limit valide ist.
      * Bei keiner Änderung wird nichts erzeugt.
      */
-    public void setLimit(Group group, String exec, Limit userLimit) {
+    public void setLimit(Group group, String exec, @Valid Limit userLimit) {
         if (userLimit.getValue() == group.getLimit()) {
             return;
         }
@@ -247,7 +254,8 @@ public class GroupService {
         applyAndSave(group, new SetParentEvent(group.getId(), exec, parent));
     }
 
-    public void setLink(Group group, String exec, Link link) {
+    //TODO: UI Link regenerieren button
+    public void setLink(Group group, String exec, @Valid Link link) {
         if (group.getLink().equals(link.getValue())) {
             return;
         }

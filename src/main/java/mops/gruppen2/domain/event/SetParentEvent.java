@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.NoAccessException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
@@ -29,7 +30,7 @@ public class SetParentEvent extends Event {
     protected void updateCache(GroupCache cache, Group group) {}
 
     @Override
-    protected void applyEvent(Group group) throws NoAccessException {
+    protected void applyEvent(Group group) throws NoAccessException, BadArgumentException {
         group.setParent(exec, parent);
 
         log.trace("\t\t\t\t\tNeues Parent: {}", group.getParent());

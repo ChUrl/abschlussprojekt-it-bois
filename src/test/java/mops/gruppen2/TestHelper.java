@@ -1,5 +1,8 @@
 package mops.gruppen2;
 
+import mops.gruppen2.domain.event.Event;
+
+import java.util.List;
 import java.util.UUID;
 
 public final class TestHelper {
@@ -11,5 +14,11 @@ public final class TestHelper {
         string += num;
 
         return UUID.fromString(string);
+    }
+
+    public static void initEvents(List<Event> events) {
+        for (int i = 1; i <= events.size(); i++) {
+            events.get(i - 1).init(i);
+        }
     }
 }

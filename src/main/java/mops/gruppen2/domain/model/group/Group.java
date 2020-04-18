@@ -278,14 +278,20 @@ public class Group {
         this.limit = limit;
     }
 
-    public void setParent(String exec, @Valid Parent parent) throws NoAccessException {
+    public void setParent(String exec, @Valid Parent parent) throws NoAccessException, BadArgumentException {
         ValidationHelper.throwIfNoAdmin(this, exec);
+        if (parent.getValue().equals(groupid)) {
+            throw new BadArgumentException("Die Gruppe kann nicht zu sich selbst gehören!");
+        }
 
         this.parent = parent;
     }
 
     public void setLink(String exec, @Valid Link link) throws NoAccessException {
         ValidationHelper.throwIfNoAdmin(this, exec);
+        if (link.getValue().equals(groupid.toString())) {
+            throw new BadArgumentException("Link kann nicht der GruppenID entsprechen.");
+        }
 
         this.link = link;
     }
