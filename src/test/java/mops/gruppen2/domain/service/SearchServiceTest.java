@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 
 class SearchServiceTest {
 
-    GroupCache groupCache;
-    SearchService searchService;
+    private GroupCache groupCache;
+    private SearchService searchService;
 
     @BeforeEach
     void setUp() {
