@@ -9,29 +9,26 @@
 <body>
 
 <main th:fragment="bodycontent">
-    <div class="container-fluid">
+    <h1>Meine Gruppen</h1>
 
-        <h1>Meine Gruppen</h1>
+    <!--Gruppenliste belegte Gruppen-->
+    <div class="mx-n2 mx-sm-0" th:unless="${lectures.isEmpty()}">
+        <h3>Veranstaltungen</h3>
 
-        <!--Gruppenliste belegte Gruppen-->
-        <div th:unless="${lectures.isEmpty()}">
-            <h3>Veranstaltungen</h3>
+        <div class="content px-1 px-sm-3" th:each="group: ${lectures}"
+             th:insert="fragments/groups :: groupcontentlink"></div>
+    </div>
 
-            <div class="content" th:each="group: ${lectures}"
-                 th:insert="fragments/groups :: groupcontentlink"></div>
-        </div>
+    <div class="mx-n2 mx-sm-0" th:unless="${publics.isEmpty()}">
+        <h3>Öffentliche Gruppen</h3>
+        <div class="content px-1 px-sm-3" th:each="group: ${publics}"
+             th:insert="fragments/groups :: groupcontentlink"></div>
+    </div>
 
-        <div th:unless="${publics.isEmpty()}">
-            <h3>Öffentliche Gruppen</h3>
-            <div class="content" th:each="group: ${publics}"
-                 th:insert="fragments/groups :: groupcontentlink"></div>
-        </div>
-
-        <div th:unless="${privates.isEmpty()}">
-            <h3>Private Gruppen</h3>
-            <div class="content" th:each="group: ${privates}"
-                 th:insert="fragments/groups :: groupcontentlink"></div>
-        </div>
+    <div class="mx-n2 mx-sm-0" th:unless="${privates.isEmpty()}">
+        <h3>Private Gruppen</h3>
+        <div class="content px-1 px-sm-3" th:each="group: ${privates}"
+             th:insert="fragments/groups :: groupcontentlink"></div>
     </div>
 </main>
 

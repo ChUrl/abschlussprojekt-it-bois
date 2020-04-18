@@ -66,7 +66,7 @@
 <!--Userlimit-->
 <th:block th:fragment="userlimit">
     <label for="userlimit">Teilnehmeranzahl:</label>
-    <div class="btn-toolbar mt-n2 mr-n2 d-flex flex-row flex-wrap" id="userlimit">
+    <div class="btn-toolbar mt-n2 mr-n2 d-flex flex-row flex-wrap flex-grow-1" id="userlimit">
         <input type="hidden" name="limit" id="limit" value="999999"
                th:disabled="${group != null && group.getLimit() < 999999} ? 'disabled' : 'false'">
         <div class="btn-group btn-group-toggle flex-grow-1 mt-2 mr-2" style="flex-basis: 10%;" data-toggle="buttons">

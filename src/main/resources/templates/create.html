@@ -9,38 +9,35 @@
 <body>
 
 <main th:fragment="bodycontent">
-    <div class="container">
+    <h1>Neue Gruppe</h1>
 
-        <h1>Neue Gruppe</h1>
+    <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
+        <div class="content px-1 px-sm-3 mx-n2 mx-sm-0">
+            <h3>Eigenschaften:</h3>
 
-        <form enctype="multipart/form-data" method="post" th:action="@{/gruppen2/create}">
-            <div class="content">
-                <h3>Eigenschaften:</h3>
+            <!--Titel + Beschreibung-->
+            <div class="content-text" th:insert="~{fragments/forms :: meta}"></div>
 
-                <!--Titel + Beschreibung-->
-                <div class="content-text" th:insert="~{fragments/forms :: meta}"></div>
+            <!--TODO: Enter AsciiDoc Description-->
 
-                <!--TODO: Enter AsciiDoc Description-->
+            <div class="content-text-in">
+                <!--Gruppentyp-->
+                <div th:insert="~{fragments/forms :: grouptype}"></div>
 
-                <div class="content-text-in">
-                    <!--Gruppentyp-->
-                    <div th:insert="~{fragments/forms :: grouptype}"></div>
-
-                    <!--Benutzerlimit-->
-                    <div class="mt-2" th:insert="~{fragments/forms :: userlimit}"></div>
-                </div>
-
-                <!--CSV Import-->
-                <div class="content-text mb-0" th:insert="~{fragments/forms :: csvimport}"></div>
+                <!--Benutzerlimit-->
+                <div class="mt-2" th:insert="~{fragments/forms :: userlimit}"></div>
             </div>
 
-            <div class="content d-flex flex-row flex-wrap">
-                <!--Submit-->
-                <button class="btn btn-primary btn-block ml-auto" type="submit">Gruppe Erstellen
-                </button>
-            </div>
-        </form>
-    </div>
+            <!--CSV Import-->
+            <div class="content-text mb-0" th:insert="~{fragments/forms :: csvimport}"></div>
+        </div>
+
+        <div class="content d-flex flex-row flex-wrap px-1 px-sm-3">
+            <!--Submit-->
+            <button class="btn btn-primary btn-block ml-auto" type="submit">Gruppe Erstellen
+            </button>
+        </div>
+    </form>
 </main>
 
 </body>

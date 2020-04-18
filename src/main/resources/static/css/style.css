@@ -76,11 +76,9 @@ h1, h3 {
 
 /*Button*/
 .btn {
-    max-width: 250px;
 }
 
 .btn-spacer {
-    max-width: 250px;
 }
 
 /*Badges*/
@@ -107,6 +105,10 @@ h1, h3 {
 }
 
 /*Input*/
+.input-group {
+    width: auto;
+}
+
 .input-group-append {
     max-width: 50%;
     overflow: hidden;

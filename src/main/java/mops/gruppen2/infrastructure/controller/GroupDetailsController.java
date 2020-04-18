@@ -108,7 +108,7 @@ public class GroupDetailsController {
         model.addAttribute("events",
                            eventStoreService.findGroupEvents(UUID.fromString(groupId)));
 
-        return "history";
+        return "log";
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
