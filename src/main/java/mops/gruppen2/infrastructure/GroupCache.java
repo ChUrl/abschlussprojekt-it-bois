@@ -198,11 +198,11 @@ public class GroupCache {
         types.get(type).add(group);
     }
 
-    public void typesRemove(Group group) {
-        if (!types.containsKey(group.getType())) {
+    public void typesRemove(Type type, Group group) {
+        if (!types.containsKey(type)) {
             return;
         }
 
-        types.get(group.getType()).remove(group);
+        types.get(type).remove(group);
     }
 }

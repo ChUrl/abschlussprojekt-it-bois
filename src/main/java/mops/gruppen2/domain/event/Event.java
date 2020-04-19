@@ -52,6 +52,7 @@ public abstract class Event {
     @JsonProperty("date")
     protected LocalDateTime date;
 
+    //TODO: Eigentlich sollte die Gruppe aus dem Cache genommen werden, nicht übergeben
     public Event(UUID groupid, String exec, String target) {
         this.groupid = groupid;
         this.exec = exec;
