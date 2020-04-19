@@ -58,7 +58,7 @@ public class Group {
     private GroupMeta meta = GroupMeta.EMPTY();
 
     //TODO: UI set + use for options
-    private GroupOptions options = GroupOptions.DEFAULT();
+    private final GroupOptions options = GroupOptions.DEFAULT();
 
     // Inhalt
     private Title title = Title.EMPTY();
@@ -71,7 +71,7 @@ public class Group {
     // Integrationen
 
     // Teilnehmer
-    private Map<String, Membership> memberships = new HashMap<>();
+    private final Map<String, Membership> memberships = new HashMap<>();
 
 
     // ####################################### Members ###########################################
@@ -318,7 +318,9 @@ public class Group {
         }
 
         groupid = null;
-        type = null;
+        // Wenn man alles null setzt hat der cache mehr arbeit, weil dieser erst nach der löschung
+        // geupdated wird und sich link und mitgliedschaften selber heraussuchen muss
+        /*type = null;
         parent = null;
         limit = null;
         link = null;
@@ -327,7 +329,7 @@ public class Group {
         title = null;
         description = null;
         body = null;
-        memberships = null;
+        memberships = null;*/
     }
 
     public String format() {

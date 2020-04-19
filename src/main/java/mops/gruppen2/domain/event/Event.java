@@ -77,15 +77,9 @@ public abstract class Event {
         }
 
         checkGroupIdMatch(group.getId());
+        group.updateVersion(version);
         applyEvent(group);
         updateCache(cache, group); // Update erst nachdem apply keine exception geworfen hat
-
-        // Danach hat die Gruppe nur Nullfelder
-        if (this instanceof DestroyGroupEvent) {
-            return;
-        }
-
-        group.updateVersion(version);
     }
 
     public void apply(Group group) throws EventException {
@@ -98,6 +92,7 @@ public abstract class Event {
         checkGroupIdMatch(group.getId());
         group.updateVersion(version);
         applyEvent(group);
+
     }
 
     private void checkGroupIdMatch(UUID groupid) throws IdMismatchException {

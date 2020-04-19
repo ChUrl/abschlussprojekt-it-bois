@@ -20,7 +20,7 @@ public class DestroyGroupEvent extends Event {
 
     @Override
     protected void updateCache(GroupCache cache, Group group) {
-        cache.groupsRemove(groupid);
+        cache.groupsRemove(groupid, group);
     }
 
     @Override

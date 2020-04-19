@@ -58,7 +58,7 @@ class AddMemberEventTest {
     void apply_userExists() {
         Group group = GroupBuilder.get(cache, 1).group().testadmin().limit(2).build();
         Event add = new AddMemberEvent(TestHelper.uuid(1), "TEST", "TEST", new User("TEST"));
-        add.init(3);
+        add.init(5);
 
         assertThatThrownBy(() -> add.apply(group, cache))
                 .isInstanceOf(UserExistsException.class);
@@ -68,7 +68,7 @@ class AddMemberEventTest {
     void apply_groupFull() {
         Group group = GroupBuilder.get(cache, 1).group().testadmin().build();
         Event add = new AddMemberEvent(TestHelper.uuid(1), "TEST", "PETER", new User("PETER"));
-        add.init(2);
+        add.init(4);
 
         assertThatThrownBy(() -> add.apply(group, cache))
                 .isInstanceOf(GroupFullException.class);

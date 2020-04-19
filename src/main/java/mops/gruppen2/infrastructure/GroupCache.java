@@ -159,12 +159,15 @@ public class GroupCache {
         groups.put(groupid, group);
     }
 
-    public void groupsRemove(UUID groupid) {
+    public void groupsRemove(UUID groupid, Group group) {
         if (!groups.containsKey(groupid)) {
             return;
         }
 
         groups.remove(groupid);
+        links.remove(group.getLink());
+        group.getMembers().forEach(user -> users.get(user.getId()).removeIf(usergroup -> !usergroup.exists()));
+        types.get(group.getType()).removeIf(typegroup -> !typegroup.exists());
     }
 
     public void linksPut(String link, Group group) {
