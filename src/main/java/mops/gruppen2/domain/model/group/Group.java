@@ -10,7 +10,7 @@ import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.IdMismatchException;
 import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
-import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.exception.UserExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.wrapper.Body;
 import mops.gruppen2.domain.model.group.wrapper.Description;
@@ -101,7 +101,7 @@ public class Group {
         return memberships.get(userid).getRole();
     }
 
-    public void addMember(String target, User user) throws UserAlreadyExistsException, GroupFullException {
+    public void addMember(String target, User user) throws UserExistsException, GroupFullException {
         ValidationHelper.throwIfMember(this, target);
         ValidationHelper.throwIfGroupFull(this);
 
@@ -347,5 +347,9 @@ public class Group {
 
     public static Group EMPTY() {
         return new Group();
+    }
+
+    public long getVersion() {
+        return meta.getVersion();
     }
 }

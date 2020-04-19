@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,7 +58,11 @@ class ProjectionHelperTest {
                 new CreateGroupEvent(uuid(4), "TEST", LocalDateTime.now()),
                 new CreateGroupEvent(uuid(5), "TEST", LocalDateTime.now()));
 
-        initEvents(events);
+        events.get(0).init(1);
+        events.get(1).init(1);
+        events.get(2).init(1);
+        events.get(3).init(1);
+        events.get(4).init(1);
 
         assertThat(project(events)).hasSize(5);
     }
@@ -82,28 +87,40 @@ class ProjectionHelperTest {
 
     @Test
     void project_nocache_multipleDetailed() {
-        List<Event> events = Arrays.asList(
+        List<Event> eventsA = Arrays.asList(
                 new CreateGroupEvent(uuid(1), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(1), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(1), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(1), "TEST", new Limit(5)),
+                new SetLimitEvent(uuid(1), "TEST", new Limit(5)));
 
+        List<Event> eventsB = Arrays.asList(
                 new CreateGroupEvent(uuid(2), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(2), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(2), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(2), "TEST", new Limit(15)),
+                new SetLimitEvent(uuid(2), "TEST", new Limit(15)));
 
+        List<Event> eventsC = Arrays.asList(
                 new CreateGroupEvent(uuid(3), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(3), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(3), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(3), "TEST", new Limit(25)),
+                new SetLimitEvent(uuid(3), "TEST", new Limit(25)));
 
+        List<Event> eventsD = Arrays.asList(
                 new CreateGroupEvent(uuid(4), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(4), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(4), "TEST", "TEST", Role.ADMIN),
                 new SetLimitEvent(uuid(4), "TEST", new Limit(35)));
 
-        initEvents(events);
+        initEvents(eventsA);
+        initEvents(eventsB);
+        initEvents(eventsC);
+        initEvents(eventsD);
+
+        List<Event> events = new ArrayList<>();
+        events.addAll(eventsA);
+        events.addAll(eventsB);
+        events.addAll(eventsC);
+        events.addAll(eventsD);
 
         List<Group> groups = project(events);
 
@@ -156,7 +173,10 @@ class ProjectionHelperTest {
                 new CreateGroupEvent(uuid(3), "TEST", LocalDateTime.now()),
                 new CreateGroupEvent(uuid(4), "TEST", LocalDateTime.now()));
 
-        initEvents(events);
+        events.get(0).init(1);
+        events.get(1).init(1);
+        events.get(2).init(1);
+        events.get(3).init(1);
         project(groups, events, mock(GroupCache.class));
 
         assertThat(groups).hasSize(4);
@@ -166,28 +186,41 @@ class ProjectionHelperTest {
     @Test
     void project_cache_multipleDetailed() {
         Map<UUID, Group> groups = new HashMap<>();
-        List<Event> events = Arrays.asList(
+        List<Event> eventsA = Arrays.asList(
                 new CreateGroupEvent(uuid(1), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(1), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(1), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(1), "TEST", new Limit(5)),
+                new SetLimitEvent(uuid(1), "TEST", new Limit(5)));
 
+        List<Event> eventsB = Arrays.asList(
                 new CreateGroupEvent(uuid(2), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(2), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(2), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(2), "TEST", new Limit(15)),
+                new SetLimitEvent(uuid(2), "TEST", new Limit(15)));
 
+        List<Event> eventsC = Arrays.asList(
                 new CreateGroupEvent(uuid(3), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(3), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(3), "TEST", "TEST", Role.ADMIN),
-                new SetLimitEvent(uuid(3), "TEST", new Limit(25)),
+                new SetLimitEvent(uuid(3), "TEST", new Limit(25)));
 
+        List<Event> eventsD = Arrays.asList(
                 new CreateGroupEvent(uuid(4), "TEST", LocalDateTime.now()),
                 new AddMemberEvent(uuid(4), "TEST", "TEST", new User("TEST")),
                 new UpdateRoleEvent(uuid(4), "TEST", "TEST", Role.ADMIN),
                 new SetLimitEvent(uuid(4), "TEST", new Limit(35)));
 
-        initEvents(events);
+        initEvents(eventsA);
+        initEvents(eventsB);
+        initEvents(eventsC);
+        initEvents(eventsD);
+
+        List<Event> events = new ArrayList<>();
+        events.addAll(eventsA);
+        events.addAll(eventsB);
+        events.addAll(eventsC);
+        events.addAll(eventsD);
+
         project(groups, events, mock(GroupCache.class));
 
         assertThat(groups).hasSize(4);

@@ -7,7 +7,7 @@ import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
-import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.exception.UserExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
@@ -39,10 +39,10 @@ public final class ValidationHelper {
     // ######################################## THROW ############################################
 
 
-    public static void throwIfMember(Group group, String userid) throws UserAlreadyExistsException {
+    public static void throwIfMember(Group group, String userid) throws UserExistsException {
         if (group.isMember(userid)) {
             log.error("Benutzer {} ist schon in Gruppe {}", userid, group);
-            throw new UserAlreadyExistsException(userid);
+            throw new UserExistsException(userid);
         }
     }
 

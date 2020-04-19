@@ -5,7 +5,7 @@ import mops.gruppen2.domain.exception.BadArgumentException;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
-import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.exception.UserExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.Type;
@@ -137,7 +137,7 @@ class GroupServiceTest {
         Group group = GroupBuilder.get(mock(GroupCache.class), 1).group().testadmin().limit(3).add("PETER").build();
 
         assertThatThrownBy(() -> groupService.addMember(group, "Test", "PETER", new User("PETER")))
-                .isInstanceOf(UserAlreadyExistsException.class);
+                .isInstanceOf(UserExistsException.class);
     }
 
     @Test

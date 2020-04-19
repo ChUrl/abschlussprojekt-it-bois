@@ -301,9 +301,9 @@ class GroupCacheTest {
 
     @Test
     void linksRemove() {
-        Group group = GroupBuilder.get(cache, 1).group().testadmin().lecture().link(1).build();
+        Group group = GroupBuilder.get(cache, 1).group().testadmin().lecture().link(2).build();
 
-        assertThat(cache.group(String.valueOf(uuid(1)))).isEqualTo(group);
+        assertThat(cache.group(String.valueOf(uuid(2)))).isEqualTo(group);
     }
 
     //Indirekt: void typesPut() {}

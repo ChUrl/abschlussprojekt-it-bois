@@ -21,6 +21,9 @@ class GroupMeta {
         if (this.version >= version) {
             throw new IdMismatchException("Die Gruppe ist bereits auf einem neueren Stand.");
         }
+        if (this.version + 1 != version) {
+            throw new IdMismatchException("Es fehlen vorherige Events.");
+        }
 
         return new GroupMeta(version, creator, creationDate);
     }

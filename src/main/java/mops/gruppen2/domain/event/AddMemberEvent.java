@@ -6,7 +6,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.IdMismatchException;
-import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.exception.UserExistsException;
 import mops.gruppen2.domain.model.group.Group;
 import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.infrastructure.GroupCache;
@@ -39,7 +39,7 @@ public class AddMemberEvent extends Event {
     }
 
     @Override
-    protected void applyEvent(Group group) throws UserAlreadyExistsException, GroupFullException {
+    protected void applyEvent(Group group) throws UserExistsException, GroupFullException {
         group.addMember(target, user);
 
         log.trace("\t\t\t\t\tNeue Members: {}", group.getMembers());
