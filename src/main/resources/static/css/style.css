@@ -76,6 +76,7 @@ h1, h3 {
 
 /*Button*/
 .btn {
+    width: 250px;
 }
 
 .btn-spacer {
