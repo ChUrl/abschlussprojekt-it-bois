@@ -41,6 +41,8 @@ public class APIController {
      *
      * @param eventId Die Event-ID, welche der Anfragesteller beim letzten Aufruf erhalten hat
      */
+    //TODO: sollte den cache benutzen, am besten wäre eine groupversion, welche der eventid
+    //TODO: entspricht, dann kann man leicht alle geänderten gruppen finden
     @GetMapping("/update/{id}")
     @Secured("ROLE_api_user")
     @ApiOperation("Gibt veränderte Gruppen zurück")
