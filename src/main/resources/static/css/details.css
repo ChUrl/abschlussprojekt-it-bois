@@ -1,0 +1,17 @@
+/*Content*/
+.content-heading {
+    margin-bottom: 15px;
+}
+
+/*Member List*/
+.members {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 250px);
+    max-width: 100%;
+}
+
+li span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

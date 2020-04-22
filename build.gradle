@@ -1,11 +1,9 @@
-import com.github.spotbugs.SpotBugsTask
-
 plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 
-    id 'com.github.spotbugs' version '3.0.0'
+    id 'com.github.spotbugs' version '4.0.1'
     id 'checkstyle'
     id 'pmd'
 }
@@ -14,34 +12,43 @@ group = 'mops'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+repositories {
+    maven {
+        url = 'https://s3.cs.hhu.de/public/mops/'
+        metadataSources {
+            artifact()
+        }
+    }
+    mavenCentral()
+}
+
 spotbugs {
+    toolVersion = '4.0.1'
     ignoreFailures = false
     reportLevel = "high"
     effort = "max"
-    toolVersion = '4.0.0-RC1'
+    showProgress = true
 }
 
-tasks.withType(SpotBugsTask) {
+spotbugsMain {
     reports {
-        xml.enabled = false
-        html.enabled = true
+        html {
+            enabled = true
+        }
     }
 }
 
 pmd {
     consoleOutput = true
     ignoreFailures = true
-    toolVersion = "6.21.0"
+    toolVersion = "6.22.0"
     rulePriority = 5
-    ruleSets = ["category/java/errorprone.xml",
-                "category/java/bestpractices.xml",
-                "category/java/security.xml",
-                "category/java/performance.xml",
-                "category/java/design.xml"]
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    ruleSets = []
 }
 
 checkstyle {
-    toolVersion = "8.28"
+    toolVersion = "8.30"
     configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
     ignoreFailures = true
 }
@@ -56,24 +63,17 @@ configurations {
     }
 }
 
-repositories {
-    maven {
-        url = 'https://s3.cs.hhu.de/public/mops/'
-        metadataSources {
-            artifact()
-        }
-    }
-    mavenCentral()
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.security.oauth:spring-security-oauth2:2.4.0.RELEASE'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     implementation 'org.keycloak:keycloak-spring-boot-starter:9.0.0'
     implementation 'org.keycloak.bom:keycloak-adapter-bom:9.0.0'
@@ -82,10 +82,11 @@ dependencies {
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'com.github.javafaker:javafaker:1.0.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.10.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
 

@@ -34,3 +34,4 @@ out/
 .flooignore
 
 /mysql/db/storage/
+/mysql/keycloak/

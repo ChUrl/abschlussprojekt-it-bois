@@ -1,35 +1,51 @@
 package mops.gruppen2.domain.event;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Value;
+import lombok.extern.log4j.Log4j2;
+import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.model.group.Role;
+import mops.gruppen2.infrastructure.GroupCache;
 
 import java.util.UUID;
 
 /**
  * Aktualisiert die Gruppenrolle eines Teilnehmers.
  */
-@Getter
-@NoArgsConstructor // For Jackson
+@Log4j2
+@Value
+@AllArgsConstructor
 public class UpdateRoleEvent extends Event {
 
-    private Role newRole;
+    @JsonProperty("role")
+    Role role;
 
-    public UpdateRoleEvent(UUID groupId, String userId, Role newRole) {
-        super(groupId, userId);
-        this.newRole = newRole;
+    public UpdateRoleEvent(UUID groupId, String exec, String target, Role role) {
+        super(groupId, exec, target);
+        this.role = role;
     }
 
     @Override
-    protected void applyEvent(Group group) throws UserNotFoundException {
-        if (group.getRoles().containsKey(userId)) {
-            group.getRoles().put(userId, newRole);
-            return;
-        }
+    protected void updateCache(GroupCache cache, Group group) {}
 
-        throw new UserNotFoundException(getClass().toString());
+    @Override
+    protected void applyEvent(Group group) throws UserNotFoundException, LastAdminException {
+        group.memberPutRole(target, role);
+
+        log.trace("\t\t\t\t\tNeue Admin: {}", group.getAdmins());
+    }
+
+    @Override
+    public String format() {
+        return "Mitgliedsrolle gesetzt: " + target + ": " + role + ".";
+    }
+
+    @Override
+    public String type() {
+        return EventType.UPDATEROLE.toString();
     }
 
 }

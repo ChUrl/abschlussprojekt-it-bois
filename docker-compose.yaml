@@ -1,23 +1,50 @@
 version: "3.7"
 services:
   dbmysql:
-    image: mysql:5.7
+    image: mysql:8.0
     container_name: 'dbmysql'
     environment:
-      MYSQL_DATABASE: 'gruppen2'
-      MYSQL_USER: 'root'
-      MYSQL_ROOT_PASSWORD: 'geheim'
+      MYSQL_DATABASE: 'gruppen'
+      MYSQL_USER: 'gruppen'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'root'
     restart: always
     volumes:
       - './mysql/db/storage:/var/lib/mysql'
       - './mysql/db/entrypoint:/docker-entrypoint-initdb.d/'
-    ports:
-      - '3306:3306'
+
+    keymysql:
+      image: mysql:8.0
+      container_name: 'keymysql'
+      environment:
+        MYSQL_DATABASE: 'keycloak'
+        MYSQL_USER: 'keycloak'
+        MYSQL_PASSWORD: 'password'
+        MYSQL_ROOT_PASSWORD: 'root'
+      volumes:
+        - './mysql/keycloak/storage:/var/lib/mysql'
+    keycloak:
+      image: jboss/keycloak
+      container_name: 'keycloak'
+      depends_on:
+        - keymysql
+      environment:
+        DB_VENDOR: 'MYSQL'
+        DB_ADDR: 'keymysql'
+        DB_DATABASE: 'keycloak'
+        DB_USER: 'keycloak'
+        DB_PASSWORD: 'password'
+        KEYCLOAK_USER: 'admin'
+        KEYCLOAK_PASSWORD: 'admin'
+      ports:
+        - '8082:8080'
+
   gruppenapp:
     build: .
     container_name: 'gruppenapp'
     depends_on:
       - dbmysql
+      - keycloak
     command: ["/app/wait-for-it.sh", "dbmysql:3306", "--", "java", "-Dspring.profiles.active=docker", "-jar", "/app/gruppen2.jar"]
     ports:
       - '8081:8080'

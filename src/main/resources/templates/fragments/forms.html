@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--/*@thymesVar id="parent" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="group" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="member" type="mops.gruppen2.domain.model.group.User"*/-->
+<!--/*@thymesVar id="account" type="mops.gruppen2.domain.Account"*/-->
+<!--/*@thymesVar id="lectures" type="java.util.List<mops.gruppen2.domain.model.group.Group>"*/-->
+
+<!--Meta-->
+<th:block th:fragment="meta">
+    <!--Gruppentitel-->
+    <div class="input-group mb-2"
+         title="Ein Gruppentitel zwischen 4 und 128 Zeichen. Der Titel ist öffentlich.">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Gruppentitel:</span>
+        </div>
+        <input type="text" class="form-control" name="title" minlength="4" maxlength="128"
+               th:value="${group?.getTitle()}" required>
+    </div>
+
+
+    <!--Gruppenbeschreibung-->
+    <div class="input-group"
+         title="Eine kurze Gruppenbeschreibung zwischen 4 und 512 Zeichen. Die Beschreibung ist öffentlich.">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Beschreibung:</span>
+        </div>
+        <textarea class="form-control" name="description" minlength="4" maxlength="512"
+                  th:text="${group?.getDescription()}" required></textarea>
+    </div>
+</th:block>
+
+<!--Gruppentyp-->
+<th:block th:fragment="grouptype">
+    <label for="grouptype">Gruppentyp:</label>
+    <div class="btn-toolbar mt-n2 mr-n2 d-flex flex-row flex-wrap overflow-hidden" id="grouptype">
+        <div class="btn-group btn-group-toggle flex-grow-1 mt-2 mr-2" style="flex-basis: 10%;" data-toggle="buttons">
+            <label class="btn btn-secondary active" onclick="enable('#parentselect'); disable('#parentdummy')">
+                <input type="radio" name="type" value="PRIVATE" checked> Privat
+            </label>
+            <label class="btn btn-secondary" onclick="enable('#parentselect'); disable('#parentdummy')">
+                <input type="radio" name="type" value="PUBLIC"> Öffentlich
+            </label>
+            <label class="btn btn-secondary" onclick="disable('#parentselect'); enable('#parentdummy')"
+                   th:if="${account.getRoles().contains('orga')}">
+                <input type="radio" name="type" value="LECTURE"> Veranstaltung
+            </label>
+        </div>
+
+        <div class="input-group flex-grow-1 mt-2 mr-2"
+             title="Optional kann eine Veranstaltungszugehörigkeit festgelegt werden.">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Gehört zu:</span>
+            </div>
+            <input type="hidden" id="parentdummy" name="parent" value="00000000-0000-0000-0000-000000000000" disabled>
+            <select class="custom-select" id="parentselect" name="parent">
+                <option value="00000000-0000-0000-0000-000000000000" selected>Keiner</option>
+                <option th:each="lecture : ${lectures}" th:value="${lecture.getId()}"
+                        th:text="${lecture.getTitle()}"></option>
+            </select>
+        </div>
+    </div>
+</th:block>
+
+<!--Userlimit-->
+<th:block th:fragment="userlimit">
+    <label for="userlimit">Teilnehmeranzahl:</label>
+    <div class="btn-toolbar mt-n2 mr-n2 d-flex flex-row flex-wrap flex-grow-1" id="userlimit">
+        <input type="hidden" name="limit" id="limit" value="999999"
+               th:disabled="${group != null && group.getLimit() < 999999} ? 'disabled' : 'false'">
+        <div class="btn-group btn-group-toggle flex-grow-1 mt-2 mr-2" style="flex-basis: 10%;" data-toggle="buttons">
+            <label class="btn btn-secondary active" onclick="disable('#limitselect'); enable('#limit')">
+                <input type="radio"
+                       th:checked="${group != null && group.getLimit() < 999999} ? 'false' : 'checked'">
+                Unbegrenzt
+            </label>
+            <label class="btn btn-secondary" onclick="enable('#limitselect'); disable('#limit')">
+                <input type="radio"
+                       th:checked="${group != null && group.getLimit() < 999999} ? 'checked' : 'false'">
+                Begrenzt
+            </label>
+        </div>
+
+        <div class="input-group flex-grow-1 mt-2 mr-2"
+             title="999999 ist die maximal zulässige Teilnehmerzahl. Ist diese Obergrenze erreicht, gilt die Gruppe als unbegrenzt.">
+            <div class="input-group-prepend" style="max-width: 25%">
+                <span class="input-group-text">Limit:</span>
+            </div>
+            <input type="number" class="form-control" name="limit"
+                   th:value="${group != null} ? ${group.getLimit()} : '999999'"
+                   min="1" max="999999" id="limitselect" required
+                   th:disabled="${group != null && group.getLimit() < 999999} ? 'false' : 'disabled'">
+            <div class="input-group-append" style="max-width: 25%">
+                <span class="input-group-text">Teilnehmer</span>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<!--CSV-->
+<div th:fragment="csvimport" class="input-group" th:if="${account.getRoles().contains('orga')}"
+     title="Das CSV folgt dem Format id,givenname,familyname,email.">
+    <div class="input-group-prepend">
+        <span class="input-group-text">CSV:</span>
+    </div>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input" id="file" name="file">
+        <label class="custom-file-label" for="file">Datei auswählen</label>
+    </div>
+    <script>
+        $(".custom-file-input").on("change", function () {
+            const fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+</div>

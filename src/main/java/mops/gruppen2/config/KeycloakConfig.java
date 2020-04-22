@@ -2,6 +2,7 @@ package mops.gruppen2.config;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,15 +16,16 @@ import org.springframework.web.client.RestTemplate;
  */
 
 @Configuration
+@KeycloakConfiguration
 public class KeycloakConfig {
 
     @Value("${keycloak.resource}")
     private String clientId;
 
-    @Value("${keycloak.credentials.secret}")
+    @Value("2e2e5770-c454-4d31-be99-9d8c34c93089")
     private String clientSecret;
 
-    @Value("${hhu_keycloak.token-uri}")
+    @Value("https://churl-keycloak.herokuapp.com/auth/realms/Gruppen/protocol/openid-connect/token")
     private String tokenUri;
 
     @Bean

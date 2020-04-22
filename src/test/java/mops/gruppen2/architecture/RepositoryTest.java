@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
-public class RepositoryTest {
+class RepositoryTest {
 
     @ArchTest
     public static final ArchRule repositoryClassesThatAreAnnotatedWithRepositoryShouldHaveRepositoryInName = classes()
@@ -20,7 +20,7 @@ public class RepositoryTest {
     @ArchTest
     public static final ArchRule repositoryClassesShouldBeInRepositoryPackage = classes()
             .that().haveSimpleNameEndingWith("Repository")
-            .should().resideInAPackage("..repository..");
+            .should().resideInAPackage("..persistance");
 
     @ArchTest
     public static final ArchRule repositoryClassesShouldBeAnnotatedWithRepositoryAnnotation = classes()
@@ -29,12 +29,17 @@ public class RepositoryTest {
 
     @ArchTest
     public static final ArchRule classesInRepositoryPackageShouldHaveRepositoryInName = classes()
-            .that().resideInAPackage("..repository..")
+            .that().resideInAPackage("..persistance")
             .should().haveSimpleNameEndingWith("Repository");
 
     @ArchTest
     public static final ArchRule classesThatAreAssignableToCrudRepositoryShouldHaveRepositoryInName = classes()
             .that().areAssignableTo(CrudRepository.class)
             .should().beAnnotatedWith(Repository.class);
+
+    @ArchTest
+    public static final ArchRule dtoClassesShouldBeInDtoPackage = classes()
+            .that().haveSimpleNameEndingWith("DTO")
+            .should().resideInAPackage("..persistance.dto..");
 
 }

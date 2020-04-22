@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenfindung',
+    title='Event-Log',
+    headcontent=~{fragments/general :: headcontent('none')},
+    navigation=~{fragments/general :: nav('none')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <h1>Event-Log</h1>
+
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0" th:each="event : ${events}">
+        <div class="content-heading d-flex flex-row flex-wrap">
+            <span th:text="${event.type()}"></span>
+
+            <span class="ml-auto">Datum: </span>
+            <span th:text="${event.getDate()}"></span>
+        </div>
+
+        <div class="content-text-in px-1 px-sm-3">
+            <span th:text="${'User:' + event.getExec()}"></span>
+
+            <span th:text="${'>>>' + event.format()}"></span>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

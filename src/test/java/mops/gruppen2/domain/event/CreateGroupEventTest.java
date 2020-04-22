@@ -1,32 +1,45 @@
 package mops.gruppen2.domain.event;
 
-import mops.gruppen2.TestBuilder;
-import mops.gruppen2.domain.Group;
-import mops.gruppen2.domain.GroupType;
-import mops.gruppen2.domain.Visibility;
+import mops.gruppen2.domain.model.group.Group;
+import mops.gruppen2.domain.service.EventStoreService;
+import mops.gruppen2.infrastructure.GroupCache;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static mops.gruppen2.TestBuilder.uuidMock;
+import java.time.LocalDateTime;
+
+import static mops.gruppen2.TestHelper.uuid;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class CreateGroupEventTest {
 
+    GroupCache cache;
+
+    @BeforeEach
+    void setUp() {
+        cache = new GroupCache(mock(EventStoreService.class));
+    }
+
     @Test
-    void applyEvent() {
-        Event createEvent = new CreateGroupEvent(uuidMock(0),
-                                                 "A",
-                                                 uuidMock(1),
-                                                 GroupType.SIMPLE,
-                                                 Visibility.PUBLIC,
-                                                 100L);
+    void apply() {
+        Group group = Group.EMPTY();
+        Event add = new CreateGroupEvent(uuid(1), "TEST", LocalDateTime.now());
+        add.init(1);
 
-        Group group = TestBuilder.apply(createEvent);
+        assertThat(group.exists()).isFalse();
+        add.apply(group);
+        assertThat(group.exists()).isTrue();
+    }
 
-        assertThat(group.getMembers()).hasSize(0);
-        assertThat(group.getType()).isEqualTo(GroupType.SIMPLE);
-        assertThat(group.getVisibility()).isEqualTo(Visibility.PUBLIC);
-        assertThat(group.getUserMaximum()).isEqualTo(100);
-        assertThat(group.getId()).isEqualTo(uuidMock(0));
-        assertThat(group.getParent()).isEqualTo(uuidMock(1));
+    @Test
+    void apply_cache() {
+        Group group = Group.EMPTY();
+        Event add = new CreateGroupEvent(uuid(1), "TEST", LocalDateTime.now());
+        add.init(1);
+
+        add.apply(group, cache);
+        assertThat(group.exists()).isTrue();
+        assertThat(cache.groups()).hasSize(1);
     }
 }

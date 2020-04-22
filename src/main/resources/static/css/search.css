@@ -1,0 +1,27 @@
+/*Grouplist*/
+.content.top {
+    padding: 10px 10px !important;
+    margin-bottom: 15px !important;
+}
+
+.content {
+    margin-top: 5px;
+    padding: 5px 5px;
+}
+
+.content-heading {
+    margin-bottom: 5px;
+}
+
+.content-text-in {
+    box-shadow: none;
+    margin-bottom: 0;
+    padding: 5px;
+}
+
+/*Badges*/
+.badge-pill {
+    align-self: start;
+    margin-top: 2px;
+    margin-right: 15px;
+}

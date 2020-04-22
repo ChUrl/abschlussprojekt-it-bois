@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Gruppe verwalten',
+    headcontent=~{fragments/general :: headcontent('none')},
+    navigation=~{fragments/general :: nav('none')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <h1 th:text="${group.getTitle()}"></h1>
+
+    <!--Fertig oder löschen-->
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <div class="d-flex flex-row flex-wrap mt-n2 mr-n2">
+            <a class="btn btn-primary flex-grow-1 mt-2 mr-2" style="max-width: 250px;"
+               th:href="@{/gruppen2/details/{id}(id=${group.getId()})}">Fertig</a>
+
+            <div class="mt-2 mr-2 flex-grow-1 ml-auto btn-spacer">
+                <form method="post" th:action="@{/gruppen2/details/{id}/edit/destroy(id=${group.getId()})}">
+                    <button class="btn btn-danger w-100" type="submit">Gruppe löschen
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--Invite Link-->
+    <div class="content input-group py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <div class="input-group-prepend">
+            <span class="input-group-text">Einladungslink:</span>
+        </div>
+        <input class="form-control" id="linkview" readonly th:value="${link}" type="text">
+        <div class="input-group-append">
+            <button type="button" class="btn btn-secondary" onclick="copyLink()">Link kopieren
+            </button>
+        </div>
+    </div>
+
+    <!--Meta-->
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <div class="content-heading">
+            <span>Eigenschaften</span>
+        </div>
+
+        <!--Beschreibung + Titel-->
+        <div class="content-text">
+            <form th:action="@{/gruppen2/details/{id}/edit/meta(id=${group.getId()})}"
+                  method="post">
+
+                <div th:replace="~{fragments/forms :: meta}"></div>
+
+                <div class="d-flex flex-row flex-wrap">
+                    <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!--Userlimit-->
+        <div class="content-text-in px-1 px-sm-3">
+            <form th:action="@{/gruppen2/details/{id}/edit/userlimit(id=${group.getId()})}"
+                  method="post">
+
+                <div th:replace="~{fragments/forms :: userlimit}"></div>
+
+                <div class="d-flex flex-row flex-wrap">
+                    <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!--CSV Import-->
+        <div class="content-text mb-0">
+            <form th:action="@{/gruppen2/details/{id}/edit/csv(id=${group.getId()})}"
+                  th:if="${account.getRoles().contains('orga')}"
+                  enctype="multipart/form-data" method="post">
+
+                <div th:replace="~{fragments/forms :: csvimport}"></div>
+
+                <div class="d-flex flex-row flex-wrap">
+                    <button type="submit" class="btn btn-secondary mt-2 ml-auto">Speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--Export + Log-->
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <div class="content-heading">
+            <span>Event-Historie</span>
+        </div>
+        <div class="d-flex flex-row flex-wrap mt-n2 mr-n2">
+            <a class="btn btn-primary mt-2 mr-2 flex-grow-1"
+               th:href="@{/gruppen2/details/{id}/history(id=${group.getId()})}">Event-Log</a>
+
+            <a class="btn btn-info flex-grow-1 mt-2 mr-2 ml-auto"
+               th:href="@{/gruppen2/details/{id}/export/history/plain(id=${group.getId()})}"
+               title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann beim erstellen importiert werden.">
+                Event-Log exportieren (TXT)
+            </a>
+
+            <a class="btn btn-info flex-grow-1 mt-2 mr-2"
+               th:href="@{/gruppen2/details/{id}/export/history/sql(id=${group.getId()})}"
+               title="Exportiert die gesamte Event-Historie dieser Gruppe. Kann als data.sql verwendet werden.">
+                Event-Log exportieren (SQL)
+            </a>
+
+            <a class="btn btn-info flex-grow-1 mt-2 mr-2"
+               th:href="@{/gruppen2/details/{id}/export/members(id=${group.getId()})}"
+               title="Exportiert die Teilnehmerliste. Kann beim erstellen (oder nachträglich) importiert werden.">
+                Teilnehmer exportieren
+            </a>
+        </div>
+    </div>
+
+    <!--Teilnehmerliste-->
+    <div class="content members py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <div class="content-heading">
+            <span>Teilnehmer</span>
+        </div>
+
+        <ul class="list-group">
+            <li class="list-group-item d-flex flex-row flex-wrap" th:each="member : ${group.getMembers()}">
+                <div class="overflow-hidden ml-n2" style="max-width: 50%; text-overflow: ellipsis;">
+                    <span class="overflow-hidden ml-2" th:text="${member.format()}"></span>
+                    <span th:replace="~{fragments/groups :: userbadges}"></span>
+                </div>
+
+                <div class="d-flex flex-row flex-wrap mt-n2 mr-n2 ml-auto" style="max-width: 50%;">
+                    <div class="flex-grow-1 mt-2 mr-2"
+                         th:unless="${member.getId() == account.getName()}">
+                        <form th:action="@{/gruppen2/details/{id}/edit/delete/{userid}(id=${group.getId()}, userid=${member.getId()})}"
+                              method="post">
+                            <button type="submit" class="btn btn-danger w-100">
+                                Entfernen
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="flex-grow-1 mt-2 mr-2">
+                        <form th:action="@{/gruppen2/details/{id}/edit/role/{userid}(id=${group.getId()}, userid=${member.getId()})}"
+                              method="post">
+                            <button type="submit" class="btn btn-warning w-100">
+                                Rolle ändern
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</main>

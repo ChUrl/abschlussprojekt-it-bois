@@ -1,0 +1,84 @@
+<!DOCTYPE HTML>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+
+<!--/*@thymesVar id="parent" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="group" type="mops.gruppen2.domain.model.group.Group"*/-->
+<!--/*@thymesVar id="member" type="mops.gruppen2.domain.model.group.User"*/-->
+
+<!--Grouptype Badges-->
+<th:block th:fragment="badges">
+    <span class="badge badge-pill private align-self-start"
+          title="Kann nicht über die Suche gefunden werden, beitritt ist per Einladungslink möglich."
+          th:if='${group.isPrivate()}'>Privat</span>
+    <span class="badge badge-pill public align-self-start"
+          title="Kann über die Suche gefunden werden, jeder kann beitreten."
+          th:if="${group.isPublic()}">Öffentlich</span>
+    <span class="badge badge-pill lecture align-self-start"
+          title="Offizielle Veranstaltung"
+          th:if='${group.isLecture()}'>Veranstaltung</span>
+
+    <span class="badge badge-pill parent align-self-start"
+          th:if="${parent?.exists()}"
+          th:title="${'Die Gruppe gehört zur Veranstaltung ' + parent.getTitle() + '.'}"
+          th:text="${parent.getTitle()}">Parent</span>
+
+    <!--Needs completly projected (cached) groups-->
+    <!--<span class="badge badge-success float-right"
+          th:if='${group.getRoles().get(user.getId()) == admin}'>Admin</span>-->
+</th:block>
+
+
+<!--User Badges-->
+<th:block th:fragment="userbadges">
+    <span class="badge badge-success align-self-start ml-2"
+          th:if="${group.isAdmin(member.getId())}">Admin</span>
+</th:block>
+
+<th:block th:fragment="groupcontent">
+    <!--Badges-->
+    <div class="content-heading overflow-hidden">
+        <span th:replace="~{fragments/groups :: badges}"></span>
+    </div>
+
+    <!--Description-->
+    <div class="content-text-in">
+        <span th:text="${group.getDescription()}"></span>
+    </div>
+
+    <!--<div class="body-text-in" th:if="${group.getMembers().contains(user.getId())}"></div>-->
+</th:block>
+
+<th:block th:fragment="groupcontentlink">
+    <div class="content-heading row overflow-hidden">
+        <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+           th:text="${group.getTitle()}"></a>
+
+        <span th:replace="~{fragments/groups :: badges}"></span>
+    </div>
+
+    <div class="content-text-in overflow-hidden" style="text-overflow: ellipsis;">
+        <span th:text="${group.getDescription()}"></span>
+    </div>
+</th:block>
+
+<!--Buttonbar zum Gruppe beitreten-->
+<th:block th:fragment="joingroup">
+    <div class="content-heading">
+        <span th:unless="${group.isFull()}">
+            Möchtest du dieser Gruppe beitreten?
+        </span>
+        <span th:if="${group.isFull()}">
+            Diese Gruppe hat ihre maximale Teilnehmeranzahl erreicht.
+        </span>
+    </div>
+
+    <div class="d-flex flex-row flex-wrap">
+        <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}"
+              th:unless="${group.isFull()}">
+            <button class="btn btn-success" type="submit">Gruppe beitreten.</button>
+        </form>
+
+        <a class="btn btn-primary ml-auto" href="/gruppen2"
+           type="submit">Startseite.</a>
+    </div>
+</th:block>

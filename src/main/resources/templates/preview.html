@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Details',
+    headcontent=~{fragments/general :: headcontent('details')},
+    navigation=~{fragments/general :: nav('none')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <div class="container-fluid">
+        <h1 th:text="${group.getTitle()}"></h1>
+
+        <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
+
+        <div class="content" th:unless="${group.isPrivate()}"
+             th:insert="~{fragments/groups :: joingroup}"></div>
+
+        <div class="content d-flex flex-row flex-wrap" th:if="${group.isPrivate()}">
+            <a class="btn btn-primary ml-auto" href="/gruppen2">Startseite.</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:replace="~{mopslayout :: html(
+    name='Gruppenbildung',
+    title='Beitreten',
+    headcontent=~{fragments/general :: headcontent('details')},
+    navigation=~{fragments/general :: nav('none')},
+    bodycontent=~{:: bodycontent})}">
+
+<body>
+
+<main th:fragment="bodycontent">
+    <div class="container-fluid">
+        <h1 th:text="${group.getTitle()}"></h1>
+
+        <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
+
+        <div class="content" th:insert="~{fragments/groups :: joingroup}"></div>
+    </div>
+</main>
+</body>
+</html>

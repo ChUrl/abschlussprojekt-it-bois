@@ -11,7 +11,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "mops.gruppen2", importOptions = ImportOption.DoNotIncludeTests.class)
-public class ControllerTest {
+class ControllerTest {
 
     @ArchTest
     public static final ArchRule controllerClassesShouldBeAnnotatedWithControllerOrRestControllerAnnotation = classes()
@@ -23,18 +23,20 @@ public class ControllerTest {
     public static final ArchRule controllerClassesShouldHaveControllerInName = classes()
             .that().areAnnotatedWith(Controller.class)
             .or().areAnnotatedWith(RestController.class)
-            .should().haveSimpleNameEndingWith("Controller");
+            .should().haveSimpleNameEndingWith("Controller")
+            .orShould().haveSimpleNameEndingWith("ControllerAdvice");
 
     @ArchTest
     public static final ArchRule controllerClassesShouldBeInControllerPackage = classes()
             .that().areAnnotatedWith(Controller.class)
             .or().areAnnotatedWith(RestController.class)
-            .should().resideInAPackage("..controller..");
+            .should().resideInAPackage("..controller");
 
     @ArchTest
     public static final ArchRule classesInControllerPackageShouldHaveControllerInName = classes()
-            .that().resideInAPackage("..controller..")
-            .should().haveSimpleNameEndingWith("Controller");
+            .that().resideInAPackage("..web")
+            .should().haveSimpleNameEndingWith("Controller")
+            .orShould().haveSimpleNameEndingWith("ControllerAdvice");
 
     @ArchTest
     public static final ArchRule controllerClassesShouldNotDependOnEachOther = noClasses()
