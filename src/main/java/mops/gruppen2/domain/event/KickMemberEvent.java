@@ -35,6 +35,11 @@ public class KickMemberEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Mitglied entfernt: " + target + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.KICKMEMBER.toString();
     }

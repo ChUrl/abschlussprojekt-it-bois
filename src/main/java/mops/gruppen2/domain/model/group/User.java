@@ -12,6 +12,7 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
 @Log4j2
 @Value
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 public class User {
 

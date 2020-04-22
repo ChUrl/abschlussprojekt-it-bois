@@ -20,7 +20,7 @@ public class DestroyGroupEvent extends Event {
 
     @Override
     protected void updateCache(GroupCache cache, Group group) {
-        cache.groupsRemove(group);
+        cache.groupsRemove(groupid, group);
     }
 
     @Override
@@ -28,6 +28,11 @@ public class DestroyGroupEvent extends Event {
         group.destroy(exec);
 
         log.trace("\t\t\t\t\tGelöschte Gruppe: {}", group.toString());
+    }
+
+    @Override
+    public String format() {
+        return "Gruppe gelöscht.";
     }
 
     @Override

@@ -8,11 +8,13 @@ import mops.gruppen2.domain.model.group.User;
 import mops.gruppen2.domain.model.group.wrapper.Description;
 import mops.gruppen2.domain.model.group.wrapper.Limit;
 import mops.gruppen2.domain.model.group.wrapper.Title;
+import mops.gruppen2.domain.service.EventStoreService;
 import mops.gruppen2.domain.service.GroupService;
-import mops.gruppen2.domain.service.helper.CsvHelper;
+import mops.gruppen2.domain.service.helper.FileHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 import mops.gruppen2.infrastructure.GroupCache;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.UUID;
 
 @SuppressWarnings("SameReturnValue")
@@ -37,6 +41,7 @@ public class GroupDetailsController {
 
     private final GroupCache groupCache;
     private final GroupService groupService;
+    private final EventStoreService eventStoreService;
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}")
@@ -95,6 +100,77 @@ public class GroupDetailsController {
     }
 
     @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping("details/{id}/history")
+    public String getDetailsHistory(KeycloakAuthenticationToken token,
+                                    Model model,
+                                    @PathVariable("id") String groupId) {
+
+        model.addAttribute("events",
+                           eventStoreService.findGroupEvents(UUID.fromString(groupId)));
+
+        return "log";
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping(value = "details/{id}/export/history/plain", produces = "text/plain;charset=UTF-8")
+    public void getDetailsExportHistoryPlain(HttpServletResponse response,
+                                             @PathVariable("id") String groupId) {
+
+        String filename = "eventlog-" + groupId + ".txt";
+
+        response.setContentType("text/txt;charset=UTF-8");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                           "attachment; filename=\"" + filename + "\"");
+
+        try {
+            response.getWriter()
+                    .write(FileHelper.payloadsToPlain(
+                            eventStoreService.findGroupPayloads(UUID.fromString(groupId))));
+        } catch (IOException e) {
+            log.error("Payloads konnten nicht geschrieben werden.", e);
+        }
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping(value = "details/{id}/export/history/sql", produces = "application/sql;charset=UTF-8")
+    public void getDetailsExportHistorySql(HttpServletResponse response,
+                                           @PathVariable("id") String groupId) {
+
+        String filename = "data.sql";
+
+        response.setContentType("application/sql;charset=UTF-8");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                           "attachment; filename=\"" + filename + "\"");
+
+        try {
+            response.getWriter()
+                    .write(FileHelper.eventDTOsToSql(
+                            eventStoreService.findGroupDTOs(UUID.fromString(groupId))));
+        } catch (IOException e) {
+            log.error("Payloads konnten nicht geschrieben werden.", e);
+        }
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
+    @GetMapping(value = "details/{id}/export/members", produces = "text/csv;charset=UTF-8")
+    public void getDetailsExportMembers(HttpServletResponse response,
+                                        @PathVariable("id") String groupId) {
+
+        String filename = "teilnehmer-" + groupId + ".csv";
+
+        response.setContentType("text/csv;charset=UTF-8");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                           "attachment; filename=\"" + filename + "\"");
+
+        try {
+            response.getWriter()
+                    .print(FileHelper.writeCsvUserList(groupCache.group(UUID.fromString(groupId)).getMembers()));
+        } catch (IOException e) {
+            log.error("Teilnehmerliste konnte nicht geschrieben werden.", e);
+        }
+    }
+
+    @RolesAllowed({"ROLE_orga", "ROLE_studentin"})
     @GetMapping("/details/{id}/edit")
     public String getDetailsEdit(KeycloakAuthenticationToken token,
                                  Model model,
@@ -127,8 +203,6 @@ public class GroupDetailsController {
         String principal = token.getName();
         Group group = groupCache.group(UUID.fromString(groupId));
 
-        System.out.println(group);
-
         groupService.setTitle(group, principal, title);
         groupService.setDescription(group, principal, description);
 
@@ -157,7 +231,7 @@ public class GroupDetailsController {
         String principal = token.getName();
         Group group = groupCache.group(UUID.fromString(groupId));
 
-        groupService.addUsersToGroup(group, principal, CsvHelper.readCsvFile(file));
+        groupService.addUsersToGroup(group, principal, FileHelper.readCsvFile(file));
 
         return "redirect:/gruppen2/details/" + groupId + "/edit";
     }
@@ -172,6 +246,9 @@ public class GroupDetailsController {
         Group group = groupCache.group(UUID.fromString(groupId));
 
         ValidationHelper.throwIfNoAdmin(group, principal);
+        if (target.equals(principal)) {
+            ValidationHelper.throwIfLastAdmin(group, principal);
+        }
 
         groupService.toggleMemberRole(group, principal, target);
 

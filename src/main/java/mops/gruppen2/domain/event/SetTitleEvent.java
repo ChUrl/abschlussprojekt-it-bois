@@ -39,6 +39,11 @@ public class SetTitleEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Titel gesetzt: " + title + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETTITLE.toString();
     }

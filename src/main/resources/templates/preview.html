@@ -10,17 +10,15 @@
 
 <main th:fragment="bodycontent">
     <div class="container-fluid">
-        <h1 class="def-cursor" th:text="${group.getTitle()}"></h1>
+        <h1 th:text="${group.getTitle()}"></h1>
 
         <div class="content" th:insert="~{fragments/groups :: groupcontent}"></div>
 
         <div class="content" th:unless="${group.isPrivate()}"
              th:insert="~{fragments/groups :: joingroup}"></div>
 
-        <div class="content row" th:if="${group.isPrivate()}">
-            <span class="col"></span>
-
-            <a class="btn btn-primary" href="/gruppen2">Startseite.</a>
+        <div class="content d-flex flex-row flex-wrap" th:if="${group.isPrivate()}">
+            <a class="btn btn-primary ml-auto" href="/gruppen2">Startseite.</a>
         </div>
     </div>
 </main>

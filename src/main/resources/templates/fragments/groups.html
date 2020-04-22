@@ -7,17 +7,17 @@
 
 <!--Grouptype Badges-->
 <th:block th:fragment="badges">
-    <span class="badge badge-pill private"
+    <span class="badge badge-pill private align-self-start"
           title="Kann nicht über die Suche gefunden werden, beitritt ist per Einladungslink möglich."
           th:if='${group.isPrivate()}'>Privat</span>
-    <span class="badge badge-pill public"
+    <span class="badge badge-pill public align-self-start"
           title="Kann über die Suche gefunden werden, jeder kann beitreten."
           th:if="${group.isPublic()}">Öffentlich</span>
-    <span class="badge badge-pill lecture"
+    <span class="badge badge-pill lecture align-self-start"
           title="Offizielle Veranstaltung"
           th:if='${group.isLecture()}'>Veranstaltung</span>
 
-    <span class="badge badge-pill parent"
+    <span class="badge badge-pill parent align-self-start"
           th:if="${parent?.exists()}"
           th:title="${'Die Gruppe gehört zur Veranstaltung ' + parent.getTitle() + '.'}"
           th:text="${parent.getTitle()}">Parent</span>
@@ -36,7 +36,7 @@
 
 <th:block th:fragment="groupcontent">
     <!--Badges-->
-    <div class="content-heading">
+    <div class="content-heading overflow-hidden">
         <span th:replace="~{fragments/groups :: badges}"></span>
     </div>
 
@@ -46,6 +46,19 @@
     </div>
 
     <!--<div class="body-text-in" th:if="${group.getMembers().contains(user.getId())}"></div>-->
+</th:block>
+
+<th:block th:fragment="groupcontentlink">
+    <div class="content-heading row overflow-hidden">
+        <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
+           th:text="${group.getTitle()}"></a>
+
+        <span th:replace="~{fragments/groups :: badges}"></span>
+    </div>
+
+    <div class="content-text-in overflow-hidden" style="text-overflow: ellipsis;">
+        <span th:text="${group.getDescription()}"></span>
+    </div>
 </th:block>
 
 <!--Buttonbar zum Gruppe beitreten-->
@@ -59,15 +72,13 @@
         </span>
     </div>
 
-    <div class="row">
+    <div class="d-flex flex-row flex-wrap">
         <form method="post" th:action="@{/gruppen2/details/{id}/join(id = ${group.getId()})}"
               th:unless="${group.isFull()}">
             <button class="btn btn-success" type="submit">Gruppe beitreten.</button>
         </form>
 
-        <div class="col" th:unless="${group.isFull()}"></div>
-
-        <a class="btn btn-primary" href="/gruppen2"
+        <a class="btn btn-primary ml-auto" href="/gruppen2"
            type="submit">Startseite.</a>
     </div>
 </th:block>

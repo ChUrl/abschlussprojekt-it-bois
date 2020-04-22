@@ -37,6 +37,11 @@ public class SetLimitEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Benutzerlimit gesetzt: " + limit + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETLIMIT.toString();
     }

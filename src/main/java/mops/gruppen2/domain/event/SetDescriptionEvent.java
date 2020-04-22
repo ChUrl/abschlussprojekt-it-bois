@@ -39,6 +39,11 @@ public class SetDescriptionEvent extends Event {
     }
 
     @Override
+    public String format() {
+        return "Beschreibung gesetzt: " + description + ".";
+    }
+
+    @Override
     public String type() {
         return EventType.SETDESCRIPTION.toString();
     }

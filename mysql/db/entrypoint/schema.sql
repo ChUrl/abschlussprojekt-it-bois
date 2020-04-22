@@ -5,6 +5,6 @@ CREATE TABLE event
     group_version INT         NOT NULL,
     exec_id       VARCHAR(32) NOT NULL,
     target_id     VARCHAR(32),
-    event_type    VARCHAR(16) NOT NULL,
+    event_date    DATETIME    NOT NULL,
     event_payload JSON        NOT NULL
 );

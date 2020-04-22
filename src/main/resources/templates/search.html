@@ -8,38 +8,44 @@
 
 <body>
 
+<!--/*@thymesVar id="LECTURE" type="mops.gruppen2.domain.model.group.Type"*/-->
+<!--/*@thymesVar id="PUBLIC" type="mops.gruppen2.domain.model.group.Type"*/-->
+
 <main th:fragment="bodycontent">
-    <div class="container-fluid">
+    <h1>Suchen</h1>
 
-        <h1>Suchen</h1>
-
-        <!--Suchfilter-->
-        <div class="content top">
-            <form method="post" th:action="@{/gruppen2/search}">
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text text-monospace">Suchbegriff:</span>
+    <!--Suchfilter-->
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0">
+        <form method="post" th:action="@{/gruppen2/search/string}">
+            <div class="d-flex flex-row flex-wrap mr-n2 mt-n2">
+                <div class="input-group mr-2 mt-2 flex-grow-1" style="flex-basis: 75%;">
+                    <div class="input-group-prepend" style="max-width: 50%;">
+                            <span class="input-group-text text-monospace overflow-hidden"
+                                  style="text-overflow: ellipsis">Suchbegriff:</span>
                     </div>
-                    <input class="form-control" name="string" type="text">
+                    <input class="form-control" required minlength="1" name="string" type="text">
                 </div>
-                <button class="btn btn-primary" type="submit">Suchen</button>
-            </form>
-        </div>
 
-        <!--Ergebnisliste-->
-        <div class="content" th:each="group: ${groups}">
-            <div class="content-heading row">
-                <span th:replace="~{fragments/groups :: badges}"></span>
-
-                <a class="link col" th:href="@{/gruppen2/details/{id}(id=${group.getId()})}"
-                   th:text="${group.getTitle()}"></a>
+                <button class="btn btn-primary btn-block mr-2 mt-2 flex-grow-1" type="submit">
+                    Suchen
+                </button>
             </div>
-            <div class="content-text-in">
-                <span th:text="${group.getDescription()}"></span>
-            </div>
-        </div>
+        </form>
 
+        <div class="d-flex flex-row flex-wrap mt-1 mr-n2">
+            <a class="btn btn-info mt-2 mr-2 flex-grow-1"
+               th:href="@{/gruppen2/search/all}">Alle Anzeigen</a>
+
+            <a class="btn btn-info mt-2 mr-2 flex-grow-1 ml-auto"
+               th:href="@{/gruppen2/search/type/{type}(type=${LECTURE})}">Vorlesungen</a>
+            <a class="btn btn-info mt-2 mr-2 flex-grow-1"
+               th:href="@{/gruppen2/search/type/{type}(type=${PUBLIC})}">Öffentliche Gruppen</a>
+        </div>
     </div>
+
+    <!--Ergebnisliste-->
+    <div class="content py-2 px-1 px-sm-3 mx-n2 mx-sm-0" th:each="group: ${groups}"
+         th:insert="fragments/groups :: groupcontentlink"></div>
 </main>
 
 </body>

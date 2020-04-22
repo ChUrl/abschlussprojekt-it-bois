@@ -10,7 +10,7 @@ import mops.gruppen2.domain.exception.GroupFullException;
 import mops.gruppen2.domain.exception.IdMismatchException;
 import mops.gruppen2.domain.exception.LastAdminException;
 import mops.gruppen2.domain.exception.NoAccessException;
-import mops.gruppen2.domain.exception.UserAlreadyExistsException;
+import mops.gruppen2.domain.exception.UserExistsException;
 import mops.gruppen2.domain.exception.UserNotFoundException;
 import mops.gruppen2.domain.model.group.wrapper.Body;
 import mops.gruppen2.domain.model.group.wrapper.Description;
@@ -19,6 +19,7 @@ import mops.gruppen2.domain.model.group.wrapper.Link;
 import mops.gruppen2.domain.model.group.wrapper.Parent;
 import mops.gruppen2.domain.model.group.wrapper.Title;
 import mops.gruppen2.domain.service.helper.CommonHelper;
+import mops.gruppen2.domain.service.helper.SortHelper;
 import mops.gruppen2.domain.service.helper.ValidationHelper;
 
 import javax.validation.Valid;
@@ -56,19 +57,21 @@ public class Group {
 
     private GroupMeta meta = GroupMeta.EMPTY();
 
-    private GroupOptions options = GroupOptions.DEFAULT();
+    //TODO: UI set + use for options
+    private final GroupOptions options = GroupOptions.DEFAULT();
 
     // Inhalt
     private Title title = Title.EMPTY();
 
     private Description description = Description.EMPTY();
 
+    //TODO: Asciidoc description
     private Body body;
 
     // Integrationen
 
     // Teilnehmer
-    private Map<String, Membership> memberships = new HashMap<>();
+    private final Map<String, Membership> memberships = new HashMap<>();
 
 
     // ####################################### Members ###########################################
@@ -98,7 +101,7 @@ public class Group {
         return memberships.get(userid).getRole();
     }
 
-    public void addMember(String target, User user) throws UserAlreadyExistsException, GroupFullException {
+    public void addMember(String target, User user) throws UserExistsException, GroupFullException {
         ValidationHelper.throwIfMember(this, target);
         ValidationHelper.throwIfGroupFull(this);
 
@@ -215,6 +218,26 @@ public class Group {
         return !parent.isEmpty();
     }
 
+    public boolean hasMaterial() {
+        return options.isHasMaterialIntegration();
+    }
+
+    public boolean hasForums() {
+        return options.isHasForumsIntegration();
+    }
+
+    public boolean hasCalendar() {
+        return options.isHasTermineIntegration();
+    }
+
+    public boolean hasModules() {
+        return options.isHasModulesIntegration();
+    }
+
+    public boolean hasPortfolios() {
+        return options.isHasPortfolioIntegration();
+    }
+
 
     // ######################################## Setters ##########################################
 
@@ -255,14 +278,20 @@ public class Group {
         this.limit = limit;
     }
 
-    public void setParent(String exec, @Valid Parent parent) throws NoAccessException {
+    public void setParent(String exec, @Valid Parent parent) throws NoAccessException, BadArgumentException {
         ValidationHelper.throwIfNoAdmin(this, exec);
+        if (parent.getValue().equals(groupid)) {
+            throw new BadArgumentException("Die Gruppe kann nicht zu sich selbst gehören!");
+        }
 
         this.parent = parent;
     }
 
     public void setLink(String exec, @Valid Link link) throws NoAccessException {
         ValidationHelper.throwIfNoAdmin(this, exec);
+        if (link.getValue().equals(groupid.toString())) {
+            throw new BadArgumentException("Link kann nicht der GruppenID entsprechen.");
+        }
 
         this.link = link;
     }
@@ -289,7 +318,9 @@ public class Group {
         }
 
         groupid = null;
-        type = null;
+        // Wenn man alles null setzt hat der cache mehr arbeit, weil dieser erst nach der löschung
+        // geupdated wird und sich link und mitgliedschaften selber heraussuchen muss
+        /*type = null;
         parent = null;
         limit = null;
         link = null;
@@ -298,11 +329,11 @@ public class Group {
         title = null;
         description = null;
         body = null;
-        memberships = null;
+        memberships = null;*/
     }
 
     public String format() {
-        return title + " " + description;
+        return title + " - " + description;
     }
 
     @Override
@@ -318,5 +349,9 @@ public class Group {
 
     public static Group EMPTY() {
         return new Group();
+    }
+
+    public long getVersion() {
+        return meta.getVersion();
     }
 }

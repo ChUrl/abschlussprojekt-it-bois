@@ -16,6 +16,9 @@
     margin-bottom: 15px;
     box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .25);
     transition: 100ms;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: default;
 }
 
 /*Content Heading*/
@@ -31,6 +34,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+h1, h3 {
+    cursor: default;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /*Content Paragraph*/
@@ -65,10 +74,19 @@
     color: #4fa4ff;
 }
 
+/*Button*/
+.btn {
+    width: 250px;
+}
+
+.btn-spacer {
+}
+
 /*Badges*/
 .badge-pill {
     cursor: default;
     color: whitesmoke;
+    align-self: start;
 }
 
 .lecture {
@@ -87,18 +105,31 @@
     background: var(--warning);
 }
 
-/*Grid System*/
-.row {
-    margin-left: 0;
-    margin-right: 0;
+/*Input*/
+.input-group {
+    width: auto;
 }
 
-.col {
-    padding-left: 0;
-    padding-right: 0;
+.input-group-append {
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/*Miscellanous*/
-.def-cursor {
-    cursor: default;
+.input-group-append {
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.input-group-append span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: monospace;
+}
+
+.input-group-append span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: monospace;
 }
