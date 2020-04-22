@@ -8,6 +8,43 @@ Private Gruppen kann man nur über einen Beitrittslink beitreten.
 Öffentliche Gruppen kann man ohne diesen beitreten.
 Man kann nach Öffentlichen Gruppen über eine Suchfunktion suchen.
 
+== Stand
+
+=== Probleme
+
+* Momentan ist kein Controller getestet
+* Das Styling ist inkonsistent und skaliert nicht gut auf kleineren screens
+* Schlecht dokumentiert und Arc42 nicht aktuell
+* Integrationen nicht implementiert
+* Gruppenoptionen nicht implementiert
+* Snapshotting nicht implementiert
+* Caching funktioniert, aber teilweise nicht konsequent verwendet
+* Gruppenbeschreibung mit markup nicht implementiert
+* Invitelink kann nicht regeneriert werden
+* Seit Implementierung eines Caches ist die API kaputt
+
+=== Fertig
+
+* Fast die komplette Logik + Templates + Controller überholt
+* Verwendung eines Caches anstatt vieler Datenbankanfragen
+* UI: Templates mit Fragmenten und auslagertem styling vereinfacht, einige Seiten zusammengefasst
+* Services komplett umstrukturiert, ergeben inhaltlich mehr Sinn und sind kleiner
+* Konsequenteres Logging, aspektorientiertes Logging
+* Aktivere Gruppenobjekte mit mehr Validierung
+* Extratabelle für Invitelinks entfernt, Datenbank vereinfacht
+* Man kann Änderungen an Gruppen nachvollziehen mit Zeitstempeln und einer Übersichtsseite
+* Gruppen und Teilnehmerlisten können exportiert werden
+
+=== Heroku
+
+Die letzte Version der Anwendung ist unter gruppenfindung.herokuapp.com zu erreichen.
+Es existieren zwei Defaultuser:
+
+* Username: orga, Passwort: orga
+* Username: studentin, Passwort: studentin
+
+== Ursprüngliche Readme
+
 === Problem
 
 Die meisten Teilsysteme von MOPS arbeiten mit Gruppierungen von Studenten: Materialien für Lerngruppen/Veranstaltungen, Gruppenportfolios, Gruppenabstimmungen etc.
